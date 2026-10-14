@@ -399,6 +399,20 @@ button.btn:not(:disabled):hover{filter:saturate(1.12);box-shadow:0 7px 15px rgba
 
 <div id="toast" class="toast hidden"></div>
 
+<div id="completionModal" class="hidden" style="position:fixed;inset:0;z-index:120;background:rgba(25,40,60,.45);padding:18px;display:none;align-items:center;justify-content:center">
+  <div class="card" style="width:min(420px,100%);background:#fff!important">
+    <h3 id="completionModalTitle">Konfirmasi Selesai</h3>
+    <p id="completionModalDesc" class="small">Pilih tanggal penyelesaian.</p>
+    <div class="field"><label>TANGGAL PENYELESAIAN *</label><input id="completionDateInput" type="date" required></div>
+    <div class="actions">
+      <button class="btn btn-green" onclick="submitCompletionConfirmation()">✓ Simpan Konfirmasi</button>
+      <button class="btn btn-light" onclick="closeCompletionModal()">Batal</button>
+    </div>
+  </div>
+</div>
+
+
+
 <div id="loginView" class="login-wrap hidden">
   <div class="login-card">
     <div class="logo">🧭</div>
@@ -1783,6 +1797,75 @@ async function loadDirectDatabaseHistory(moduleName){
 
 async function loadSalesHistory(){if(!state.user)return;try{$('salesHistoryBody').innerHTML='<tr><td colspan="15" class="empty">Memuat history Sales...</td></tr>';const rows=await loadDirectDatabaseHistory('sales');$('salesHistoryBody').innerHTML=rows.length?rows.map(x=>`<tr><td><b>${escapeHtml(x.store||'-')}</b></td><td>${escapeHtml(formatDateWIB(x.tanggal))}</td><td>${formatRupiah(x.dineIn)}</td><td>${Number(x.tcDineIn||0).toLocaleString('id-ID')}</td><td>${formatRupiah(x.delivery)}</td><td>${Number(x.tcDelivery||0).toLocaleString('id-ID')}</td><td>${formatRupiah(x.takeAway)}</td><td>${Number(x.tcTakeAway||0).toLocaleString('id-ID')}</td><td>${formatRupiah(x.connectBO)}</td><td>${Number(x.tcConnectBO||0).toLocaleString('id-ID')}</td><td>${formatRupiah(x.tips)}</td><td><b>${formatRupiah(x.totalSales)}</b></td><td><b>${Number(x.totalTc||0).toLocaleString('id-ID')}</b></td><td>${escapeHtml(x.keterangan||'-')}</td><td>${escapeHtml(x.inputBy||'-')}</td></tr>`).join(''):'<tr><td colspan="15" class="empty">Belum ada history Sales.</td></tr>';__filterHistoryRows('sales');}catch(err){$('salesHistoryBody').innerHTML='<tr><td colspan="15" class="empty">Gagal memuat history Sales.</td></tr>';toast('History Sales: '+err.message)}}
 async function loadWasteHistory(){if(!state.user)return;try{$('wasteHistoryBody').innerHTML='<tr><td colspan="6" class="empty">Memuat history Waste...</td></tr>';const r=await apiGet('wasteData',{store:'ALL',role:'PUBLIC',userStore:'',limit:5000});const rows=Array.isArray(r.allRows)?r.allRows:(Array.isArray(r.data)?r.data:[]);$('wasteHistoryBody').innerHTML=rows.length?rows.slice().sort((a,b)=>String(b.periodeAkhir||'').localeCompare(String(a.periodeAkhir||''))).map(x=>`<tr><td>${escapeHtml(x.periodeMulai||'-')} s/d ${escapeHtml(x.periodeAkhir||'-')}</td><td>${escapeHtml(x.kode||'-')}</td><td>${escapeHtml(x.namaBarang||'-')}</td><td>${escapeHtml(x.satuan||'-')}</td><td><b>${Number(x.totalWaste||0).toLocaleString('id-ID',{maximumFractionDigits:2})}</b></td><td>${escapeHtml(x.storeName||'-')}</td></tr>`).join(''):'<tr><td colspan="6" class="empty">Belum ada history Waste.</td></tr>';__filterHistoryRows('waste');}catch(err){$('wasteHistoryBody').innerHTML='<tr><td colspan="6" class="empty">Gagal memuat history Waste.</td></tr>';toast('History Waste: '+err.message)}}
+let completionContext = null;
+
+function openCompletionModal(type, id){
+  completionContext = {type, id};
+  const isMaintenance = type === 'maintenance';
+  $('completionModalTitle').textContent = isMaintenance ? 'Konfirmasi Ticket Maintenance Selesai' : 'Konfirmasi Smallware Selesai';
+  $('completionModalDesc').textContent = isMaintenance
+    ? `Masukkan tanggal penyelesaian untuk No SC ${id}.`
+    : `Masukkan tanggal penyelesaian untuk Request Smallware ${id}.`;
+  $('completionDateInput').value = todayISO();
+  const modal = $('completionModal');
+  modal.classList.remove('hidden');
+  modal.style.display = 'flex';
+}
+
+function closeCompletionModal(){
+  const modal = $('completionModal');
+  modal.classList.add('hidden');
+  modal.style.display = 'none';
+  completionContext = null;
+}
+
+async function submitCompletionConfirmation(){
+  if(!completionContext) return;
+  const tanggalSelesai = $('completionDateInput').value;
+  if(!tanggalSelesai){
+    toast('Tanggal penyelesaian wajib dipilih.');
+    return;
+  }
+  const ctx = {...completionContext};
+  try{
+    showLoading(true);
+    if(ctx.type === 'maintenance'){
+      await apiPost({
+        action:'updateMaintenanceStatus',
+        noSC:ctx.id,
+        status:'COMPLETED',
+        tanggalSelesai,
+        updateBy:state.user?.nama || state.user?.username || 'PUBLIC'
+      });
+    }else{
+      await apiPost({
+        action:'updateSmallwareStatus',
+        idRequest:ctx.id,
+        role:state.user?.role || 'STORE',
+        status:'COMPLETED',
+        completedDate:tanggalSelesai,
+        tanggalSelesai,
+        updateBy:state.user?.nama || state.user?.username || 'PUBLIC'
+      });
+    }
+    closeCompletionModal();
+    toast('Konfirmasi selesai berhasil dikirim.');
+    if(ctx.type === 'maintenance'){
+      await loadMaintenanceHistory();
+      if($('searchSC')?.value.trim()) await searchMaintenance();
+      loadDashboard();
+    }else{
+      $('swDetail').classList.add('hidden');
+      await loadSmallware();
+      await loadSmallwareFrequency();
+    }
+  }catch(err){
+    toast('Gagal menyimpan konfirmasi: '+(err.message||err));
+  }finally{
+    showLoading(false);
+  }
+}
+
 function exportMaintenanceWhatsApp(rowIndex){
   const rows=window.__maintenanceHistoryRows||[];
   const x=rows[rowIndex];
@@ -1807,7 +1890,7 @@ function exportMaintenanceWhatsApp(rowIndex){
   window.open(url,'_blank','noopener,noreferrer');
 }
 
-async function loadMaintenanceHistory(){if(!state.user)return;try{$('maintenanceHistoryBody').innerHTML='<tr><td colspan="11" class="empty">Memuat history Maintenance...</td></tr>';const rows=await loadDirectDatabaseHistory('maintenance');window.__maintenanceHistoryRows=rows;$('maintenanceHistoryBody').innerHTML=rows.length?rows.map((x,i)=>`<tr><td>${escapeHtml(formatDateWIB(x.tanggalInput||'-'))}</td><td><b>${escapeHtml(x.noSC||'-')}</b></td><td>${escapeHtml(x.store||'-')}</td><td>${escapeHtml(x.kategori||'-')}</td><td>${escapeHtml(x.itemAsset||'-')}</td><td>${escapeHtml(x.jenisKerusakan||'-')}</td><td>${escapeHtml(x.prioritas||'-')}</td><td>${statusBadge(x.status)}</td><td>${escapeHtml(x.teknisiVendor||'-')}</td><td>${escapeHtml(x.tanggalSelesai||'-')}</td><td><button class="btn btn-peach" onclick="exportMaintenanceWhatsApp(${i})">💬 Export WA</button></td></tr>`).join(''):'<tr><td colspan="11" class="empty">Belum ada history Maintenance.</td></tr>';__filterHistoryRows('maintenance');}catch(err){$('maintenanceHistoryBody').innerHTML='<tr><td colspan="11" class="empty">Gagal memuat history Maintenance.</td></tr>';toast('History Maintenance Semua Store: '+err.message)}}
+async function loadMaintenanceHistory(){if(!state.user)return;try{$('maintenanceHistoryBody').innerHTML='<tr><td colspan="11" class="empty">Memuat history Maintenance...</td></tr>';const rows=await loadDirectDatabaseHistory('maintenance');window.__maintenanceHistoryRows=rows;$('maintenanceHistoryBody').innerHTML=rows.length?rows.map((x,i)=>`<tr><td>${escapeHtml(formatDateWIB(x.tanggalInput||'-'))}</td><td><b>${escapeHtml(x.noSC||'-')}</b></td><td>${escapeHtml(x.store||'-')}</td><td>${escapeHtml(x.kategori||'-')}</td><td>${escapeHtml(x.itemAsset||'-')}</td><td>${escapeHtml(x.jenisKerusakan||'-')}</td><td>${escapeHtml(x.prioritas||'-')}</td><td>${statusBadge(x.status)}</td><td>${escapeHtml(x.teknisiVendor||'-')}</td><td>${escapeHtml(x.tanggalSelesai||'-')}</td><td><div class="actions"><button class="btn btn-peach" onclick="exportMaintenanceWhatsApp(${i})">💬 Export WA</button>${String(x.status||'').toUpperCase()==='COMPLETED'?'<span class="badge badge-done">SELESAI</span>':`<button class="btn btn-green" onclick="openCompletionModal('maintenance','${escapeAttr(x.noSC||'')}')">✓ Konfirmasi Selesai</button>`}</div></td></tr>`).join(''):'<tr><td colspan="11" class="empty">Belum ada history Maintenance.</td></tr>';__filterHistoryRows('maintenance');}catch(err){$('maintenanceHistoryBody').innerHTML='<tr><td colspan="11" class="empty">Gagal memuat history Maintenance.</td></tr>';toast('History Maintenance Semua Store: '+err.message)}}
 async function loadKPIHistory(){if(!state.user)return;try{$('kpiHistoryBody').innerHTML='<tr><td colspan="8" class="empty">Memuat history KPI...</td></tr>';const rows=await loadDirectDatabaseHistory('kpi');$('kpiHistoryBody').innerHTML=rows.length?rows.map(x=>`<tr><td>${escapeHtml(x.timestamp||'-')}</td><td>${escapeHtml(x.store||'-')}</td><td>${escapeHtml(x.bulan||'-')}</td><td>${escapeHtml(x.tahun||'-')}</td><td>${escapeHtml(x.tanggalUpload||'-')}</td><td>${escapeHtml(x.keterangan||'-')}</td><td>${x.driveUrl?`<a class="btn btn-light" target="_blank" href="${escapeAttr(x.driveUrl)}">Lihat KPI</a>`:escapeHtml(x.fileName||'-')}</td><td>${escapeHtml(x.uploadBy||'-')}</td></tr>`).join(''):'<tr><td colspan="8" class="empty">Belum ada history KPI.</td></tr>';__filterHistoryRows('kpi');}catch(err){$('kpiHistoryBody').innerHTML='<tr><td colspan="8" class="empty">Gagal memuat history KPI.</td></tr>';toast('History KPI Semua Store: '+err.message)}}
 
 async function loadSoldOutSummary(){
@@ -2809,11 +2892,18 @@ function renderSmallwareAdminActions(row){
   }
 
   if(['APPROVED','ORDERED','RECEIVED'].includes(s)){
-    const next = s==='APPROVED' ? 'ORDERED' : s==='ORDERED' ? 'RECEIVED' : 'COMPLETED';
-    html += `
-      <button class="btn btn-primary" onclick="updateSmallwareStatusUI('${escapeAttr(row.idRequest)}','${next}')">
-        Ubah → ${next}
-      </button>`;
+    const next = s==='APPROVED' ? 'ORDERED' : s==='ORDERED' ? 'RECEIVED' : '';
+    if(next){
+      html += `
+        <button class="btn btn-primary" onclick="updateSmallwareStatusUI('${escapeAttr(row.idRequest)}','${next}')">
+          Ubah → ${next}
+        </button>`;
+    }else{
+      html += `
+        <button class="btn btn-green" onclick="openCompletionModal('smallware','${escapeAttr(row.idRequest)}')">
+          ✓ Konfirmasi Selesai
+        </button>`;
+    }
   }
 
   if(!['PENDING','APPROVED','ORDERED','RECEIVED'].includes(s)){
