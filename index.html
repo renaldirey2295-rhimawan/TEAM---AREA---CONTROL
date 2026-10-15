@@ -2370,8 +2370,15 @@ async function viewWalkthroughDetail(id){
       throw new Error('Detail temuan tidak ditemukan.');
     }
 
+    // Detail card berada di panel Follow-up yang tersembunyi saat halaman History aktif.
+    // Pindahkan tampilan ke panel Follow-up sebelum merender detail agar temuan dan foto terlihat.
+    __setupModulePanels();
+    __setModuleView('walkthrough','followup');
     renderWalkthroughDetail(r.data);
-    $('walkthroughDetail').scrollIntoView({behavior:'smooth',block:'start'});
+    $('walkthroughDetail').classList.remove('hidden');
+    requestAnimationFrame(function(){
+      $('walkthroughDetail').scrollIntoView({behavior:'smooth',block:'start'});
+    });
   }catch(err){
     toast(err.message);
   }finally{
