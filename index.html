@@ -441,15 +441,28 @@ button.btn:not(:disabled):hover{filter:saturate(1.12);box-shadow:0 7px 15px rgba
   </header>
 
   <main class="page">
-    <nav class="nav" id="nav">
-      <button data-page="dashboard" onclick="showPage('dashboard')">🏠 Dashboard</button>
-      <button data-page="sales" onclick="showPage('sales')">💰 Sales</button>
-      <button data-page="waste" onclick="showPage('waste')">♻️ Waste</button>
-      <button data-page="maintenance" onclick="showPage('maintenance')">🔧 Maintenance</button>
-      <button data-page="kpi" onclick="showPage('kpi')">📊 KPI Store</button>
-      <button data-page="walkthrough" onclick="showPage('walkthrough')">📝 Walkthrough</button>
-      <button data-page="smallware" onclick="showPage('smallware')">🍴 Smallware</button>
-      <button data-page="soldout" onclick="showPage('soldout')">🚫 Rekap Sold Out</button>
+    <nav class="nav" id="nav" aria-label="Menu utama">
+      <div class="nav-group">
+        <div class="nav-group-title">UTAMA</div>
+        <button data-page="dashboard" onclick="showPage('dashboard')"><span class="nav-icon">⌂</span><span>Dashboard</span></button>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-title">DATA</div>
+        <button data-page="sales" onclick="showPage('sales')"><span class="nav-icon">▤</span><span>Sales</span></button>
+        <button data-page="waste" onclick="showPage('waste')"><span class="nav-icon">♻</span><span>Waste</span></button>
+        <button data-page="maintenance" onclick="showPage('maintenance')"><span class="nav-icon">⚒</span><span>Maintenance</span></button>
+        <button data-page="smallware" onclick="showPage('smallware')"><span class="nav-icon">▣</span><span>Smallware</span></button>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-title">REPORT</div>
+        <button data-page="kpi" onclick="showPage('kpi')"><span class="nav-icon">▥</span><span>KPI Store</span></button>
+        <button data-page="walkthrough" onclick="showPage('walkthrough')"><span class="nav-icon">☷</span><span>Walkthrough</span></button>
+        <button data-page="soldout" onclick="showPage('soldout')"><span class="nav-icon">⊘</span><span>Rekap Sold Out</span></button>
+      </div>
+      <div class="nav-group nav-utility">
+        <div class="nav-group-title">UTILITY</div>
+        <div class="nav-utility-note">Menu operasional terhubung ke database yang sama.</div>
+      </div>
     </nav>
 
     <div class="store-only-note">
@@ -3427,6 +3440,51 @@ button:hover,.btn:hover{filter:brightness(.98);box-shadow:0 4px 12px rgba(47,70,
 /* Keep text contrast clear on light backgrounds */
 .card h1,.card h2,.card h3,.panel h1,.panel h2,.panel h3,
 .page-section h1,.page-section h2,.page-section h3{color:#293a50}
+</style>
+
+
+
+<!-- V19: SARIRASA-INSPIRED LAYOUT ONLY. Existing API, data flow, and module logic preserved. -->
+<style id="v19-sarirasa-layout">
+:root{--brand-maroon:#633b43;--brand-maroon-dark:#4b2b32;--brand-black:#171717;--workspace:#dedede;--nav-text:#f8ecee;--nav-muted:#e4cfd3}
+html,body{min-height:100%;background:var(--workspace)!important;color:#202020}
+body::before,body::after{display:none!important}
+#appView{min-height:100vh;background:var(--workspace)!important}
+.topbar{position:fixed;left:0;right:0;top:0;height:44px;min-height:44px;padding:0 14px!important;z-index:80;background:var(--brand-black)!important;color:#f7f7f7;border:0!important;border-bottom:1px solid #303030!important;border-radius:0!important;box-shadow:none!important;backdrop-filter:none!important}
+.brand{gap:9px}.brand .logo{width:28px;height:28px;flex:0 0 28px;border-radius:5px;background:transparent!important;color:#fff;box-shadow:none!important;font-size:20px}.brand h1{font-size:16px!important;font-weight:500;letter-spacing:.1px;color:#f4d600!important}.brand small{display:none!important}.userbox{gap:8px}.userpill{background:transparent!important;border:0!important;color:#f4d600!important;border-radius:0!important;padding:5px 8px!important;font-size:12px!important}
+.page{max-width:none!important;width:auto;margin:0 10px 10px 222px!important;padding:62px 22px 22px!important;min-height:100vh;background:var(--workspace)!important;overflow-x:hidden;border-radius:0!important}
+.nav{position:fixed;z-index:70;left:0;top:44px;bottom:0;width:210px;display:flex!important;flex-direction:column;align-items:stretch;gap:0!important;overflow-y:auto!important;overflow-x:hidden!important;padding:12px 9px 22px!important;background:var(--brand-maroon)!important;border:0!important;border-radius:0!important;box-shadow:none!important;scrollbar-width:thin}
+.nav-group{display:flex;flex-direction:column;gap:2px;margin:0 0 17px;padding:0;min-width:0}
+.nav-group-title{padding:11px 12px 7px;color:#e7cdd1;font-size:10px;font-weight:800;letter-spacing:1.3px;text-transform:uppercase}
+#nav button{display:flex!important;align-items:center;gap:11px;width:100%;min-width:0;white-space:normal!important;text-align:left;border:0!important;border-radius:5px!important;background:transparent!important;color:var(--nav-text)!important;padding:10px 12px!important;margin:0!important;font-size:13px!important;font-weight:500!important;box-shadow:none!important;outline:0!important;transform:none!important}
+#nav button .nav-icon{display:inline-grid;place-items:center;flex:0 0 23px;width:23px;height:23px;font-size:19px;line-height:1;color:#fff}
+#nav button:hover{background:rgba(255,255,255,.12)!important;color:#fff!important;box-shadow:none!important;filter:none!important}
+#nav button.active{background:#f0e6e7!important;color:#4b2b32!important;font-weight:700!important;box-shadow:inset 3px 0 #f4d600!important;outline:0!important;filter:none!important}
+#nav button.active .nav-icon{color:#4b2b32!important}
+.nav-utility-note{margin:0 12px;color:#e7cdd1;font-size:11px;line-height:1.5}
+.store-only-note{border-radius:3px!important;background:#f1eeee!important;border:1px solid #d2c8ca!important;color:#5a4347!important;box-shadow:none!important}
+.hero{border-radius:3px!important;background:#e9e9e9!important;border:0!important;box-shadow:none!important;padding:4px 14px 18px!important;margin:0 0 18px!important}
+.hero h2{font-size:24px!important;font-weight:500;color:#161616!important}.hero p{color:#5d5d5d!important}
+.card,.stat,.panel,.walk-card,.module-menu-card,#page-dashboard .card,#page-dashboard .panel,.page-section .card,.page-section .panel{border-radius:4px!important;box-shadow:none!important;border:1px solid #d0d0d0!important}
+.card h3,.page-section h3{color:#272727}
+#page-dashboard .card:nth-of-type(n),.page-section .card:nth-of-type(n){background:#e8e8e8!important}
+input:not([type="file"]),select,textarea{border-radius:3px!important;background:#fff!important;border:1px solid #c9c9c9!important;color:#222!important;box-shadow:none!important}
+.btn,button.btn,.module-menu-card{border-radius:4px!important}
+.table-wrap{border-radius:3px!important;border-color:#ccc!important}th,thead th,table thead th{background:#d0d0d0!important;color:#262626!important}
+#loading{z-index:150;background:rgba(220,220,220,.72)!important}
+#toast{border-radius:4px!important}
+@media(max-width:760px){
+ .topbar{height:48px;min-height:48px;padding:0 9px!important}.brand h1{font-size:13px!important}.userpill{font-size:10px!important;padding:4px!important;max-width:42vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+ .nav{top:48px;bottom:0;width:58px;padding:8px 5px 16px!important;overflow-x:hidden}
+ .nav-group{margin-bottom:12px}.nav-group-title{font-size:0;padding:8px 0 5px;text-align:center}.nav-group-title:after{content:"•";font-size:12px;color:#d5b7bd}
+ #nav button{justify-content:center;padding:10px 2px!important;gap:0;font-size:0!important;min-height:42px}
+ #nav button .nav-icon{flex-basis:26px;width:26px;font-size:21px}
+ .nav-utility-note{display:none}
+ .page{margin:0 0 0 58px!important;padding:60px 10px 16px!important;width:auto;max-width:calc(100% - 58px)!important}
+ .hero{padding:8px 10px 14px!important}.hero h2{font-size:20px!important}
+ .store-only-note{font-size:11px;padding:8px!important}
+}
+@media(max-width:420px){.brand .logo{display:none}.brand h1{font-size:12px!important}.page{padding-left:7px!important;padding-right:7px!important}}
 </style>
 
 </body>
