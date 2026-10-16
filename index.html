@@ -459,6 +459,10 @@ button.btn:not(:disabled):hover{filter:saturate(1.12);box-shadow:0 7px 15px rgba
         <button data-page="walkthrough" onclick="showPage('walkthrough')"><span class="nav-icon">☷</span><span>Walkthrough</span></button>
         <button data-page="soldout" onclick="showPage('soldout')"><span class="nav-icon">⊘</span><span>Rekap Sold Out</span></button>
       </div>
+      <div class="nav-group">
+        <div class="nav-group-title">ADMIN</div>
+        <button data-page="admin" onclick="showPage('admin')"><span class="nav-icon">🛡</span><span>Admin Approval</span></button>
+      </div>
       <div class="nav-group nav-utility">
         <div class="nav-group-title">UTILITY</div>
         <div class="nav-utility-note">Menu operasional terhubung ke database yang sama.</div>
@@ -1144,6 +1148,58 @@ button.btn:not(:disabled):hover{filter:saturate(1.12);box-shadow:0 7px 15px rgba
       <div id="swDetail" class="card hidden" style="margin-top:16px"></div>
     </section>
 
+    <section id="page-admin" class="page-section hidden">
+      <div class="hero">
+        <h2>🛡️ ADMIN — Pusat Approval</h2>
+        <p>Kelola request yang membutuhkan persetujuan dari satu menu. Setiap modul tetap menulis ke database aslinya.</p>
+      </div>
+      <div id="adminLocked" class="card">
+        <h3>Verifikasi Admin / AM</h3>
+        <p class="small">Gunakan akun AM/Admin yang terdaftar pada MASTER USER. Menu approval tidak terbuka sebelum verifikasi berhasil.</p>
+        <div class="form-grid">
+          <div class="field"><label>USERNAME</label><input id="adminUsername" autocomplete="username" placeholder="Username AM/Admin"></div>
+          <div class="field"><label>PASSWORD</label><input id="adminPassword" type="password" autocomplete="current-password" placeholder="Password"></div>
+        </div>
+        <div class="actions"><button class="btn btn-primary" onclick="verifyAdminPortal()">Verifikasi & Buka Admin</button></div>
+      </div>
+      <div id="adminUnlocked" class="hidden">
+        <div class="card" style="margin-bottom:16px">
+          <div class="card-head">
+            <div><h3 id="adminWelcome">Pusat Approval</h3><div class="small">Akun terverifikasi. Pilih modul untuk melihat request.</div></div>
+            <div class="actions"><button class="btn btn-light" onclick="loadAdminRequests()">↻ Refresh</button><button class="btn btn-danger" onclick="lockAdminPortal()">Keluar Admin</button></div>
+          </div>
+          <div class="form-grid">
+            <div class="field"><label>MODUL REQUEST</label>
+              <select id="adminModule" onchange="loadAdminRequests()">
+                <option value="smallware">Smallware</option>
+                <option value="maintenance">Maintenance (monitoring)</option>
+              </select>
+            </div>
+            <div class="field"><label>FILTER STATUS</label>
+              <select id="adminStatus" onchange="renderAdminRequests()">
+                <option value="ALL">Semua Status</option>
+                <option value="PENDING">PENDING</option>
+                <option value="APPROVED">APPROVED</option>
+                <option value="ORDERED">ORDERED</option>
+                <option value="RECEIVED">RECEIVED</option>
+                <option value="COMPLETED">COMPLETED</option>
+                <option value="REJECTED">REJECTED</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="stats" id="adminStats">
+          <div class="stat"><div class="label">TOTAL REQUEST</div><div id="adminTotal" class="value">0</div></div>
+          <div class="stat"><div class="label">MENUNGGU APPROVAL</div><div id="adminPending" class="value">0</div></div>
+          <div class="stat"><div class="label">PROSES BERJALAN</div><div id="adminProgress" class="value">0</div></div>
+          <div class="stat"><div class="label">SELESAI</div><div id="adminCompleted" class="value">0</div></div>
+        </div>
+        <div class="card">
+          <div class="card-head"><div><h3 id="adminListTitle">Daftar Request</h3><div id="adminListInfo" class="small">Data dimuat dari database modul asal.</div></div></div>
+          <div id="adminRequestList"><div class="empty">Tekan Refresh untuk memuat request.</div></div>
+        </div>
+      </div>
+    </section>
   </main>
 </div>
 
@@ -1161,7 +1217,8 @@ const CONFIG = {
 
 const state = {
   user: null,
-  dashboard: null
+  dashboard: null,
+  adminToken: ''
 };
 
 const $ = id => document.getElementById(id);
@@ -1867,6 +1924,7 @@ async function submitCompletionConfirmation(){
         action:'updateSmallwareStatus',
         idRequest:ctx.id,
         role:state.user?.role || 'STORE',
+        adminToken:state.adminToken || '',
         status:'COMPLETED',
         completedDate:tanggalSelesai,
         tanggalSelesai,
@@ -3098,7 +3156,7 @@ async function updateSmallwareStatusUI(id,status){
       action:'updateSmallwareStatus',
       idRequest:id,
       role:state.user.role,
-      userStore:storeApiOfUser(),
+      userStore:(selectedStore('swStore') || storeApiOfUser()),
       status,
       updateBy:state.user.nama || state.user.username || ''
     });
@@ -3384,6 +3442,14 @@ async function openModuleView(module,view){
 }
 function showPage(page){
   __setupModulePanels();
+  if(page==='admin'){
+    document.querySelectorAll('.page-section').forEach(x=>x.classList.add('hidden'));
+    const admin=__el('page-admin');if(admin)admin.classList.remove('hidden');
+    document.querySelectorAll('#nav button').forEach(btn=>btn.classList.toggle('active',btn.dataset.page==='admin'));
+    __moduleViewState.module='admin';__moduleViewState.view='dashboard';
+    if(isAM() && typeof loadAdminRequests==='function') loadAdminRequests();
+    return;
+  }
   if(page==='dashboard'){
     document.querySelectorAll('.page-section').forEach(x=>x.classList.add('hidden'));
     const dash=__el('page-dashboard');if(dash)dash.classList.remove('hidden');
@@ -3397,6 +3463,152 @@ function showPage(page){
   }
   document.querySelectorAll('.page-section').forEach(x=>x.classList.add('hidden'));
   const target=__el('page-'+page);if(target)target.classList.remove('hidden');
+}
+
+
+// ADMIN HUB V1: verifikasi memakai akun AM/Admin yang sudah ada.
+// Data Smallware tetap dibaca/ditulis ke SMALLWARE DATABASE melalui API modul aslinya.
+let adminRequestsCache = [];
+let adminMaintenanceCache = [];
+
+async function verifyAdminPortal(){
+  const username = ($('adminUsername')?.value || '').trim();
+  const password = $('adminPassword')?.value || '';
+  if(!username || !password){ toast('Username dan password wajib diisi.'); return; }
+  try{
+    showLoading(true);
+    const result = await apiPost({action:'login', username, password});
+    const user = result && result.user;
+    const role = String(user?.role || '').trim().toUpperCase();
+    if(!result.success || !user){ throw new Error(result.message || 'Verifikasi gagal.'); }
+    if(!['AM','AREA MANAGER','ADMIN','SUPER ADMIN','SUPERADMIN'].includes(role)){
+      throw new Error('Akun ini bukan role AM/Admin. Menu Admin tidak dibuka.');
+    }
+    state.user = {
+      username:user.username, nama:user.nama || user.username,
+      role:role, store:user.store || 'ALL', userId:user.userId || ''
+    };
+    state.adminToken = result.adminToken || '';
+    $('adminLocked').classList.add('hidden');
+    $('adminUnlocked').classList.remove('hidden');
+    $('adminWelcome').textContent = 'Admin aktif: ' + (state.user.nama || state.user.username);
+    $('userPill').textContent = 'ADMIN • ' + (state.user.nama || state.user.username);
+    $('adminPassword').value = '';
+    toast('Verifikasi Admin berhasil.');
+    await loadAdminRequests();
+  }catch(err){
+    toast(err.message || 'Verifikasi Admin gagal.');
+  }finally{ showLoading(false); }
+}
+
+function lockAdminPortal(){
+  state.user = {username:'PUBLIC',nama:'PUBLIC USER',role:'STORE',store:'ALL'};
+  state.adminToken = '';
+  $('adminUnlocked').classList.add('hidden');
+  $('adminLocked').classList.remove('hidden');
+  $('userPill').textContent = 'PUBLIC STORE PORTAL';
+  $('adminPassword').value = '';
+  toast('Menu Admin dikunci kembali.');
+}
+
+async function loadAdminRequests(){
+  if(!isAM()){ $('adminLocked')?.classList.remove('hidden'); $('adminUnlocked')?.classList.add('hidden'); return; }
+  const module = $('adminModule')?.value || 'smallware';
+  try{
+    showLoading(true);
+    if(module === 'smallware'){
+      const res = await apiGet('smallware',{store:'',limit:500,role:state.user.role});
+      adminRequestsCache = res.data || [];
+      $('adminListTitle').textContent = 'Request Smallware';
+      $('adminListInfo').textContent = 'Sumber: SMALLWARE DATABASE. Approval dan perubahan status disimpan kembali ke database ini.';
+    }else{
+      // Maintenance belum mempunyai tahap approval tersendiri pada struktur database saat ini.
+      const res = await apiGet('recentMaintenance',{store:'',limit:500});
+      adminMaintenanceCache = res.data || [];
+      adminRequestsCache = adminMaintenanceCache;
+      $('adminListTitle').textContent = 'Monitoring Maintenance';
+      $('adminListInfo').textContent = 'Maintenance ditampilkan untuk monitoring. Status approval khusus belum tersedia pada skema modul ini.';
+    }
+    renderAdminRequests();
+  }catch(err){
+    $('adminRequestList').innerHTML = `<div class="empty">Gagal memuat request: ${escapeHtml(err.message || err)}</div>`;
+    toast(err.message || 'Gagal memuat request.');
+  }finally{ showLoading(false); }
+}
+
+function renderAdminRequests(){
+  const module = $('adminModule')?.value || 'smallware';
+  const filter = $('adminStatus')?.value || 'ALL';
+  const rows = adminRequestsCache || [];
+  const statusOf = r => String(r.status || '').trim().toUpperCase();
+  $('adminTotal').textContent = rows.length;
+  $('adminPending').textContent = rows.filter(r=>statusOf(r)==='PENDING').length;
+  $('adminProgress').textContent = rows.filter(r=>['APPROVED','ORDERED','RECEIVED','ON PROGRESS','WAITING PART','OPEN'].includes(statusOf(r))).length;
+  $('adminCompleted').textContent = rows.filter(r=>['COMPLETED','CLOSED'].includes(statusOf(r))).length;
+  const filtered = rows.filter(r=>filter==='ALL' || statusOf(r)===filter);
+  if(!filtered.length){ $('adminRequestList').innerHTML='<div class="empty">Tidak ada request untuk filter ini.</div>'; return; }
+  if(module==='maintenance'){
+    $('adminRequestList').innerHTML = `<div class="table-wrap"><table><thead><tr><th>No SC / ID</th><th>Tanggal</th><th>Store</th><th>Item / Asset</th><th>Prioritas</th><th>Status</th><th>Keterangan</th></tr></thead><tbody>${filtered.map(r=>`<tr><td>${escapeHtml(r.noSC||r.id||'-')}</td><td>${escapeHtml(formatDateWIB(r.tanggalInput||r.tanggalKejadian||''))}</td><td>${escapeHtml(r.store||'-')}</td><td>${escapeHtml(r.itemAsset||r.item||'-')}</td><td>${escapeHtml(r.prioritas||'-')}</td><td>${escapeHtml(statusOf(r)||'-')}</td><td>${escapeHtml(r.keterangan||'-')}</td></tr>`).join('')}</tbody></table></div>`;
+    return;
+  }
+  $('adminRequestList').innerHTML = filtered.map((r,idx)=>{
+    const status = statusOf(r) || 'PENDING';
+    const id = String(r.idRequest||r.id||'');
+    const canApprove = status==='PENDING';
+    const canOrder = status==='APPROVED';
+    const canComplete = status==='RECEIVED';
+    const photo = r.fotoKerusakan ? `<a class="photo-link" href="${escapeAttr(r.fotoKerusakan)}" target="_blank" rel="noopener">Lihat Foto</a>` : 'Tidak ada foto';
+    return `<div class="walk-card">
+      <div class="walk-card-head"><div><strong>${escapeHtml(r.namaSmallware||'Smallware request')}</strong><div class="small">${escapeHtml(id)} • ${escapeHtml(r.store||'-')} • ${escapeHtml(r.jenisRequest||'-')}</div></div><span class="badge ${status==='PENDING'?'badge-open':(['COMPLETED','REJECTED'].includes(status)?'badge-done':'badge-progress')}">${escapeHtml(status)}</span></div>
+      <div class="walk-meta">
+        <div class="walk-meta-item"><div class="label">TANGGAL REQUEST</div><strong>${escapeHtml(formatDateWIB(r.tanggalRequest||r.timestamp||''))}</strong></div>
+        <div class="walk-meta-item"><div class="label">QTY</div><strong>${escapeHtml(r.qtyRequest||0)}</strong></div>
+        <div class="walk-meta-item"><div class="label">AREA</div><strong>${escapeHtml(r.area||'-')}</strong></div>
+        <div class="walk-meta-item"><div class="label">FOTO</div><strong>${photo}</strong></div>
+      </div>
+      <div class="walk-finding"><b>Keterangan:</b> ${escapeHtml(r.keterangan||'-')}<br><b>Catatan approval:</b> ${escapeHtml(r.approvalNote||'-')}<br><b>Approval oleh:</b> ${escapeHtml(r.approvalBy||'-')}</div>
+      <div class="actions">
+        <button class="btn btn-light" onclick="toggleAdminRequestDetail('${escapeAttr(id)}')">Lihat Detail</button>
+        ${canApprove?`<button class="btn btn-green" onclick="adminApproveSmallware('${escapeAttr(id)}')">✓ APPROVE</button><button class="btn btn-danger" onclick="adminRejectSmallware('${escapeAttr(id)}')">✕ REJECT</button>`:''}
+        ${canOrder?`<button class="btn btn-primary" onclick="adminSetSmallwareStatus('${escapeAttr(id)}','ORDERED')">Tandai Sudah Dipesan</button>`:''}
+        ${canComplete?`<button class="btn btn-green" onclick="openCompletionModal('smallware','${escapeAttr(id)}')">Konfirmasi Selesai</button>`:''}
+      </div>
+      <div id="admin-detail-${escapeAttr(id)}" class="hidden walk-finding"><b>Detail request</b><br>ID: ${escapeHtml(id)}<br>Smallware ID: ${escapeHtml(r.smallwareId||'-')}<br>Input oleh: ${escapeHtml(r.inputBy||'-')}<br>Tanggal proses: ${escapeHtml(formatDateWIB(r.processingDate||''))}<br>Tanggal selesai: ${escapeHtml(formatDateWIB(r.completedDate||''))}<br>${r.fotoKerusakan?`<img src="${escapeAttr(r.fotoKerusakan)}" alt="Foto smallware" style="max-width:220px;max-height:180px;border-radius:12px;margin-top:8px">`:''}</div>
+    </div>`;
+  }).join('');
+}
+
+function toggleAdminRequestDetail(id){
+  const el = $('admin-detail-'+id);
+  if(el) el.classList.toggle('hidden');
+}
+
+async function adminApproveSmallware(id){
+  const note = prompt('Catatan approval (opsional):','');
+  if(note===null) return;
+  await adminSmallwareAction({action:'approveSmallwareRequest',idRequest:id,role:state.user.role,adminToken:state.adminToken,approvalBy:state.user.nama||state.user.username,approvalNote:note},'Request berhasil APPROVED.');
+}
+async function adminRejectSmallware(id){
+  const note = prompt('Alasan REJECT wajib diisi:','');
+  if(note===null) return;
+  if(!note.trim()){toast('Alasan reject wajib diisi.');return;}
+  await adminSmallwareAction({action:'rejectSmallwareRequest',idRequest:id,role:state.user.role,adminToken:state.adminToken,approvalBy:state.user.nama||state.user.username,approvalNote:note},'Request berhasil REJECTED.');
+}
+async function adminSetSmallwareStatus(id,status){
+  if(!confirm('Ubah status request menjadi '+status+'?')) return;
+  await adminSmallwareAction({action:'updateSmallwareStatus',idRequest:id,role:state.user.role,adminToken:state.adminToken,status,updateBy:state.user.nama||state.user.username},'Status berubah menjadi '+status+'.');
+}
+async function adminSmallwareAction(payload,successMessage){
+  if(!isAM()){toast('Verifikasi Admin diperlukan.');return;}
+  try{
+    showLoading(true);
+    await apiPost(payload);
+    toast(successMessage);
+    await loadAdminRequests();
+    if(typeof loadSmallware==='function') await loadSmallware();
+    if(typeof loadSmallwareFrequency==='function') await loadSmallwareFrequency();
+  }catch(err){toast(err.message||'Aksi Admin gagal.');}
+  finally{showLoading(false);}
 }
 
 </script>
