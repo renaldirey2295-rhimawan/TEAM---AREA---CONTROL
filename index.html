@@ -1924,6 +1924,7 @@ async function submitCompletionConfirmation(){
         action:'updateSmallwareStatus',
         idRequest:ctx.id,
         role:state.user?.role || 'STORE',
+        adminToken:state.adminToken || '',
         userStore:storeApiOfUser(),
         status:'COMPLETED',
         completedDate:tanggalSelesai,
@@ -2998,8 +2999,10 @@ function renderSmallwareAdminActions(row){
       </button>`;
   }
 
-  // Konfirmasi selesai dilakukan oleh Store pemilik request, mengikuti alur Maintenance.
-  if(s==='ORDERED' && storeUser && canonicalStore(state.user?.store||'') === canonicalStore(row.store||'')){
+  // Store pemilik request atau Admin/AM dapat mengonfirmasi selesai setelah barang dipesan.
+  const adminCanComplete = am;
+  const storeCanComplete = storeUser && canonicalStore(state.user?.store||'') === canonicalStore(row.store||'');
+  if(s==='ORDERED' && (adminCanComplete || storeCanComplete)){
     html += `
       <button class="btn btn-green" onclick="openCompletionModal('smallware','${escapeAttr(row.idRequest)}')">
         ✓ Konfirmasi Selesai
@@ -3545,7 +3548,7 @@ function renderAdminRequests(){
     const id = String(r.idRequest||r.id||'');
     const canApprove = status==='PENDING';
     const canOrder = status==='APPROVED';
-    const canComplete = false; // Hanya Store pemilik request yang mengonfirmasi selesai.
+    const canComplete = status==='ORDERED'; // Admin/AM dapat mengonfirmasi melalui menu Admin Approval.
     const photo = r.fotoKerusakan ? `<a class="photo-link" href="${escapeAttr(r.fotoKerusakan)}" target="_blank" rel="noopener">Lihat Foto</a>` : 'Tidak ada foto';
     return `<div class="walk-card">
       <div class="walk-card-head"><div><strong>${escapeHtml(r.namaSmallware||'Smallware request')}</strong><div class="small">${escapeHtml(id)} • ${escapeHtml(r.store||'-')} • ${escapeHtml(r.jenisRequest||'-')}</div></div><span class="badge ${status==='PENDING'?'badge-open':(['COMPLETED','REJECTED'].includes(status)?'badge-done':'badge-progress')}">${escapeHtml(status)}</span></div>
