@@ -910,8 +910,14 @@ button.btn:not(:disabled):hover{filter:saturate(1.12);box-shadow:0 7px 15px rgba
           <div class="field full-row">
             <label>FOTO KPI *</label>
             <div class="filebox">
-              <input id="kpiPhoto" type="file" accept="image/*" onchange="previewFile(this,'kpiPreview')">
+              <div class="actions" style="margin-bottom:8px">
+                <button type="button" class="btn btn-light" onclick="document.getElementById('kpiPhotoGallery').click()">🖼️ Pilih dari Galeri</button>
+                <button type="button" class="btn btn-light" onclick="document.getElementById('kpiPhotoCamera').click()">📷 Kamera</button>
+              </div>
+              <input id="kpiPhotoGallery" type="file" accept="image/*" onchange="handleImageChoice(this,'kpiPhotoCamera','kpiPreview')" style="display:none">
+              <input id="kpiPhotoCamera" type="file" accept="image/*" capture="environment" onchange="handleImageChoice(this,'kpiPhotoGallery','kpiPreview')" style="display:none">
               <div id="kpiPreview" class="preview"></div>
+              <div class="small">Pilih screenshot/foto KPI dari galeri atau ambil foto menggunakan kamera.</div>
             </div>
           </div>
         </div>
@@ -1070,8 +1076,14 @@ button.btn:not(:disabled):hover{filter:saturate(1.12);box-shadow:0 7px 15px rgba
           <div class="field full-row">
             <label>FOTO KERUSAKAN <span id="swPhotoMark" style="visibility:hidden">*</span></label>
             <div class="filebox">
-              <input id="swPhoto" type="file" accept="image/*" onchange="previewFile(this,'swPhotoPreview')">
+              <div class="actions" style="margin-bottom:8px">
+                <button type="button" class="btn btn-light" onclick="document.getElementById('swPhotoGallery').click()">🖼️ Pilih dari Galeri</button>
+                <button type="button" class="btn btn-light" onclick="document.getElementById('swPhotoCamera').click()">📷 Kamera</button>
+              </div>
+              <input id="swPhotoGallery" type="file" accept="image/*" onchange="handleImageChoice(this,'swPhotoCamera','swPhotoPreview')" style="display:none">
+              <input id="swPhotoCamera" type="file" accept="image/*" capture="environment" onchange="handleImageChoice(this,'swPhotoGallery','swPhotoPreview')" style="display:none">
               <div id="swPhotoPreview" class="preview"></div>
+              <div class="small">Pilih foto yang sudah ada atau ambil foto langsung dari kamera perangkat.</div>
             </div>
             <div class="small" id="swPhotoHelp">Wajib untuk Replacement - Rusak / Pecah.</div>
           </div>
@@ -1986,7 +1998,7 @@ async function saveSales(){
       tcConnect:num('tcConnect'),
       tips:num('salesTips'),
       keterangan:$('salesNote').value.trim(),
-      inputBy:'PUBLIC USER'
+      inputBy:state.user?.nama || state.user?.username || state.user?.userId || 'USER'
     };
 
     showLoading(true);
@@ -2170,7 +2182,7 @@ async function saveKPI(){
     return;
   }
 
-  const file=$('kpiPhoto').files[0];
+  const file=$('kpiPhotoGallery').files[0] || $('kpiPhotoCamera').files[0];
   if(!file){
     toast('Foto KPI wajib dipilih.');
     return;
@@ -2192,7 +2204,8 @@ async function saveKPI(){
 
     const r=await apiPost(payload);
     toast('KPI berhasil diupload ke Google Drive.');
-    $('kpiPhoto').value='';
+    $('kpiPhotoGallery').value='';
+    $('kpiPhotoCamera').value='';
     $('kpiPreview').innerHTML='';
     $('kpiNote').value='';
     await loadKPIHistory();
@@ -2204,6 +2217,12 @@ async function saveKPI(){
 /* UTILS */
 function num(id){
   return Number($(id).value||0)||0;
+}
+
+function handleImageChoice(input, otherInputId, targetId){
+  const other = $(otherInputId);
+  if(other) other.value = '';
+  previewFile(input, targetId);
 }
 
 function previewFile(input,targetId){
@@ -2891,7 +2910,7 @@ function openSmallwareDetail(index){
         </div>
       </div>` : ''}
 
-    ${am ? renderSmallwareAdminActions(row) : ''}
+    ${renderSmallwareAdminActions(row)}
   `;
 
   $('swDetail').scrollIntoView({behavior:'smooth',block:'start'});
@@ -2899,31 +2918,45 @@ function openSmallwareDetail(index){
 
 function renderSmallwareAdminActions(row){
   const s = String(row.status||'').toUpperCase();
+  const am = isAM();
+  const role = String(state.user?.role || '').toUpperCase();
+  const storeUser = !am && (role === 'STORE' || role === 'STORE MANAGER');
 
   let html = `
-    <div class="section-title">⚙️ Approval / Processing</div>
+    <div class="section-title">${am ? '⚙️ Approval / Processing' : '📦 Konfirmasi Barang'}</div>
     <div class="actions">
   `;
 
-  if(s==='PENDING'){
+  if(s==='PENDING' && am){
     html += `
       <button class="btn btn-green" onclick="approveSmallwareUI('${escapeAttr(row.idRequest)}')">✓ APPROVE</button>
       <button class="btn btn-danger" onclick="rejectSmallwareUI('${escapeAttr(row.idRequest)}')">✕ REJECT</button>`;
   }
 
-  if(['APPROVED','ORDERED','RECEIVED'].includes(s)){
-    const next = s==='APPROVED' ? 'ORDERED' : s==='ORDERED' ? 'RECEIVED' : '';
-    if(next){
-      html += `
-        <button class="btn btn-primary" onclick="updateSmallwareStatusUI('${escapeAttr(row.idRequest)}','${next}')">
-          Ubah → ${next}
-        </button>`;
-    }else{
-      html += `
-        <button class="btn btn-green" onclick="openCompletionModal('smallware','${escapeAttr(row.idRequest)}')">
-          ✓ Konfirmasi Selesai
-        </button>`;
-    }
+  if(s==='APPROVED' && am){
+    html += `
+      <button class="btn btn-primary" onclick="updateSmallwareStatusUI('${escapeAttr(row.idRequest)}','ORDERED')">
+        Tandai Sudah Dipesan
+      </button>`;
+  }
+
+  if(s==='ORDERED' && storeUser){
+    html += `
+      <button class="btn btn-green" onclick="updateSmallwareStatusUI('${escapeAttr(row.idRequest)}','RECEIVED')">
+        ✓ Konfirmasi Barang Sudah Datang
+      </button>`;
+  } else if(s==='ORDERED' && am){
+    html += `
+      <button class="btn btn-primary" onclick="updateSmallwareStatusUI('${escapeAttr(row.idRequest)}','RECEIVED')">
+        Ubah → RECEIVED
+      </button>`;
+  }
+
+  if(s==='RECEIVED' && am){
+    html += `
+      <button class="btn btn-green" onclick="openCompletionModal('smallware','${escapeAttr(row.idRequest)}')">
+        ✓ Konfirmasi Selesai
+      </button>`;
   }
 
   if(!['PENDING','APPROVED','ORDERED','RECEIVED'].includes(s)){
@@ -2940,7 +2973,8 @@ async function saveSmallwareRequestUI(){
   const name = $('swName').value.trim();
   const qty = Number($('swQty').value||0);
   const type = $('swType').value;
-  const file = $('swPhoto').files[0];
+  const targetStore = selectedStore('swStore') || storeApiOfUser();
+  const file = $('swPhotoGallery').files[0] || $('swPhotoCamera').files[0];
 
   if(!name){
     toast('Nama Smallware wajib diisi.');
@@ -3064,6 +3098,7 @@ async function updateSmallwareStatusUI(id,status){
       action:'updateSmallwareStatus',
       idRequest:id,
       role:state.user.role,
+      userStore:storeApiOfUser(),
       status,
       updateBy:state.user.nama || state.user.username || ''
     });
@@ -3083,7 +3118,8 @@ function resetSmallwareForm(){
   $('swName').value='';
   $('swQty').value='';
   $('swType').value='';
-  $('swPhoto').value='';
+  $('swPhotoGallery').value='';
+  $('swPhotoCamera').value='';
   $('swPhotoPreview').innerHTML='';
   $('swNote').value='';
   toggleSmallwarePhoto();
