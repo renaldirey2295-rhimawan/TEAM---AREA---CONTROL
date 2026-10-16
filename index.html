@@ -1844,7 +1844,7 @@ async function submitCompletionConfirmation(){
     showLoading(true);
     if(ctx.type === 'maintenance'){
       await apiPost({
-        action:'updateMaintenanceStatus',
+        action:'confirmMaintenanceComplete',
         noSC:ctx.id,
         status:'COMPLETED',
         tanggalSelesai,
