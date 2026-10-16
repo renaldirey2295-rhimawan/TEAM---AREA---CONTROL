@@ -2978,8 +2978,6 @@ function openSmallwareDetail(index){
 function renderSmallwareAdminActions(row){
   const s = String(row.status||'').toUpperCase();
   const am = isAM();
-  const role = String(state.user?.role || '').toUpperCase();
-  const storeUser = !am && (role === 'STORE' || role === 'STORE MANAGER');
 
   let html = `
     <div class="section-title">${am ? '⚙️ Approval / Processing' : '📦 Konfirmasi Barang'}</div>
@@ -2999,10 +2997,9 @@ function renderSmallwareAdminActions(row){
       </button>`;
   }
 
-  // Store pemilik request atau Admin/AM dapat mengonfirmasi selesai setelah barang dipesan.
-  const adminCanComplete = am;
-  const storeCanComplete = storeUser && canonicalStore(state.user?.store||'') === canonicalStore(row.store||'');
-  if(s==='ORDERED' && (adminCanComplete || storeCanComplete)){
+  // Konfirmasi selesai boleh dilakukan dari akun Store, Admin/AM, maupun portal publik.
+  // Backend tetap memvalidasi bahwa status saat ini ORDERED dan tanggal selesai diisi.
+  if(s==='ORDERED'){
     html += `
       <button class="btn btn-green" onclick="openCompletionModal('smallware','${escapeAttr(row.idRequest)}')">
         ✓ Konfirmasi Selesai
