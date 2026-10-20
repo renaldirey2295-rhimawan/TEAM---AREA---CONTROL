@@ -304,7 +304,7 @@ body{
 </style>
 
 <style>
-/* V16: scenic photographic background rotates every 3 hours; cards stay readable. */
+/* V16: scenic photographic background rotates every 1 hour; cards stay readable. */
 :root{--scenic-overlay:rgba(246,249,255,.70)}
 html{min-height:100%;background:#eaf0f7}
 body{background:transparent!important;position:relative;isolation:isolate;min-height:100vh}
@@ -3260,7 +3260,7 @@ document.addEventListener('DOMContentLoaded', function(){
 });
 
 
-/* V16 scenic wallpaper: one landscape per 3-hour block, consistent for all visitors in that block. */
+/* V16 scenic wallpaper: one landscape per hour, consistent for all visitors in that hour. */
 (function initScenicBackground(){
   const scenicPhotos = [
     'https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=2200&q=85',
@@ -3269,8 +3269,8 @@ document.addEventListener('DOMContentLoaded', function(){
     'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=2200&q=85'
   ];
   const applyScenic = () => {
-    const threeHourBlock = Math.floor(Date.now() / (3 * 60 * 60 * 1000));
-    const url = scenicPhotos[threeHourBlock % scenicPhotos.length];
+    const oneHourBlock = Math.floor(Date.now() / (60 * 60 * 1000));
+    const url = scenicPhotos[oneHourBlock % scenicPhotos.length];
     document.documentElement.style.setProperty('--scenic-image', `url("${url}")`);
   };
   applyScenic();
