@@ -330,60 +330,31 @@ body{
 </style>
 
 <style>
-/* V16: scenic photographic background rotates every 3 hours; cards stay readable. */
-:root{--scenic-overlay:rgba(246,249,255,.70)}
+/* V20 MINIMAL PATCH: scenic image only behind the existing layout; preserve original panels and navigation. */
 html{min-height:100%;background:#eaf0f7}
 body{background:transparent!important;position:relative;isolation:isolate;min-height:100vh}
 body::before{
   content:"";position:fixed;inset:0;z-index:-2;pointer-events:none;
-  background-image:linear-gradient(135deg,rgba(248,250,255,.68),rgba(250,248,255,.57)),var(--scenic-image);
+  background-image:linear-gradient(rgba(248,250,255,.48),rgba(248,250,255,.48)),var(--scenic-image);
   background-size:cover;background-position:center;background-repeat:no-repeat;
-  transform:scale(1.015);transition:background-image .8s ease;
+  transition:opacity .6s ease;
 }
-body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:rgba(247,249,253,.12)}
 #appView{background:transparent!important}
-.topbar{background:rgba(255,255,255,.82)!important;backdrop-filter:blur(14px)}
-.page{background:transparent}
-.card,.stat,.hero,.login-card{background:rgba(255,255,255,.91)!important;backdrop-filter:blur(8px)}
-.nav button{box-shadow:0 4px 12px rgba(40,60,90,.10)}
-@media(prefers-reduced-motion:reduce){body::before{transition:none}}
-</style>
-
-
-<style>
-/* V19: black header with rotating team motivation, scenic background changes hourly. */
-.topbar{
-  background:rgba(18,18,18,.97)!important;color:#fff;
-  border-bottom:1px solid rgba(255,212,59,.28);
-  box-shadow:0 4px 20px rgba(0,0,0,.18);
-  min-height:68px;
-}
-.topbar .brand h1{color:#ffd43b;letter-spacing:.25px}
+/* Header remains black as requested; other original layout styles are untouched. */
+.topbar{background:#171717!important;color:#fff;border-bottom:1px solid rgba(255,212,59,.25)}
+.topbar .brand h1{color:#ffd43b}
 .topbar .brand small{color:#d4d4d4}
-.topbar .logo{flex:0 0 auto}
-.topbar .userpill{background:transparent;color:#ffd43b;border:0;border-radius:0;font-weight:800;white-space:nowrap}
-.header-motivation{
-  flex:1;min-width:0;text-align:center;padding:0 16px;
-  animation:motivationFade .65s ease;
-}
-#headerMotivationMain{
-  color:#ffd43b;font-size:clamp(12px,1.25vw,17px);font-weight:800;
-  letter-spacing:.15px;line-height:1.35;
-}
-#headerMotivationSub{color:#f3f4f6;font-size:11px;margin-top:3px;letter-spacing:.15px}
-@keyframes motivationFade{from{opacity:.35;transform:translateY(3px)}to{opacity:1;transform:translateY(0)}}
-@media(max-width:760px){
-  .topbar{gap:7px;padding:9px 10px;flex-wrap:wrap}
-  .topbar .brand{gap:7px}
-  .topbar .brand .logo{width:32px;height:32px;font-size:17px;border-radius:10px}
-  .topbar .brand h1{font-size:13px}
-  .topbar .brand small{font-size:9px}
-  .header-motivation{order:3;flex:1 0 100%;padding:2px 0 0}
+.topbar .userpill{background:transparent;color:#ffd43b;border-color:transparent;font-weight:800}
+.header-motivation{flex:1;min-width:0;text-align:center;padding:0 16px}
+#headerMotivationMain{color:#ffd43b;font-size:clamp(12px,1.2vw,17px);font-weight:800;line-height:1.3}
+#headerMotivationSub{color:#f3f4f6;font-size:10px;margin-top:3px}
+@media(max-width:700px){
+  .topbar{flex-wrap:wrap;gap:8px}
+  .header-motivation{order:3;flex:1 0 100%;padding:2px 0}
   #headerMotivationMain{font-size:12px}
   #headerMotivationSub{font-size:10px}
-  .topbar .userpill{font-size:10px;padding:4px 0}
 }
-@media(prefers-reduced-motion:reduce){.header-motivation{animation:none}}
+@media(prefers-reduced-motion:reduce){body::before{transition:none}}
 </style>
 
 </head>
@@ -418,8 +389,8 @@ body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;bac
     </div>
 
     <div class="header-motivation" aria-live="polite">
-      <div id="headerMotivationMain">Bukan Sekadar Mencapai Target, Tapi Membangun Standar Terbaik.</div>
-      <div id="headerMotivationSub">Disiplin dalam proses • Konsisten dalam eksekusi • Unggul dalam hasil</div>
+      <div id="headerMotivationMain">Tidak Menunggu Hasil Berubah — Kita yang Mengubah Hasil.</div>
+      <div id="headerMotivationSub">Ambil tanggung jawab • Berikan solusi • Tuntaskan aksi</div>
     </div>
 
     <div class="userbox">
@@ -2993,19 +2964,16 @@ document.addEventListener('DOMContentLoaded', function(){
 });
 
 
-/* V19 scenic wallpaper: changes once per hour; same hourly image for all visitors. */
+/* V20 scenic wallpaper: changes on the hour, using the same image for everyone during that hour. */
 (function initScenicBackground(){
   const scenicPhotos = [
     'https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=2200&q=85',
     'https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=2200&q=85',
     'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=2200&q=85',
-    'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=2200&q=85'
+    'https://images.unsplash.com/photo-1500530855697-b586d89ee3?auto=format&fit=crop&w=2200&q=85'
   ];
-  let lastHourBlock = -1;
   const applyScenic = () => {
     const hourBlock = Math.floor(Date.now() / (60 * 60 * 1000));
-    if (hourBlock === lastHourBlock) return;
-    lastHourBlock = hourBlock;
     const url = scenicPhotos[hourBlock % scenicPhotos.length];
     document.documentElement.style.setProperty('--scenic-image', `url("${url}")`);
   };
@@ -3013,24 +2981,22 @@ document.addEventListener('DOMContentLoaded', function(){
   window.setInterval(applyScenic, 60 * 1000);
 })();
 
-/* V19 rotating motivation slogans in the center of the black header. */
+/* Rotate only the motivation text; do not change navigation or page layout. */
 (function initHeaderMotivation(){
-  const messages = [
-    ['Bukan Sekadar Mencapai Target, Tapi Membangun Standar Terbaik.', 'Disiplin dalam proses • Konsisten dalam eksekusi • Unggul dalam hasil'],
-    ['Bergerak Bersama, Bertumbuh Bersama, Menang Bersama.', 'Satu tim • Satu tujuan • Satu komitmen'],
-    ['Target adalah Komitmen, Kualitas adalah Standar, Hasil adalah Bukti.', 'Kerjakan dengan benar, setiap hari, di setiap store'],
-    ['Tidak Menunggu Hasil Berubah — Kita yang Mengubah Hasil.', 'Ambil tanggung jawab • Berikan solusi • Tuntaskan aksi']
+  const quotes = [
+    ['Tidak Menunggu Hasil Berubah — Kita yang Mengubah Hasil.', 'Ambil tanggung jawab • Berikan solusi • Tuntaskan aksi'],
+    ['Target adalah Komitmen, Kualitas adalah Standar.', 'Disiplin dalam proses • Konsisten dalam eksekusi'],
+    ['Bergerak Bersama, Bertumbuh Bersama, Menang Bersama.', 'Satu tim • Satu tujuan • Hasil terbaik'],
+    ['Konsistensi Kecil Menghasilkan Pencapaian Besar.', 'Fokus pada solusi • Unggul dalam pelayanan']
   ];
   let index = 0;
   const main = document.getElementById('headerMotivationMain');
   const sub = document.getElementById('headerMotivationSub');
   if (!main || !sub) return;
-  window.setInterval(() => {
-    index = (index + 1) % messages.length;
-    const wrap = main.parentElement;
-    if (wrap) { wrap.style.animation = 'none'; void wrap.offsetWidth; wrap.style.animation = ''; }
-    main.textContent = messages[index][0];
-    sub.textContent = messages[index][1];
+  window.setInterval(function(){
+    index = (index + 1) % quotes.length;
+    main.textContent = quotes[index][0];
+    sub.textContent = quotes[index][1];
   }, 8000);
 })();
 
