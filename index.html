@@ -979,7 +979,7 @@ button.btn:not(:disabled):hover{filter:saturate(1.12);box-shadow:0 7px 15px rgba
     <section id="page-soldout" class="page-section hidden">
       <div class="hero">
         <h2>🚫 Rekap Sold Out</h2>
-        <p>Detail Sold Out per item, tanggal, store, kategori, dan penyebab manual dari store.</p>
+        <p>Summary Sold Out per material untuk kontrol tanggal kejadian dan total hari dalam periode pencarian.</p>
       </div>
       <div class="card" style="margin-bottom:16px">
         <div class="form-grid">
@@ -996,8 +996,8 @@ button.btn:not(:disabled):hover{filter:saturate(1.12);box-shadow:0 7px 15px rgba
         <div class="stat"><div class="icon">🚨</div><div class="label">CRITICAL</div><div id="soCritical" class="value">0</div></div>
       </div>
       <div class="card">
-        <div class="card-head"><div><h3>📋 Detail Rekap Sold Out</h3><div class="small">Sumber: RECAP SOLD OUT DETAIL · Data hanya dibaca, tidak mengubah sumber.</div></div><button class="btn btn-light" onclick="loadSoldOutSummary()">↻ Refresh</button></div>
-        <div class="table-wrap"><table style="min-width:1250px"><thead><tr><th>TANGGAL</th><th>STORE</th><th>KODE MATERIAL</th><th>NAMA MATERIAL</th><th>KODE MENU</th><th>NAMA MENU</th><th>KATEGORI</th><th>PENYEBAB SOLD OUT</th><th>PRIORITAS</th></tr></thead><tbody id="soldOutBody"><tr><td colspan="9" class="empty">Klik Tampilkan Rekap untuk memuat data.</td></tr></tbody></table></div>
+        <div class="card-head"><div><h3>📋 Summary Sold Out per Material</h3><div class="small">Sumber: RECAP SOLD OUT DETAIL · Material dihitung satu kali per tanggal, meskipun terkait beberapa menu.</div></div><button class="btn btn-light" onclick="loadSoldOutSummary()">↻ Refresh</button></div>
+        <div class="table-wrap"><table style="min-width:1050px"><thead><tr><th>STORE</th><th>NAMA MATERIAL</th><th>TANGGAL SOLD OUT</th><th>JUMLAH HARI SOLD OUT</th><th>KATEGORI</th><th>PENYEBAB SOLD OUT</th><th>PRIORITAS</th></tr></thead><tbody id="soldOutBody"><tr><td colspan="7" class="empty">Klik Tampilkan Rekap untuk memuat data.</td></tr></tbody></table></div>
       </div>
     </section>
 
@@ -1980,7 +1980,7 @@ async function loadKPIHistory(){if(!state.user)return;try{$('kpiHistoryBody').in
 async function loadSoldOutSummary(){
   const body=document.getElementById('soldOutBody');
   if(!body)return;
-  body.innerHTML='<tr><td colspan="9" class="empty">Memuat rekap Sold Out...</td></tr>';
+  body.innerHTML='<tr><td colspan="7" class="empty">Memuat summary Sold Out...</td></tr>';
   try{
     const r=await apiGet('soldoutSummary',{
       store:document.getElementById('soStore')?.value||'ALL',
@@ -1994,15 +1994,17 @@ async function loadSoldOutSummary(){
     document.getElementById('soDays').textContent=Number(summary.totalSoldOutDays||0).toLocaleString('id-ID');
     document.getElementById('soCritical').textContent=Number(summary.critical||0).toLocaleString('id-ID');
     const rows=Array.isArray(r.data)?r.data:[];
-    if(!rows.length){body.innerHTML='<tr><td colspan="9" class="empty">Tidak ada data Sold Out untuk filter ini.</td></tr>';return;}
+    if(!rows.length){body.innerHTML='<tr><td colspan="7" class="empty">Tidak ada data Sold Out untuk filter ini.</td></tr>';return;}
     body.innerHTML=rows.map(x=>{
       const priority=String(x.priority||'NORMAL').toUpperCase();
       const colors={CRITICAL:'badge-danger',HIGH:'badge-warning',MONITOR:'badge-progress',NORMAL:'badge-success'};
       const badge=colors[priority]||'badge-progress';
-      return `<tr><td>${escapeHtml(formatDateWIB(x.tanggal||'-'))}</td><td><b>${escapeHtml(x.store||'-')}</b></td><td>${escapeHtml(x.kodeMaterial||'-')}</td><td>${escapeHtml(x.namaMaterial||'-')}</td><td>${escapeHtml(x.kodeMenu||'-')}</td><td>${escapeHtml(x.namaMenu||'-')}</td><td>${escapeHtml(x.kategori||'-')}</td><td style="white-space:normal;min-width:220px;max-width:380px">${escapeHtml(x.penyebabSoldOut||'Belum diisi oleh store')}</td><td><span class="badge ${badge}">${escapeHtml(priority)}</span></td></tr>`;
+      const dates=Array.isArray(x.tanggalSoldOut)?x.tanggalSoldOut:[];
+      const datesText=dates.map(d=>formatDateWIB(d)).join(', ');
+      return `<tr><td><b>${escapeHtml(x.store||'-')}</b></td><td>${escapeHtml(x.namaMaterial||'-')}</td><td style="white-space:normal;min-width:190px">${escapeHtml(datesText||'-')}</td><td style="text-align:center;font-weight:700">${Number(x.jumlahHariSoldOut||0).toLocaleString('id-ID')} hari</td><td>${escapeHtml(x.kategori||'-')}</td><td style="white-space:normal;min-width:220px;max-width:380px">${escapeHtml(x.penyebabSoldOut||'Belum diisi oleh store')}</td><td><span class="badge ${badge}">${escapeHtml(priority)}</span></td></tr>`;
     }).join('');
   }catch(err){
-    body.innerHTML=`<tr><td colspan="9" class="empty">Gagal memuat Sold Out: ${escapeHtml(err.message||String(err))}</td></tr>`;
+    body.innerHTML=`<tr><td colspan="7" class="empty">Gagal memuat Sold Out: ${escapeHtml(err.message||String(err))}</td></tr>`;
     toast('Rekap Sold Out: '+(err.message||err));
   }
 }
