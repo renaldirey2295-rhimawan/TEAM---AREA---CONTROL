@@ -306,15 +306,16 @@ body{
 <style>
 /* V16: scenic photographic background rotates every 1 hour; cards stay readable. */
 :root{--scenic-overlay:rgba(246,249,255,.70)}
-html{min-height:100%;background:#eaf0f7}
+html{min-height:100%;background:transparent!important}
 body{background:transparent!important;position:relative;isolation:isolate;min-height:100vh}
 body::before{
-  content:"";position:fixed;inset:0;z-index:-2;pointer-events:none;
-  background-image:linear-gradient(135deg,rgba(248,250,255,.68),rgba(250,248,255,.57)),var(--scenic-image);
+  content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background-color:#dce6ef;
+  background-image:linear-gradient(135deg,rgba(248,250,255,.24),rgba(250,248,255,.18)),var(--scenic-image);
   background-size:cover;background-position:center;background-repeat:no-repeat;
   transform:scale(1.015);transition:background-image .8s ease;
 }
-body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:rgba(247,249,253,.12)}
+body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:rgba(247,249,253,.04)}
 #appView{background:transparent!important}
 .topbar{background:rgba(255,255,255,.82)!important;backdrop-filter:blur(14px)}
 .page{background:transparent}
