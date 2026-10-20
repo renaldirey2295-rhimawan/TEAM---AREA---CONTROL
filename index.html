@@ -677,6 +677,22 @@ button.btn:not(:disabled):hover{filter:saturate(1.12);box-shadow:0 7px 15px rgba
     </section>
 
       <div class="card" style="margin-top:16px"><div class="card-head"><div><h3>📋 History Sales</h3><div class="small">Seluruh history input Sales langsung dari SALES DATABASE. Data tetap terpisah per Store.</div></div><button class="btn btn-light" onclick="loadSalesHistory()">↻ Refresh</button></div><div class="table-wrap"><table style="min-width:1400px"><thead><tr><th>STORE</th><th>TANGGAL</th><th>DINE IN SALES</th><th>DINE IN TC</th><th>DELIVERY SALES</th><th>DELIVERY TC</th><th>TAKE AWAY SALES</th><th>TAKE AWAY TC</th><th>CONNECT / BO SALES</th><th>CONNECT / BO TC</th><th>TIPS</th><th>TOTAL SALES</th><th>TOTAL TC</th><th>KETERANGAN</th><th>INPUT BY</th></tr></thead><tbody id="salesHistoryBody"></tbody></table></div></div>
+
+      <div class="card" id="salesComparisonCard" style="margin-top:16px">
+        <div class="card-head"><div><h3>📊 Sales Pembanding</h3><div class="small">Sumber: spreadsheet SALES CONTROL → sheet SALES PEMBANDING. Data hanya dibaca.</div></div><button class="btn btn-light" onclick="loadSalesComparison()">↻ Refresh</button></div>
+        <div class="form-grid" style="margin-bottom:14px">
+          <div class="field"><label>DARI TANGGAL</label><input id="salesComparisonFrom" type="date"></div>
+          <div class="field"><label>SAMPAI TANGGAL</label><input id="salesComparisonTo" type="date"></div>
+          <div class="field"><label>STORE</label><select id="salesComparisonStore"><option value="ALL">SEMUA STORE</option><option value="MENTENG">MENTENG</option><option value="CITYWALK">CITYWALK</option><option value="CITRA TOWER">CITRA TOWER</option></select></div>
+          <div class="field" style="align-self:end"><button class="btn btn-blue" onclick="loadSalesComparison()">Tampilkan Pembanding</button></div>
+        </div>
+        <div class="stats" style="margin-bottom:14px">
+          <div class="stat"><div class="label">JUMLAH DATA</div><div class="value" id="salesComparisonCount">0</div></div>
+          <div class="stat"><div class="label">TOTAL SALES GROSS</div><div class="value" id="salesComparisonGross">Rp 0</div></div>
+          <div class="stat"><div class="label">TOTAL SALES NETT</div><div class="value" id="salesComparisonNett">Rp 0</div></div>
+        </div>
+        <div class="table-wrap"><table style="min-width:900px"><thead><tr><th>TANGGAL</th><th>HARI</th><th>STORE</th><th>SALES GROSS</th><th>SALES NETT</th><th>15%</th><th>KETERANGAN</th></tr></thead><tbody id="salesComparisonBody"><tr><td colspan="7" class="empty">Klik Refresh untuk memuat data Sales Pembanding.</td></tr></tbody></table></div>
+      </div>
     </section>
 
     <section id="page-waste" class="page-section hidden">
@@ -1878,6 +1894,39 @@ async function loadDirectDatabaseHistory(moduleName){
 }
 
 async function loadSalesHistory(){if(!state.user)return;try{$('salesHistoryBody').innerHTML='<tr><td colspan="15" class="empty">Memuat history Sales...</td></tr>';const rows=await loadDirectDatabaseHistory('sales');$('salesHistoryBody').innerHTML=rows.length?rows.map(x=>`<tr><td><b>${escapeHtml(x.store||'-')}</b></td><td>${escapeHtml(formatDateWIB(x.tanggal))}</td><td>${formatRupiah(x.dineIn)}</td><td>${Number(x.tcDineIn||0).toLocaleString('id-ID')}</td><td>${formatRupiah(x.delivery)}</td><td>${Number(x.tcDelivery||0).toLocaleString('id-ID')}</td><td>${formatRupiah(x.takeAway)}</td><td>${Number(x.tcTakeAway||0).toLocaleString('id-ID')}</td><td>${formatRupiah(x.connectBO)}</td><td>${Number(x.tcConnectBO||0).toLocaleString('id-ID')}</td><td>${formatRupiah(x.tips)}</td><td><b>${formatRupiah(x.totalSales)}</b></td><td><b>${Number(x.totalTc||0).toLocaleString('id-ID')}</b></td><td>${escapeHtml(x.keterangan||'-')}</td><td>${escapeHtml(x.inputBy||'-')}</td></tr>`).join(''):'<tr><td colspan="15" class="empty">Belum ada history Sales.</td></tr>';__filterHistoryRows('sales');}catch(err){$('salesHistoryBody').innerHTML='<tr><td colspan="15" class="empty">Gagal memuat history Sales.</td></tr>';toast('History Sales: '+err.message)}}
+
+let __salesComparisonCache = [];
+async function loadSalesComparison(){
+  const body=$('salesComparisonBody');
+  if(!body)return;
+  body.innerHTML='<tr><td colspan="7" class="empty">Memuat Sales Pembanding...</td></tr>';
+  try{
+    const result=await apiGet('salesComparison',{limit:5000});
+    __salesComparisonCache=Array.isArray(result.data)?result.data:[];
+    renderSalesComparison();
+  }catch(err){
+    body.innerHTML='<tr><td colspan="7" class="empty">Gagal memuat Sales Pembanding: '+escapeHtml(err.message||'Kesalahan backend')+'</td></tr>';
+    toast('Sales Pembanding: '+(err.message||err));
+  }
+}
+function renderSalesComparison(){
+  const body=$('salesComparisonBody');if(!body)return;
+  const from=$('salesComparisonFrom')?.value||'';
+  const to=$('salesComparisonTo')?.value||'';
+  const store=canonicalStore($('salesComparisonStore')?.value||'ALL');
+  const rows=__salesComparisonCache.filter(x=>{
+    const d=String(x.tanggalISO||'').slice(0,10);
+    const s=canonicalStore(x.store||'');
+    return (!from||d>=from)&&(!to||d<=to)&&(store==='ALL'||s===store);
+  }).sort((a,b)=>String(b.tanggalISO||'').localeCompare(String(a.tanggalISO||''))||String(a.store||'').localeCompare(String(b.store||'')));
+  const gross=rows.reduce((sum,x)=>sum+(Number(x.salesGross)||0),0);
+  const nett=rows.reduce((sum,x)=>sum+(Number(x.salesNett)||0),0);
+  if($('salesComparisonCount'))$('salesComparisonCount').textContent=rows.length.toLocaleString('id-ID');
+  if($('salesComparisonGross'))$('salesComparisonGross').textContent=formatRupiah(gross);
+  if($('salesComparisonNett'))$('salesComparisonNett').textContent=formatRupiah(nett);
+  body.innerHTML=rows.length?rows.map(x=>`<tr><td>${escapeHtml(formatDateWIB(x.tanggalISO||x.tanggal))}</td><td>${escapeHtml(x.hari||'-')}</td><td><b>${escapeHtml(x.store||'-')}</b></td><td>${formatRupiah(x.salesGross)}</td><td>${formatRupiah(x.salesNett)}</td><td>${formatRupiah(x.potongan15)}</td><td>${escapeHtml(x.keterangan||'-')}</td></tr>`).join(''):'<tr><td colspan="7" class="empty">Tidak ada data Sales Pembanding untuk filter ini.</td></tr>';
+}
+
 async function loadWasteHistory(){if(!state.user)return;try{$('wasteHistoryBody').innerHTML='<tr><td colspan="6" class="empty">Memuat history Waste...</td></tr>';const r=await apiGet('wasteData',{store:'ALL',role:'PUBLIC',userStore:'',limit:5000});const rows=Array.isArray(r.allRows)?r.allRows:(Array.isArray(r.data)?r.data:[]);$('wasteHistoryBody').innerHTML=rows.length?rows.slice().sort((a,b)=>String(b.periodeAkhir||'').localeCompare(String(a.periodeAkhir||''))).map(x=>`<tr><td>${escapeHtml(x.periodeMulai||'-')} s/d ${escapeHtml(x.periodeAkhir||'-')}</td><td>${escapeHtml(x.kode||'-')}</td><td>${escapeHtml(x.namaBarang||'-')}</td><td>${escapeHtml(x.satuan||'-')}</td><td><b>${Number(x.totalWaste||0).toLocaleString('id-ID',{maximumFractionDigits:2})}</b></td><td>${escapeHtml(x.storeName||'-')}</td></tr>`).join(''):'<tr><td colspan="6" class="empty">Belum ada history Waste.</td></tr>';__filterHistoryRows('waste');}catch(err){$('wasteHistoryBody').innerHTML='<tr><td colspan="6" class="empty">Gagal memuat history Waste.</td></tr>';toast('History Waste: '+err.message)}}
 let completionContext = null;
 
@@ -3254,7 +3303,8 @@ const __moduleViewState = { module:'dashboard', view:'menu' };
 const __moduleSpecs = {
   sales:{title:'💰 Sales',subtitle:'Pilih input sales atau lihat history berdasarkan store.',items:[
     {key:'input',icon:'➕',title:'Input Sales',desc:'Input laporan sales harian.',tone:'green'},
-    {key:'history',icon:'📋',title:'History Sales',desc:'Riwayat transaksi dan filter store.',tone:'blue'}]},
+    {key:'history',icon:'📋',title:'History Sales',desc:'Riwayat transaksi dan filter store.',tone:'blue'},
+    {key:'comparison',icon:'📊',title:'Sales Pembanding',desc:'Lihat sales gross dan nett dari sheet pembanding.',tone:'purple'}]},
   waste:{title:'♻️ Waste',subtitle:'Pilih dashboard Waste atau buka riwayat seluruh store.',items:[
     {key:'dashboard',icon:'📊',title:'Dashboard Waste',desc:'Ringkasan, top waste, dan periode terbaru.',tone:'orange'},
     {key:'history',icon:'📋',title:'History Waste',desc:'Riwayat Waste semua store.',tone:'blue'}]},
@@ -3301,7 +3351,7 @@ function __setupModulePanels(){
   const salesSection=__el('page-sales');const salesHistory=__findCardByChild('salesHistoryBody');
   if(salesSection&&salesHistory&&!salesSection.contains(salesHistory))salesSection.appendChild(salesHistory);
   const configs={
-    sales:{panels:{input:()=>[__findCardByChild('salesDineIn')],history:()=>[__findCardByChild('salesHistoryBody')] }},
+    sales:{panels:{input:()=>[__findCardByChild('salesDineIn')],history:()=>[__findCardByChild('salesHistoryBody')],comparison:()=>[__el('salesComparisonCard')] }},
     waste:{panels:{dashboard:()=>[],history:()=>[__findCardByChild('wasteHistoryBody')]}},
     maintenance:{panels:{input:()=>[__findCardByChild('mtNoSC')],search:()=>[__findCardByChild('searchSC')],history:()=>[__findCardByChild('maintenanceHistoryBody')]}},
     kpi:{panels:{input:()=>[__findCardByChild('kpiStore')],history:()=>[__findCardByChild('kpiHistoryBody')]}},
@@ -3344,7 +3394,7 @@ function __setupModulePanels(){
       }
     }
     // History store filters are client-side and never alter source data.
-    if(module==='sales')__addHistoryFilter('sales',__findCardByChild('salesHistoryBody'));
+    if(module==='sales'){__addHistoryFilter('sales',__findCardByChild('salesHistoryBody'));['salesComparisonFrom','salesComparisonTo','salesComparisonStore'].forEach(id=>{const el=__el(id);if(el&&!el.dataset.bound){el.addEventListener('change',renderSalesComparison);el.dataset.bound='1';}});}
     if(module==='waste')__addHistoryFilter('waste',__findCardByChild('wasteHistoryBody'));
     if(module==='maintenance')__addHistoryFilter('maintenance',__findCardByChild('maintenanceHistoryBody'));
     if(module==='kpi')__addHistoryFilter('kpi',__findCardByChild('kpiHistoryBody'));
@@ -3406,6 +3456,7 @@ async function openModuleView(module,view){
       if(module==='sales'){
         if(view==='input'&&__el('salesDate'))__el('salesDate').value=todayISO();
         if(view==='history')await loadSalesHistory();
+        if(view==='comparison')await loadSalesComparison();
       }else if(module==='waste'){
         if(view==='dashboard'){initWastePage();await loadWasteDashboard();}
         if(view==='history')await loadWasteHistory();
