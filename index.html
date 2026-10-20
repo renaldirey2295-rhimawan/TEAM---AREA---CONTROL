@@ -3804,5 +3804,56 @@ body::after { z-index: 0 !important; background: rgba(247,249,253,.02) !importan
 #loading, #toast, #completionModal { z-index: 150 !important; }
 
 </style>
+<style>
+
+/* V18 HARD OVERRIDE: earlier theme CSS disabled body pseudo backgrounds.
+   Re-enable the scenic image and make the workspace translucent. */
+:root {
+  --scenic-image: url("https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=2200&q=85");
+}
+html, body {
+  background: transparent !important;
+  background-color: transparent !important;
+}
+body {
+  position: relative !important;
+  isolation: isolate !important;
+  min-height: 100vh !important;
+}
+body::before {
+  display: block !important;
+  content: "" !important;
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: -1 !important;
+  pointer-events: none !important;
+  background-color: #dce6ef !important;
+  background-image:
+    linear-gradient(rgba(255,255,255,.10), rgba(255,255,255,.10)),
+    var(--scenic-image) !important;
+  background-size: cover !important;
+  background-position: center center !important;
+  background-repeat: no-repeat !important;
+  transform: none !important;
+}
+body::after {
+  display: none !important;
+  content: none !important;
+}
+#appView, #appView.app {
+  position: relative !important;
+  z-index: 1 !important;
+  min-height: 100vh !important;
+  background: transparent !important;
+  background-color: transparent !important;
+}
+.page {
+  background: rgba(225,225,225,.24) !important;
+}
+.workspace, .main-content, .content, .page-content, .view, .module-content {
+  background: transparent !important;
+}
+
+</style>
 </body>
 </html>
