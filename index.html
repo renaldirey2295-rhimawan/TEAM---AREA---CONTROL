@@ -3770,5 +3770,39 @@ input:not([type="file"]),select,textarea{border-radius:3px!important;background:
 @media(max-width:420px){.brand .logo{display:none}.brand h1{font-size:12px!important}.page{padding-left:7px!important;padding-right:7px!important}}
 </style>
 
+<style>
+
+
+/* FINAL SCENIC VISIBILITY FIX
+   Keep the image layer above the document canvas and behind all app content.
+   Make the workspace translucent so the photo can actually be seen. */
+html, body { background: transparent !important; }
+body { position: relative !important; isolation: isolate !important; }
+body::before {
+  z-index: 0 !important;
+  background-color: #dce6ef !important;
+  background-image:
+    linear-gradient(135deg, rgba(248,250,255,.20), rgba(250,248,255,.14)),
+    var(--scenic-image, url("https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=2200&q=85")) !important;
+  background-size: cover !important;
+  background-position: center center !important;
+  background-repeat: no-repeat !important;
+}
+body::after { z-index: 0 !important; background: rgba(247,249,253,.02) !important; }
+#appView { position: relative !important; z-index: 1 !important; background: transparent !important; }
+#appView .page { background: rgba(225,225,225,.40) !important; }
+#appView .hero { background: rgba(235,235,235,.70) !important; }
+#appView .card,
+#appView .stat,
+#appView .panel,
+#appView .walk-card,
+#appView .module-menu-card,
+#appView .page-section .card {
+  background-color: rgba(255,255,255,.80) !important;
+}
+#nav, .topbar { z-index: 80 !important; }
+#loading, #toast, #completionModal { z-index: 150 !important; }
+
+</style>
 </body>
 </html>
