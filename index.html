@@ -2,9 +2,9 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-  <!-- TEAM AREA CONTROL V18: MODULE SUBMENUS + SCENIC BACKGROUND + WIB DATE FIX + COLOURED MENUS. -->
+  <!-- TEAM AREA CONTROL V14: MOBILE TABLE UI FIX ONLY. FUNCTIONAL CODE FROZEN. -->
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>TEAM AREA CONTROL</title>
+<title>SYSTEM AREA CONTROL</title>
 <style>
 :root{
   --bg:#f5f7fb;
@@ -277,32 +277,6 @@ body{
   #nav button{padding:10px 12px}
 }
 
-
-/* V17 MODULE SUBMENUS: keep existing forms/history intact and switch panels in-place */
-/* V18 PRIMARY MENU: each module gets its own soft colour. */
-#nav button{transition:transform .18s ease,box-shadow .18s ease;border-width:1px}
-#nav button:hover{transform:translateY(-2px);box-shadow:0 7px 16px rgba(43,61,84,.13)}
-#nav button[data-page="dashboard"]{background:#e1edff;color:#285987;border-color:#c9dcf6}
-#nav button[data-page="sales"]{background:#ddf5e7;color:#216845;border-color:#c3e8d2}
-#nav button[data-page="waste"]{background:#fff0d9;color:#8a5a15;border-color:#f3dfbb}
-#nav button[data-page="maintenance"]{background:#fbe4da;color:#92513c;border-color:#f0d0c4}
-#nav button[data-page="kpi"]{background:#eee4ff;color:#65459a;border-color:#ddd0f6}
-#nav button[data-page="walkthrough"]{background:#ddf5f7;color:#216b73;border-color:#c5e9ec}
-#nav button[data-page="smallware"]{background:#fbe4ef;color:#914667;border-color:#f2cfdf}
-#nav button.active{box-shadow:inset 0 0 0 2px rgba(49,77,112,.16),0 5px 13px rgba(44,62,84,.12);filter:saturate(1.08)}
-
-#moduleSubnav{display:none;gap:9px;flex-wrap:wrap;padding:10px 12px;margin:0 0 14px;background:rgba(255,255,255,.88);border:1px solid rgba(255,255,255,.8);border-radius:16px;box-shadow:0 8px 24px rgba(39,56,78,.10);backdrop-filter:blur(10px)}
-#moduleSubnav.visible{display:flex}
-#moduleSubnav .subnav-btn{border:1px solid #dbe5f2;border-radius:12px;padding:10px 14px;font-weight:750;background:#fff;color:#40536b;box-shadow:0 3px 10px rgba(45,62,84,.06)}
-#moduleSubnav .subnav-btn[data-tone="blue"]{background:#e0edff;color:#285a91;border-color:#c8dcfa}
-#moduleSubnav .subnav-btn[data-tone="green"]{background:#ddf5e7;color:#216845;border-color:#c3e8d2}
-#moduleSubnav .subnav-btn[data-tone="purple"]{background:#eee4ff;color:#65459a;border-color:#ddd0f6}
-#moduleSubnav .subnav-btn[data-tone="orange"]{background:#fff0d9;color:#8a5a15;border-color:#f3dfbb}
-#moduleSubnav .subnav-btn[data-tone="pink"]{background:#fbe4ef;color:#914667;border-color:#f2cfdf}
-#moduleSubnav .subnav-btn[data-tone="cyan"]{background:#ddf5f7;color:#216b73;border-color:#c5e9ec}
-#moduleSubnav .subnav-btn.active{outline:2px solid rgba(72,119,174,.28);transform:translateY(-1px)}
-@media(max-width:600px){#moduleSubnav{gap:7px;padding:9px}#moduleSubnav .subnav-btn{flex:1 1 calc(50% - 7px);font-size:13px;padding:10px 8px}}
-
 </style>
 
 <style>
@@ -330,46 +304,119 @@ body{
 </style>
 
 <style>
-/* V20 MINIMAL PATCH: scenic image only behind the existing layout; preserve original panels and navigation. */
+/* V16: scenic photographic background rotates every 3 hours; cards stay readable. */
+:root{--scenic-overlay:rgba(246,249,255,.70)}
 html{min-height:100%;background:#eaf0f7}
 body{background:transparent!important;position:relative;isolation:isolate;min-height:100vh}
 body::before{
   content:"";position:fixed;inset:0;z-index:-2;pointer-events:none;
-  background-image:linear-gradient(rgba(248,250,255,.48),rgba(248,250,255,.48)),var(--scenic-image);
+  background-image:linear-gradient(135deg,rgba(248,250,255,.68),rgba(250,248,255,.57)),var(--scenic-image);
   background-size:cover;background-position:center;background-repeat:no-repeat;
-  transition:opacity .6s ease;
+  transform:scale(1.015);transition:background-image .8s ease;
 }
+body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:rgba(247,249,253,.12)}
 #appView{background:transparent!important}
-/* Header remains black as requested; other original layout styles are untouched. */
-.topbar{background:#171717!important;color:#fff;border-bottom:1px solid rgba(255,212,59,.25)}
-.topbar .brand h1{color:#ffd43b}
-.topbar .brand small{color:#d4d4d4}
-.topbar .userpill{background:transparent;color:#ffd43b;border-color:transparent;font-weight:800}
-.header-motivation{flex:1;min-width:0;text-align:center;padding:0 16px}
-#headerMotivationMain{color:#ffd43b;font-size:clamp(12px,1.2vw,17px);font-weight:800;line-height:1.3}
-#headerMotivationSub{color:#f3f4f6;font-size:10px;margin-top:3px}
-@media(max-width:700px){
-  .topbar{flex-wrap:wrap;gap:8px}
-  .header-motivation{order:3;flex:1 0 100%;padding:2px 0}
-  #headerMotivationMain{font-size:12px}
-  #headerMotivationSub{font-size:10px}
-}
+.topbar{background:rgba(255,255,255,.82)!important;backdrop-filter:blur(14px)}
+.page{background:transparent}
+.card,.stat,.hero,.login-card{background:rgba(255,255,255,.91)!important;backdrop-filter:blur(8px)}
+.nav button{box-shadow:0 4px 12px rgba(40,60,90,.10)}
 @media(prefers-reduced-motion:reduce){body::before{transition:none}}
+</style>
+
+<style>
+
+/* V17 SUBMENU + RESPONSIVE VIEW TRANSITIONS */
+.module-menu{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:0 0 16px;}
+.module-menu-card{display:flex;align-items:center;gap:14px;text-align:left;width:100%;min-width:0;padding:16px 18px;border:1px solid rgba(255,255,255,.78);border-radius:18px;box-shadow:0 7px 20px rgba(38,55,80,.09);transition:transform .18s ease,box-shadow .18s ease;}
+.module-menu-card:hover{transform:translateY(-2px);box-shadow:0 11px 24px rgba(38,55,80,.14)}
+.module-menu-card .module-menu-icon{width:46px;height:46px;flex:0 0 46px;border-radius:14px;background:rgba(255,255,255,.72);display:grid;place-items:center;font-size:26px}
+.module-menu-card strong{display:block;font-size:15px;margin-bottom:4px;color:#28384e}
+.module-menu-card small{display:block;font-size:12px;line-height:1.4;color:#526780;font-weight:500}
+.module-menu-card.tone-green{background:#dff5e8}.module-menu-card.tone-blue{background:#e0edff}.module-menu-card.tone-orange{background:#fff0d8}.module-menu-card.tone-peach{background:#fbe3dc}.module-menu-card.tone-purple{background:#eee5ff}.module-menu-card.tone-cyan{background:#dff5f6}.module-menu-card.tone-pink{background:#ffe5f0}
+.module-backbar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:0 0 14px}
+.module-backbar .btn{background:rgba(245,248,252,.94);border:1px solid #dfe7f1;color:#506176}
+.module-page-title{font-size:13px;font-weight:800;letter-spacing:.04em;color:#64748b;text-transform:uppercase}
+#loading{background:rgba(238,243,250,.68);backdrop-filter:blur(8px);transition:opacity .12s ease;will-change:opacity}
+#loading.hidden{display:none!important}
+.module-content-panel{min-width:0;animation:moduleFadeIn .14s ease-out}
+.module-history-filter select{min-height:42px}
+#swPanelHistory .filters>*{min-width:180px;flex:1}
+@media(max-width:600px){#swPanelHistory .filters{display:grid!important;grid-template-columns:1fr;gap:9px!important}#swPanelHistory .filters>*{width:100%;min-width:0}}
+.module-history-filter select:focus{outline:2px solid rgba(96,143,200,.2);outline-offset:1px}
+#loading .spinner{display:flex;align-items:center;gap:12px;padding:18px 22px;border:1px solid rgba(255,255,255,.9);border-radius:18px;background:rgba(255,255,255,.96);box-shadow:0 15px 45px rgba(36,55,82,.18)}
+.loading-ring{width:22px;height:22px;border:3px solid #dce7f5;border-top-color:#608fc8;border-radius:50%;animation:moduleSpin .7s linear infinite;flex:0 0 22px}
+@keyframes moduleSpin{to{transform:rotate(360deg)}}
+.page-section.module-transition-in{animation:moduleFadeIn .18s ease-out}
+@keyframes moduleFadeIn{from{opacity:.65;transform:translateY(3px)}to{opacity:1;transform:translateY(0)}}
+.module-history-filter{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px;padding:12px;background:rgba(246,249,253,.92);border:1px solid #e2e9f2;border-radius:14px}
+.module-history-filter label{font-size:11px;font-weight:800;color:#68788d;white-space:nowrap}
+.module-history-filter select{width:auto;min-width:190px;max-width:100%}
+@media(max-width:650px){.module-menu{grid-template-columns:1fr;gap:10px}.module-menu-card{padding:14px}.module-menu-card .module-menu-icon{width:42px;height:42px;flex-basis:42px}.module-backbar{align-items:stretch}.module-backbar .btn{width:100%}.module-history-filter{align-items:stretch}.module-history-filter select{width:100%;min-width:0}.page-section.module-transition-in{animation-duration:.12s}}
+
+</style>
+
+<style>
+/* V18.3 VISUAL ONLY: colorful sales rows and all menu/action buttons */
+#salesHistoryBody tr:nth-child(odd) td{background:#f0f7ff}
+#salesHistoryBody tr:nth-child(even) td{background:#ffffff}
+#salesHistoryBody tr:hover td{background:#dceeff;transition:background .15s ease}
+#salesHistoryBody td:first-child{font-weight:800;color:#315d91;background:#e4efff}
+#salesHistoryBody td:nth-child(12),#salesHistoryBody td:nth-child(13){font-weight:800;color:#246847}
+#salesHistoryBody tr:nth-child(odd) td:first-child{background:#dceafb}
+#salesHistoryBody tr:hover td:first-child{background:#c8e0ff}
+/* Main menu buttons each retain their own color identity */
+#nav button{border:1px solid transparent!important;font-weight:800!important;box-shadow:0 4px 12px rgba(40,60,90,.12);transition:transform .18s ease,box-shadow .18s ease,filter .18s ease}
+#nav button:nth-child(1){background:#e4efff!important;color:#315d91!important;border-color:#cbdfff!important}
+#nav button:nth-child(2){background:#dff5e8!important;color:#246847!important;border-color:#c1e8d1!important}
+#nav button:nth-child(3){background:#fff0d8!important;color:#8a5a16!important;border-color:#f4ddb1!important}
+#nav button:nth-child(4){background:#fbe3dc!important;color:#914d3d!important;border-color:#f0c9bd!important}
+#nav button:nth-child(5){background:#eee5ff!important;color:#6745a0!important;border-color:#d9cafa!important}
+#nav button:nth-child(6){background:#dff5f6!important;color:#216d75!important;border-color:#bfe7e9!important}
+#nav button:nth-child(7){background:#ffe5f0!important;color:#91466b!important;border-color:#f5c9dd!important}
+#nav button:nth-child(8){background:#ffe8df!important;color:#a64e2c!important;border-color:#f5c9b7!important}
+#nav button:hover,.module-menu-card:hover{filter:saturate(1.12);transform:translateY(-2px);box-shadow:0 8px 18px rgba(40,60,90,.16)}
+#nav button.active{outline:2px solid rgba(72,103,145,.25);outline-offset:1px;filter:saturate(1.15);box-shadow:0 6px 15px rgba(40,60,90,.16)}
+/* Buttons across all modules */
+button.btn-primary{background:#dceafb!important;color:#315675!important;border:1px solid #c6dbef!important}
+button.btn-green{background:#dff5e8!important;color:#246847!important;border:1px solid #c1e8d1!important}
+button.btn-purple{background:#eee5ff!important;color:#6745a0!important;border:1px solid #d9cafa!important}
+button.btn-orange{background:#fff0d8!important;color:#8a5a16!important;border:1px solid #f4ddb1!important}
+button.btn-peach{background:#fbe3dc!important;color:#914d3d!important;border:1px solid #f0c9bd!important}
+button.btn-danger{background:#f9dddd!important;color:#873d3d!important;border:1px solid #efc5c5!important}
+button.btn-light{background:#edf3fb!important;color:#425a75!important;border:1px solid #d7e3f1!important}
+button.btn:not(:disabled){box-shadow:0 3px 9px rgba(45,65,90,.09)}
+button.btn:not(:disabled):hover{filter:saturate(1.12);box-shadow:0 7px 15px rgba(45,65,90,.15)}
+.module-menu-card{border:1px solid rgba(255,255,255,.9)!important}
+@media(prefers-reduced-motion:reduce){#nav button,button.btn,#salesHistoryBody tr td{transition:none!important}}
 </style>
 
 </head>
 <body>
 
 <div id="loading" class="loading hidden">
-  <div class="spinner">⏳ Memproses...</div>
+  <div class="spinner"><span class="loading-ring"></span><span>Memuat tampilan...</span></div>
 </div>
 
 <div id="toast" class="toast hidden"></div>
 
+<div id="completionModal" class="hidden" style="position:fixed;inset:0;z-index:120;background:rgba(25,40,60,.45);padding:18px;display:none;align-items:center;justify-content:center">
+  <div class="card" style="width:min(420px,100%);background:#fff!important">
+    <h3 id="completionModalTitle">Konfirmasi Selesai</h3>
+    <p id="completionModalDesc" class="small">Pilih tanggal penyelesaian.</p>
+    <div class="field"><label>TANGGAL PENYELESAIAN *</label><input id="completionDateInput" type="date" required></div>
+    <div class="actions">
+      <button class="btn btn-green" onclick="submitCompletionConfirmation()">✓ Simpan Konfirmasi</button>
+      <button class="btn btn-light" onclick="closeCompletionModal()">Batal</button>
+    </div>
+  </div>
+</div>
+
+
+
 <div id="loginView" class="login-wrap hidden">
   <div class="login-card">
     <div class="logo">🧭</div>
-    <h2>TEAM AREA CONTROL</h2>
+    <h2>SYSTEM AREA CONTROL</h2>
     <p>Store Operation Portal</p>
     <div class="store-only-note">
       Sistem ini tidak menggunakan username dan password.
@@ -383,32 +430,44 @@ body::before{
     <div class="brand">
       <div class="logo">🧭</div>
       <div>
-        <h1>TEAM AREA CONTROL</h1>
+        <h1>SYSTEM AREA CONTROL</h1>
         <small>STORE OPERATION SYSTEM</small>
       </div>
     </div>
 
-    <div class="header-motivation" aria-live="polite">
-      <div id="headerMotivationMain">Tidak Menunggu Hasil Berubah — Kita yang Mengubah Hasil.</div>
-      <div id="headerMotivationSub">Ambil tanggung jawab • Berikan solusi • Tuntaskan aksi</div>
-    </div>
-
     <div class="userbox">
-      <div id="userPill" class="userpill">PUBLIC STORE PORTAL</div>
+      <div id="userPill" class="userpill">PORTAL STORE</div>
     </div>
   </header>
 
   <main class="page">
-    <nav class="nav" id="nav">
-      <button data-page="dashboard" onclick="showPage('dashboard')">🏠 Dashboard</button>
-      <button data-page="sales" onclick="showPage('sales')">💰 Sales</button>
-      <button data-page="waste" onclick="showPage('waste')">♻️ Waste</button>
-      <button data-page="maintenance" onclick="showPage('maintenance')">🔧 Maintenance</button>
-      <button data-page="kpi" onclick="showPage('kpi')">📊 KPI Store</button>
-      <button data-page="walkthrough" onclick="showPage('walkthrough')">📝 Walkthrough</button>
-      <button data-page="smallware" onclick="showPage('smallware')">🍴 Smallware</button>
+    <nav class="nav" id="nav" aria-label="Menu utama">
+      <div class="nav-group">
+        <div class="nav-group-title">UTAMA</div>
+        <button data-page="dashboard" onclick="showPage('dashboard')"><span class="nav-icon">⌂</span><span>Dashboard</span></button>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-title">DATA</div>
+        <button data-page="sales" onclick="showPage('sales')"><span class="nav-icon">▤</span><span>Sales</span></button>
+        <button data-page="waste" onclick="showPage('waste')"><span class="nav-icon">♻</span><span>Waste</span></button>
+        <button data-page="maintenance" onclick="showPage('maintenance')"><span class="nav-icon">⚒</span><span>Maintenance</span></button>
+        <button data-page="smallware" onclick="showPage('smallware')"><span class="nav-icon">▣</span><span>Smallware</span></button>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-title">REPORT</div>
+        <button data-page="kpi" onclick="showPage('kpi')"><span class="nav-icon">▥</span><span>KPI Store</span></button>
+        <button data-page="walkthrough" onclick="showPage('walkthrough')"><span class="nav-icon">☷</span><span>Walkthrough</span></button>
+        <button data-page="soldout" onclick="showPage('soldout')"><span class="nav-icon">⊘</span><span>Rekap Sold Out</span></button>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-title">ADMIN</div>
+        <button data-page="admin" onclick="showPage('admin')"><span class="nav-icon">🛡</span><span>Admin Approval</span></button>
+      </div>
+      <div class="nav-group nav-utility">
+        <div class="nav-group-title">UTILITY</div>
+        <div class="nav-utility-note">Menu operasional terhubung ke database yang sama.</div>
+      </div>
     </nav>
-    <div id="moduleSubnav" aria-label="Submenu modul"></div>
 
     <div class="store-only-note">
       🌐 <b>STORE PORTAL</b> — Tanpa username & password.
@@ -615,8 +674,14 @@ body::before{
           <button class="btn btn-light" onclick="resetSales()">Reset</button>
         </div>
       </div>
+    </section>
 
-      <div class="card" style="margin-top:16px"><div class="card-head"><div><h3>📋 History Sales</h3><div class="small">Seluruh history input Sales langsung dari SALES DATABASE. Data tetap terpisah per Store.</div></div><button class="btn btn-light" onclick="loadSalesHistory()">↻ Refresh</button></div><div class="field" style="max-width:320px;margin:0 0 12px"><label>FILTER STORE</label><select id="salesHistoryStoreFilter" onchange="renderSalesHistoryRows()"><option value="ALL">ALL STORE</option><option value="CITYWALK">CITYWALK</option><option value="CITRA TOWER">CITRA TOWER</option><option value="MENTENG">MENTENG</option></select></div><div class="table-wrap"><table style="min-width:1400px"><thead><tr><th>STORE</th><th>TANGGAL</th><th>DINE IN SALES</th><th>DINE IN TC</th><th>DELIVERY SALES</th><th>DELIVERY TC</th><th>TAKE AWAY SALES</th><th>TAKE AWAY TC</th><th>CONNECT / BO SALES</th><th>CONNECT / BO TC</th><th>TIPS</th><th>TOTAL SALES</th><th>TOTAL TC</th><th>KETERANGAN</th><th>INPUT BY</th></tr></thead><tbody id="salesHistoryBody"></tbody></table></div></div>
+      <div class="card" style="margin-top:16px"><div class="card-head"><div><h3>📋 History Sales</h3><div class="small">Seluruh history input Sales langsung dari SALES DATABASE. Data tetap terpisah per Store.</div></div><button class="btn btn-light" onclick="loadSalesHistory()">↻ Refresh</button></div><div class="table-wrap"><table style="min-width:1400px"><thead><tr><th>STORE</th><th>TANGGAL</th><th>DINE IN SALES</th><th>DINE IN TC</th><th>DELIVERY SALES</th><th>DELIVERY TC</th><th>TAKE AWAY SALES</th><th>TAKE AWAY TC</th><th>CONNECT / BO SALES</th><th>CONNECT / BO TC</th><th>TIPS</th><th>TOTAL SALES</th><th>TOTAL TC</th><th>KETERANGAN</th><th>INPUT BY</th></tr></thead><tbody id="salesHistoryBody"></tbody></table></div></div>
+
+      <div class="card" id="salesComparisonCard" style="margin-top:16px">
+        <div class="card-head"><div><h3>📊 Sales Pembanding</h3><div class="small">Ringkasan SALES NETT vs TARGET setiap store. Data dibaca langsung dari sheet SALES PEMBANDING.</div><div class="small" id="salesComparisonPeriod" style="margin-top:5px;font-weight:600"></div></div><button class="btn btn-light" onclick="loadSalesComparison()">↻ Refresh</button></div>
+        <div class="table-wrap"><table style="min-width:1500px"><thead><tr><th>STORE</th><th>SALES NETT BULAN LALU</th><th>TARGET NETT BULAN LALU</th><th>PENCAPAIAN TARGET LALU %</th><th>SALES NETT BULAN BERJALAN (MTD)</th><th>TARGET NETT BULAN BERJALAN</th><th>PENCAPAIAN TARGET BERJALAN %</th><th>SELISIH SALES NETT</th><th>GROWTH SALES NETT %</th><th>STATUS GROWTH</th><th>KETERANGAN</th></tr></thead><tbody id="salesComparisonBody"><tr><td colspan="11" class="empty">Klik Refresh untuk memuat Sales Pembanding.</td></tr></tbody></table></div>
+      </div>
     </section>
 
     <section id="page-waste" class="page-section hidden">
@@ -814,7 +879,7 @@ body::before{
         </div>
         <div id="maintenanceResult" style="margin-top:14px"></div>
       </div>
-      <div class="card" style="margin-top:16px"><div class="card-head"><div><h3>📋 History Maintenance Semua Store</h3><div class="small">Seluruh ticket Maintenance semua Store.</div></div><button class="btn btn-light" onclick="loadMaintenanceHistory()">↻ Refresh</button></div><div class="table-wrap"><table style="min-width:1200px"><thead><tr><th>TGL INPUT</th><th>NO SC</th><th>STORE</th><th>KATEGORI</th><th>ASSET</th><th>KERUSAKAN</th><th>PRIORITAS</th><th>STATUS</th><th>TEKNISI/VENDOR</th><th>TGL SELESAI</th></tr></thead><tbody id="maintenanceHistoryBody"></tbody></table></div></div>
+      <div class="card" style="margin-top:16px"><div class="card-head"><div><h3>📋 History Maintenance Semua Store</h3><div class="small">Seluruh ticket Maintenance semua Store.</div></div><button class="btn btn-light" onclick="loadMaintenanceHistory()">↻ Refresh</button></div><div class="table-wrap"><table style="min-width:1200px"><thead><tr><th>TGL INPUT</th><th>NO SC</th><th>STORE</th><th>KATEGORI</th><th>ASSET</th><th>KERUSAKAN</th><th>PRIORITAS</th><th>STATUS</th><th>TEKNISI/VENDOR</th><th>TGL SELESAI</th><th>EXPORT WA</th></tr></thead><tbody id="maintenanceHistoryBody"></tbody></table></div></div>
     </section>
 
     <section id="page-kpi" class="page-section hidden">
@@ -854,8 +919,14 @@ body::before{
           <div class="field full-row">
             <label>FOTO KPI *</label>
             <div class="filebox">
-              <input id="kpiPhoto" type="file" accept="image/*" onchange="previewFile(this,'kpiPreview')">
+              <div class="actions" style="margin-bottom:8px">
+                <button type="button" class="btn btn-light" onclick="document.getElementById('kpiPhotoGallery').click()">🖼️ Pilih dari Galeri</button>
+                <button type="button" class="btn btn-light" onclick="document.getElementById('kpiPhotoCamera').click()">📷 Kamera</button>
+              </div>
+              <input id="kpiPhotoGallery" type="file" accept="image/*" onchange="handleImageChoice(this,'kpiPhotoCamera','kpiPreview')" style="display:none">
+              <input id="kpiPhotoCamera" type="file" accept="image/*" capture="environment" onchange="handleImageChoice(this,'kpiPhotoGallery','kpiPreview')" style="display:none">
               <div id="kpiPreview" class="preview"></div>
+              <div class="small">Pilih screenshot/foto KPI dari galeri atau ambil foto menggunakan kamera.</div>
             </div>
           </div>
         </div>
@@ -908,6 +979,31 @@ body::before{
       </div>
 
       <div id="walkthroughDetail" class="card hidden" style="margin-top:16px"></div>
+    </section>
+
+    <section id="page-soldout" class="page-section hidden">
+      <div class="hero">
+        <h2>🚫 Rekap Sold Out</h2>
+        <p>Summary Sold Out per material untuk kontrol tanggal kejadian dan total hari dalam periode pencarian.</p>
+      </div>
+      <div class="card" style="margin-bottom:16px">
+        <div class="form-grid">
+          <div class="field"><label>FILTER STORE</label><select id="soStore"><option value="ALL">SEMUA STORE</option><option value="CITYWALK">CITYWALK</option><option value="CITRA TOWER">CITRA TOWER</option><option value="MENTENG">MENTENG</option></select></div>
+          <div class="field"><label>DARI TANGGAL</label><input id="soFrom" type="date"></div>
+          <div class="field"><label>SAMPAI TANGGAL</label><input id="soTo" type="date"></div>
+          <div class="field" style="display:flex;align-items:end"><button class="btn btn-primary" onclick="loadSoldOutSummary()">🔎 Tampilkan Rekap</button></div>
+        </div>
+      </div>
+      <div class="stats" style="margin-bottom:16px">
+        <div class="stat"><div class="icon">📦</div><div class="label">TOTAL ITEM</div><div id="soTotalItems" class="value">0</div></div>
+        <div class="stat"><div class="icon">🏬</div><div class="label">STORE-ITEM</div><div id="soStoreItems" class="value">0</div></div>
+        <div class="stat"><div class="icon">📅</div><div class="label">TOTAL HARI SO</div><div id="soDays" class="value">0</div></div>
+        <div class="stat"><div class="icon">🚨</div><div class="label">CRITICAL</div><div id="soCritical" class="value">0</div></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><div><h3>📋 Summary Sold Out per Material</h3><div class="small">Sumber: RECAP SOLD OUT DETAIL · Material dihitung satu kali per tanggal, meskipun terkait beberapa menu.</div></div><button class="btn btn-light" onclick="loadSoldOutSummary()">↻ Refresh</button></div>
+        <div class="table-wrap"><table style="min-width:1050px"><thead><tr><th>STORE</th><th>NAMA MATERIAL</th><th>TANGGAL SOLD OUT</th><th>JUMLAH HARI SOLD OUT</th><th>KATEGORI</th><th>PENYEBAB SOLD OUT</th><th>PRIORITAS</th></tr></thead><tbody id="soldOutBody"><tr><td colspan="7" class="empty">Klik Tampilkan Rekap untuk memuat data.</td></tr></tbody></table></div>
+      </div>
     </section>
 
     <section id="page-smallware" class="page-section hidden">
@@ -989,8 +1085,14 @@ body::before{
           <div class="field full-row">
             <label>FOTO KERUSAKAN <span id="swPhotoMark" style="visibility:hidden">*</span></label>
             <div class="filebox">
-              <input id="swPhoto" type="file" accept="image/*" onchange="previewFile(this,'swPhotoPreview')">
+              <div class="actions" style="margin-bottom:8px">
+                <button type="button" class="btn btn-light" onclick="document.getElementById('swPhotoGallery').click()">🖼️ Pilih dari Galeri</button>
+                <button type="button" class="btn btn-light" onclick="document.getElementById('swPhotoCamera').click()">📷 Kamera</button>
+              </div>
+              <input id="swPhotoGallery" type="file" accept="image/*" onchange="handleImageChoice(this,'swPhotoCamera','swPhotoPreview')" style="display:none">
+              <input id="swPhotoCamera" type="file" accept="image/*" capture="environment" onchange="handleImageChoice(this,'swPhotoGallery','swPhotoPreview')" style="display:none">
               <div id="swPhotoPreview" class="preview"></div>
+              <div class="small">Pilih foto yang sudah ada atau ambil foto langsung dari kamera perangkat.</div>
             </div>
             <div class="small" id="swPhotoHelp">Wajib untuk Replacement - Rusak / Pecah.</div>
           </div>
@@ -1016,6 +1118,12 @@ body::before{
         </div>
 
         <div class="filters" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
+          <select id="swHistoryStoreFilter" aria-label="Filter Store Smallware" onchange="renderSmallwareHistory()" style="min-width:190px;flex:1">
+            <option value="ALL">SEMUA STORE</option>
+            <option value="CITYWALK">CITYWALK</option>
+            <option value="CITRA TOWER">CITRA TOWER</option>
+            <option value="MENTENG">MENTENG</option>
+          </select>
           <input id="swSearch" placeholder="Cari ID / Store / Smallware / Jenis" oninput="renderSmallwareHistory()">
           <select id="swStatusFilter" onchange="renderSmallwareHistory()">
             <option value="">Semua Status</option>
@@ -1045,6 +1153,58 @@ body::before{
       <div id="swDetail" class="card hidden" style="margin-top:16px"></div>
     </section>
 
+    <section id="page-admin" class="page-section hidden">
+      <div class="hero">
+        <h2>🛡️ ADMIN — Pusat Approval</h2>
+        <p>Kelola request yang membutuhkan persetujuan dari satu menu. Setiap modul tetap menulis ke database aslinya.</p>
+      </div>
+      <div id="adminLocked" class="card">
+        <h3>Verifikasi Admin / AM</h3>
+        <p class="small">Gunakan akun AM/Admin yang terdaftar pada MASTER USER. Menu approval tidak terbuka sebelum verifikasi berhasil.</p>
+        <div class="form-grid">
+          <div class="field"><label>USERNAME</label><input id="adminUsername" autocomplete="username" placeholder="Username AM/Admin"></div>
+          <div class="field"><label>PASSWORD</label><input id="adminPassword" type="password" autocomplete="current-password" placeholder="Password"></div>
+        </div>
+        <div class="actions"><button class="btn btn-primary" onclick="verifyAdminPortal()">Verifikasi & Buka Admin</button></div>
+      </div>
+      <div id="adminUnlocked" class="hidden">
+        <div class="card" style="margin-bottom:16px">
+          <div class="card-head">
+            <div><h3 id="adminWelcome">Pusat Approval</h3><div class="small">Akun terverifikasi. Pilih modul untuk melihat request.</div></div>
+            <div class="actions"><button class="btn btn-light" onclick="loadAdminRequests()">↻ Refresh</button><button class="btn btn-danger" onclick="lockAdminPortal()">Keluar Admin</button></div>
+          </div>
+          <div class="form-grid">
+            <div class="field"><label>MODUL REQUEST</label>
+              <select id="adminModule" onchange="loadAdminRequests()">
+                <option value="smallware">Smallware</option>
+                <option value="maintenance">Maintenance (monitoring)</option>
+              </select>
+            </div>
+            <div class="field"><label>FILTER STATUS</label>
+              <select id="adminStatus" onchange="renderAdminRequests()">
+                <option value="ALL">Semua Status</option>
+                <option value="PENDING">PENDING</option>
+                <option value="APPROVED">APPROVED</option>
+                <option value="ORDERED">ORDERED</option>
+                <option value="RECEIVED">RECEIVED</option>
+                <option value="COMPLETED">COMPLETED</option>
+                <option value="REJECTED">REJECTED</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="stats" id="adminStats">
+          <div class="stat"><div class="label">TOTAL REQUEST</div><div id="adminTotal" class="value">0</div></div>
+          <div class="stat"><div class="label">MENUNGGU APPROVAL</div><div id="adminPending" class="value">0</div></div>
+          <div class="stat"><div class="label">PROSES BERJALAN</div><div id="adminProgress" class="value">0</div></div>
+          <div class="stat"><div class="label">SELESAI</div><div id="adminCompleted" class="value">0</div></div>
+        </div>
+        <div class="card">
+          <div class="card-head"><div><h3 id="adminListTitle">Daftar Request</h3><div id="adminListInfo" class="small">Data dimuat dari database modul asal.</div></div></div>
+          <div id="adminRequestList"><div class="empty">Tekan Refresh untuk memuat request.</div></div>
+        </div>
+      </div>
+    </section>
   </main>
 </div>
 
@@ -1062,7 +1222,8 @@ const CONFIG = {
 
 const state = {
   user: null,
-  dashboard: null
+  dashboard: null,
+  adminToken: ''
 };
 
 const $ = id => document.getElementById(id);
@@ -1087,19 +1248,24 @@ function todayISO(){
 
 function formatDateWIB(value){
   if(value===null||value===undefined||value==='') return '-';
-  const raw=String(value).trim();
-  // ISO timestamp from Sheets (e.g. 2026-10-07T17:00:00.000Z) is formatted in WIB.
-  const iso=raw.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})(?::(\d{2}))?(?:\.\d+)?(?:Z|[+-]\d{2}:?\d{2})$/);
+  // Sales date is a calendar date, not a timestamp to be displayed in UTC.
+  // For ISO timestamp ending at 17:00Z, take it into Asia/Jakarta first (00:00 next day).
+  const raw = String(value).trim();
+  const iso = raw.match(/^(\d{4})-(\d{2})-(\d{2})(?:T(\d{2}):(\d{2})(?::(\d{2})(?:\.\d+)?)?(Z|[+-]\d{2}:?\d{2})?)?$/);
   if(iso){
-    const d=new Date(raw);
-    if(!Number.isNaN(d.getTime())) return new Intl.DateTimeFormat('id-ID',{timeZone:'Asia/Jakarta',day:'2-digit',month:'2-digit',year:'numeric'}).format(d);
+    if(!iso[4]) return `${iso[3]}/${iso[2]}/${iso[1]}`;
+    const d = new Date(raw);
+    if(!Number.isNaN(d.getTime())){
+      const parts = new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Jakarta',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(d);
+      const part = key => parts.find(x=>x.type===key)?.value || '';
+      return `${part('day')}/${part('month')}/${part('year')}`;
+    }
   }
-  // Plain dates are calendar dates; do not let the browser timezone shift them.
-  const dateOnly=raw.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-  if(dateOnly) return `${dateOnly[3]}/${dateOnly[2]}/${dateOnly[1]}`;
-  const d=new Date(value);
+  const d = value instanceof Date ? value : new Date(value);
   if(Number.isNaN(d.getTime())) return raw;
-  return new Intl.DateTimeFormat('id-ID',{timeZone:'Asia/Jakarta',day:'2-digit',month:'2-digit',year:'numeric'}).format(d);
+  const parts = new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Jakarta',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(d);
+  const part = key => parts.find(x=>x.type===key)?.value || '';
+  return `${part('day')}/${part('month')}/${part('year')}`;
 }
 
 function formatRupiah(n){
@@ -1283,75 +1449,15 @@ function showPage(page){
   document.querySelectorAll('#nav button').forEach(btn=>{
     btn.classList.toggle('active',btn.dataset.page===page);
   });
-  buildModuleSubnav(page);
 
   if(page==='dashboard') loadDashboard();
-  if(page==='sales'){ if($('salesDate') && !$('salesDate').value) $('salesDate').value=todayISO(); loadSalesHistory(); }
+  if(page==='sales'){ $('salesDate').value=todayISO(); loadSalesHistory(); }
   if(page==='waste'){ initWastePage(); loadWasteHistory(); }
   if(page==='maintenance'){ loadMaintenanceHistory(); }
   if(page==='kpi'){ loadKPIHistory(); }
   if(page==='walkthrough') initWalkthrough();
   if(page==='smallware') initSmallware();
-}
-
-function buildModuleSubnav(page){
-  const bar=$('moduleSubnav'); if(!bar) return;
-  const defs={
-    dashboard:[],
-    sales:[['input','➕ Input Sales','blue'],['history','📋 History Sales','green'],['store','🏪 Pilih Store','purple']],
-    waste:[['dashboard','📊 Dashboard Waste','green'],['history','📋 History Waste','orange'],['store','🏪 Filter Store','purple']],
-    maintenance:[['input','➕ Input Ticket','orange'],['search','🔎 Cari Ticket','blue'],['history','📋 History Maintenance','purple']],
-    kpi:[['input','➕ Input KPI','purple'],['history','📋 History KPI','blue'],['store','🏪 Filter Store','green']],
-    walkthrough:[['history','📋 History Temuan','cyan'],['detail','🔎 Detail / Follow Up','pink']],
-    smallware:[['request','➕ Request Baru','pink'],['history','📋 History Request','blue'],['frequency','📈 Frequency','purple']]
-  };
-  const items=defs[page]||[];
-  bar.innerHTML=''; bar.classList.toggle('visible',items.length>0);
-  if(!items.length) return;
-  items.forEach((it,i)=>{
-    const b=document.createElement('button'); b.type='button'; b.className='subnav-btn'+(i===0?' active':'');
-    b.dataset.view=it[0]; b.dataset.tone=it[2]; b.textContent=it[1];
-    b.addEventListener('click',()=>setModuleSubview(page,it[0])); bar.appendChild(b);
-  });
-  setModuleSubview(page,'home');
-}
-
-function setModuleSubview(page,view){
-  const bar=$('moduleSubnav'); if(!bar) return;
-  bar.querySelectorAll('.subnav-btn').forEach(b=>b.classList.toggle('active',b.dataset.view===view));
-  const show=(el,on)=>{if(el) el.classList.toggle('hidden',!on)};
-  const cardOf=id=>$(id)?.closest('.card');
-  const section=$('page-'+page);
-  if(section){
-    [...section.children].forEach(el=>{if(!el.classList.contains('hero')) el.classList.remove('hidden');});
-    if(view==='home'){
-      [...section.children].forEach(el=>{if(!el.classList.contains('hero')) el.classList.add('hidden');});
-      return;
-    }
-  }
-  if(page==='sales'){
-    const input=cardOf('salesDate'), history=cardOf('salesHistoryBody');
-    show(input,view==='input'); show(history,view==='history');
-    if(view==='store') {show(input,false);show(history,true); if($('salesHistoryStoreFilter')) $('salesHistoryStoreFilter').scrollIntoView({behavior:'smooth',block:'center'});}
-  } else if(page==='waste'){
-    const hist=cardOf('wasteHistoryBody');
-    const section=$('page-waste');
-    [...section.children].forEach(el=>{if(el.classList.contains('hero'))return;if(el===hist)return;show(el,view!=='history');});
-    show(hist,view==='history'||view==='store');
-    if(view==='store') $('wtWasteStore')?.scrollIntoView({behavior:'smooth',block:'center'});
-  } else if(page==='maintenance'){
-    const hist=cardOf('maintenanceHistoryBody'), form=cardOf('mtNoSC'), search=cardOf('searchSC');
-    show(form,view==='input'); show(search,view==='search'); show(hist,view==='history');
-  } else if(page==='kpi'){
-    const hist=cardOf('kpiHistoryBody'), form=cardOf('kpiStore'); show(form,view==='input'); show(hist,view==='history');
-    if(view==='store') {show(form,true);show(hist,true);}
-  } else if(page==='walkthrough'){
-    const filter=cardOf('walkthroughStoreFilter'), list=cardOf('walkthroughList'), detail=$('walkthroughDetail');
-    show(filter,true); show(list,view==='history'); show(detail,view==='detail');
-    if(view==='detail' && detail && detail.classList.contains('hidden')) {show(list,true);toast('Pilih salah satu temuan untuk membuka detail dan follow up.');}
-  } else if(page==='smallware'){
-    if(typeof showSmallwareTab==='function') showSmallwareTab(view==='request'?'request':view==='history'?'history':'frequency');
-  }
+  if(page==='waste') initWastePage();
 }
 
 async function loadDashboard(){
@@ -1575,7 +1681,7 @@ function renderRecentMaintenance(rows){
           <tr>
             <th>No SC</th>
             <th>Store</th>
-            <th>Asset</th>
+            <th>Nama Barang</th>
             <th>Status</th>
           </tr>
         </thead>
@@ -1741,15 +1847,18 @@ function renderWasteLatest(rows){
 function historyHeaderKey(header){
   const h=String(header||'').trim().toUpperCase();
   const map={
-    'ID':'id','TIMESTAMP':'timestamp','TANGGAL':'tanggal','STORE':'store',
-    'DINE IN':'dineIn','TC DINE IN':'tcDineIn','DELIVERY':'delivery','TC DELIVERY':'tcDelivery','TAKE AWAY':'takeAway','TC TAKE AWAY':'tcTakeAway','CONNECT / BO':'connectBO','TC CONNECT / BO':'tcConnectBO',
-    'TIPS':'tips','TOTAL SALES':'totalSales','KETERANGAN':'keterangan','INPUT BY':'inputBy',
-    'NO SC':'noSC','TANGGAL INPUT':'tanggalInput','TANGGAL KEJADIAN':'tanggalKejadian',
-    'KATEGORI':'kategori','ITEM / ASSET':'itemAsset','JENIS KERUSAKAN':'jenisKerusakan',
+    'ID':'id','TIMESTAMP':'timestamp','TANGGAL':'tanggal','TANGGAL SALES':'tanggal','STORE':'store','STORE NAME':'store','NAMA STORE':'store',
+    'DINE IN':'dineIn','DINE IN SALES':'dineIn','SALES DINE IN':'dineIn','TC DINE IN':'tcDineIn','DINE IN TC':'tcDineIn',
+    'DELIVERY':'delivery','DELIVERY SALES':'delivery','SALES DELIVERY':'delivery','TC DELIVERY':'tcDelivery','DELIVERY TC':'tcDelivery',
+    'TAKE AWAY':'takeAway','TAKE AWAY SALES':'takeAway','TAKEAWAY SALES':'takeAway','SALES TAKE AWAY':'takeAway','TC TAKE AWAY':'tcTakeAway','TAKE AWAY TC':'tcTakeAway','TAKEAWAY TC':'tcTakeAway',
+    'CONNECT / BO':'connectBO','CONNECT / BO SALES':'connectBO','CONNECT BO SALES':'connectBO','SALES CONNECT / BO':'connectBO','TC CONNECT / BO':'tcConnectBO','CONNECT / BO TC':'tcConnectBO',
+    'TIPS':'tips','TOTAL SALES':'totalSales','TOTAL TC':'totalTc','KETERANGAN':'keterangan','INPUT BY':'inputBy',
+    'NO SC':'noSC','NOMOR SC':'noSC','TANGGAL INPUT':'tanggalInput','TGL INPUT':'tanggalInput','TANGGAL KEJADIAN':'tanggalKejadian','TGL KEJADIAN':'tanggalKejadian',
+    'KATEGORI':'kategori','ITEM / NAMA BARANG':'itemAsset','ASSET':'itemAsset','JENIS KERUSAKAN':'jenisKerusakan','KERUSAKAN':'jenisKerusakan',
     'PRIORITAS':'prioritas','FOTO BEFORE':'fotoBefore','STATUS':'status','TEKNISI / VENDOR':'teknisiVendor',
     'TANGGAL PROGRESS':'tanggalProgress','FOTO PROGRESS':'fotoProgress','TINDAKAN':'tindakan',
     'TANGGAL SELESAI':'tanggalSelesai','FOTO AFTER':'fotoAfter','KETERANGAN SELESAI':'keteranganSelesai',
-    'BULAN':'bulan','TAHUN':'tahun','TANGGAL UPLOAD':'tanggalUpload','FILE NAME':'fileName',
+    'BULAN':'bulan','TAHUN':'tahun','TANGGAL UPLOAD':'tanggalUpload','TGL UPLOAD':'tanggalUpload','FILE NAME':'fileName','NAMA FILE':'fileName',
     'DRIVE URL':'driveUrl','DRIVE FILE ID':'driveFileId','UPLOAD BY':'uploadBy'
   };
   if(map[h]) return map[h];
@@ -1758,25 +1867,181 @@ function historyHeaderKey(header){
 
 async function loadDirectDatabaseHistory(moduleName){
   const r=await apiGet('data',{module:moduleName});
-  const headers=r.headers||[];
-  const rawRows=r.data||[];
+  const headers=Array.isArray(r.headers)?r.headers:[];
+  const rawRows=Array.isArray(r.data)?r.data:(Array.isArray(r.rows)?r.rows:[]);
+  if(!headers.length && rawRows.length && !Array.isArray(rawRows[0])){
+    return rawRows.slice().reverse().slice(0,5000);
+  }
   return rawRows.map(row=>{
     const obj={};
-    headers.forEach((h,i)=>obj[historyHeaderKey(h)]=row[i]);
+    headers.forEach((h,i)=>obj[historyHeaderKey(h)]=Array.isArray(row)?row[i]:row[h]);
+    // Some databases use slightly different column labels; normalize store/date fields.
+    if(!obj.store) obj.store=obj.storeName||obj.namaStore||obj.namaToko||'';
+    if(!obj.tanggal) obj.tanggal=obj.tanggalSales||obj.tanggalInput||obj.tgl||'';
     return obj;
   }).reverse().slice(0,5000);
 }
 
-let salesHistoryCache=[];
-function renderSalesHistoryRows(){
-  const filter=$('salesHistoryStoreFilter')?.value||'ALL';
-  const rows=filter==='ALL'?salesHistoryCache:salesHistoryCache.filter(x=>String(x.store||'').trim().toUpperCase()===filter);
-  $('salesHistoryBody').innerHTML=rows.length?rows.map(x=>`<tr><td><b>${escapeHtml(x.store||'-')}</b></td><td>${escapeHtml(formatDateWIB(x.tanggal))}</td><td>${formatRupiah(x.dineIn)}</td><td>${Number(x.tcDineIn||0).toLocaleString('id-ID')}</td><td>${formatRupiah(x.delivery)}</td><td>${Number(x.tcDelivery||0).toLocaleString('id-ID')}</td><td>${formatRupiah(x.takeAway)}</td><td>${Number(x.tcTakeAway||0).toLocaleString('id-ID')}</td><td>${formatRupiah(x.connectBO)}</td><td>${Number(x.tcConnectBO||0).toLocaleString('id-ID')}</td><td>${formatRupiah(x.tips)}</td><td><b>${formatRupiah(x.totalSales)}</b></td><td><b>${Number(x.totalTc||0).toLocaleString('id-ID')}</b></td><td>${escapeHtml(x.keterangan||'-')}</td><td>${escapeHtml(x.inputBy||'-')}</td></tr>`).join(''):'<tr><td colspan="15" class="empty">Tidak ada history Sales untuk filter ini.</td></tr>';
+async function loadSalesHistory(){if(!state.user)return;try{$('salesHistoryBody').innerHTML='<tr><td colspan="15" class="empty">Memuat history Sales...</td></tr>';const rows=await loadDirectDatabaseHistory('sales');$('salesHistoryBody').innerHTML=rows.length?rows.map(x=>`<tr><td><b>${escapeHtml(x.store||'-')}</b></td><td>${escapeHtml(formatDateWIB(x.tanggal))}</td><td>${formatRupiah(x.dineIn)}</td><td>${Number(x.tcDineIn||0).toLocaleString('id-ID')}</td><td>${formatRupiah(x.delivery)}</td><td>${Number(x.tcDelivery||0).toLocaleString('id-ID')}</td><td>${formatRupiah(x.takeAway)}</td><td>${Number(x.tcTakeAway||0).toLocaleString('id-ID')}</td><td>${formatRupiah(x.connectBO)}</td><td>${Number(x.tcConnectBO||0).toLocaleString('id-ID')}</td><td>${formatRupiah(x.tips)}</td><td><b>${formatRupiah(x.totalSales)}</b></td><td><b>${Number(x.totalTc||0).toLocaleString('id-ID')}</b></td><td>${escapeHtml(x.keterangan||'-')}</td><td>${escapeHtml(x.inputBy||'-')}</td></tr>`).join(''):'<tr><td colspan="15" class="empty">Belum ada history Sales.</td></tr>';__filterHistoryRows('sales');}catch(err){$('salesHistoryBody').innerHTML='<tr><td colspan="15" class="empty">Gagal memuat history Sales.</td></tr>';toast('History Sales: '+err.message)}}
+
+let __salesComparisonCache = [];
+async function loadSalesComparison(){
+  const body=$('salesComparisonBody');
+  if(!body)return;
+  body.innerHTML='<tr><td colspan="11" class="empty">Memuat Sales Pembanding...</td></tr>';
+  try{
+    const result=await apiGet('salesComparison',{limit:5000});
+    __salesComparisonCache=Array.isArray(result.data)?result.data:[];
+    const period=$('salesComparisonPeriod');
+    if(period)period.textContent=result.period||'';
+    renderSalesComparison();
+  }catch(err){
+    body.innerHTML='<tr><td colspan="11" class="empty">Gagal memuat Sales Pembanding: '+escapeHtml(err.message||'Kesalahan backend')+'</td></tr>';
+    toast('Sales Pembanding: '+(err.message||err));
+  }
 }
-async function loadSalesHistory(){if(!state.user)return;try{salesHistoryCache=await loadDirectDatabaseHistory('sales');renderSalesHistoryRows();}catch(err){toast('History Sales: '+err.message)}}
-async function loadWasteHistory(){if(!state.user)return;try{const r=await apiGet('wasteData',{store:'ALL',role:'PUBLIC',userStore:'',limit:5000});const rows=r.allRows||[];$('wasteHistoryBody').innerHTML=rows.length?rows.slice().sort((a,b)=>String(b.periodeAkhir||'').localeCompare(String(a.periodeAkhir||''))).map(x=>`<tr><td>${escapeHtml(x.periodeMulai||'-')} s/d ${escapeHtml(x.periodeAkhir||'-')}</td><td>${escapeHtml(x.kode||'-')}</td><td>${escapeHtml(x.namaBarang||'-')}</td><td>${escapeHtml(x.satuan||'-')}</td><td><b>${Number(x.totalWaste||0).toLocaleString('id-ID',{maximumFractionDigits:2})}</b></td><td>${escapeHtml(x.storeName||'-')}</td></tr>`).join(''):'<tr><td colspan="6" class="empty">Belum ada history Waste.</td></tr>';}catch(err){toast('History Waste: '+err.message)}}
-async function loadMaintenanceHistory(){if(!state.user)return;try{const rows=await loadDirectDatabaseHistory('maintenance');$('maintenanceHistoryBody').innerHTML=rows.length?rows.map(x=>`<tr><td>${escapeHtml(x.tanggalInput||'-')}</td><td><b>${escapeHtml(x.noSC||'-')}</b></td><td>${escapeHtml(x.store||'-')}</td><td>${escapeHtml(x.kategori||'-')}</td><td>${escapeHtml(x.itemAsset||'-')}</td><td>${escapeHtml(x.jenisKerusakan||'-')}</td><td>${escapeHtml(x.prioritas||'-')}</td><td>${statusBadge(x.status)}</td><td>${escapeHtml(x.teknisiVendor||'-')}</td><td>${escapeHtml(x.tanggalSelesai||'-')}</td></tr>`).join(''):'<tr><td colspan="10" class="empty">Belum ada history Maintenance.</td></tr>';}catch(err){toast('History Maintenance Semua Store: '+err.message)}}
-async function loadKPIHistory(){if(!state.user)return;try{const rows=await loadDirectDatabaseHistory('kpi');$('kpiHistoryBody').innerHTML=rows.length?rows.map(x=>`<tr><td>${escapeHtml(x.timestamp||'-')}</td><td>${escapeHtml(x.store||'-')}</td><td>${escapeHtml(x.bulan||'-')}</td><td>${escapeHtml(x.tahun||'-')}</td><td>${escapeHtml(x.tanggalUpload||'-')}</td><td>${escapeHtml(x.keterangan||'-')}</td><td>${x.driveUrl?`<a class="btn btn-light" target="_blank" href="${escapeAttr(x.driveUrl)}">Lihat KPI</a>`:escapeHtml(x.fileName||'-')}</td><td>${escapeHtml(x.uploadBy||'-')}</td></tr>`).join(''):'<tr><td colspan="8" class="empty">Belum ada history KPI.</td></tr>';}catch(err){toast('History KPI Semua Store: '+err.message)}}
+function renderSalesComparison(){
+  const body=$('salesComparisonBody');if(!body)return;
+  const rows=__salesComparisonCache;
+  body.innerHTML=rows.length?rows.map(x=>{
+    const status=String(x.statusGrowth||'-').toUpperCase();
+    const growth=String(x.growthSalesNett||'').trim();
+    const statusStyle=/TURUN|DOWN/.test(status)?'color:#c62828;font-weight:700':(/NAIK|UP/.test(status)?'color:#16803d;font-weight:700':'font-weight:700');
+    const growthStyle=/-/.test(growth)?'color:#c62828;font-weight:700':(/\+/.test(growth)?'color:#16803d;font-weight:700':'font-weight:700');
+    return `<tr><td><b>${escapeHtml(x.store||'-')}</b></td><td>${escapeHtml(x.salesNettBulanLalu||'-')}</td><td>${escapeHtml(x.targetNettBulanLalu||'-')}</td><td>${escapeHtml(x.pencapaianTargetLalu||'-')}</td><td>${escapeHtml(x.salesNettBulanBerjalan||'-')}</td><td>${escapeHtml(x.targetNettBulanBerjalan||'-')}</td><td>${escapeHtml(x.pencapaianTargetBerjalan||'-')}</td><td>${escapeHtml(x.selisihSalesNett||'-')}</td><td style="${growthStyle}">${escapeHtml(x.growthSalesNett||'-')}</td><td style="${statusStyle}">${escapeHtml(x.statusGrowth||'-')}</td><td>${escapeHtml(x.keterangan||'-')}</td></tr>`;
+  }).join(''):'<tr><td colspan="11" class="empty">Tidak ada data Sales Pembanding pada sheet sumber.</td></tr>';
+}
+
+async function loadWasteHistory(){if(!state.user)return;try{$('wasteHistoryBody').innerHTML='<tr><td colspan="6" class="empty">Memuat history Waste...</td></tr>';const r=await apiGet('wasteData',{store:'ALL',role:'PUBLIC',userStore:'',limit:5000});const rows=Array.isArray(r.allRows)?r.allRows:(Array.isArray(r.data)?r.data:[]);$('wasteHistoryBody').innerHTML=rows.length?rows.slice().sort((a,b)=>String(b.periodeAkhir||'').localeCompare(String(a.periodeAkhir||''))).map(x=>`<tr><td>${escapeHtml(x.periodeMulai||'-')} s/d ${escapeHtml(x.periodeAkhir||'-')}</td><td>${escapeHtml(x.kode||'-')}</td><td>${escapeHtml(x.namaBarang||'-')}</td><td>${escapeHtml(x.satuan||'-')}</td><td><b>${Number(x.totalWaste||0).toLocaleString('id-ID',{maximumFractionDigits:2})}</b></td><td>${escapeHtml(x.storeName||'-')}</td></tr>`).join(''):'<tr><td colspan="6" class="empty">Belum ada history Waste.</td></tr>';__filterHistoryRows('waste');}catch(err){$('wasteHistoryBody').innerHTML='<tr><td colspan="6" class="empty">Gagal memuat history Waste.</td></tr>';toast('History Waste: '+err.message)}}
+let completionContext = null;
+
+function openCompletionModal(type, id){
+  completionContext = {type, id};
+  const isMaintenance = type === 'maintenance';
+  $('completionModalTitle').textContent = isMaintenance ? 'Konfirmasi Ticket Maintenance Selesai' : 'Konfirmasi Smallware Selesai';
+  $('completionModalDesc').textContent = isMaintenance
+    ? `Masukkan tanggal penyelesaian untuk No SC ${id}.`
+    : `Masukkan tanggal penyelesaian untuk Request Smallware ${id}.`;
+  $('completionDateInput').value = todayISO();
+  const modal = $('completionModal');
+  modal.classList.remove('hidden');
+  modal.style.display = 'flex';
+}
+
+function closeCompletionModal(){
+  const modal = $('completionModal');
+  modal.classList.add('hidden');
+  modal.style.display = 'none';
+  completionContext = null;
+}
+
+async function submitCompletionConfirmation(){
+  if(!completionContext) return;
+  const tanggalSelesai = $('completionDateInput').value;
+  if(!tanggalSelesai){
+    toast('Tanggal penyelesaian wajib dipilih.');
+    return;
+  }
+  const ctx = {...completionContext};
+  try{
+    showLoading(true);
+    if(ctx.type === 'maintenance'){
+      await apiPost({
+        action:'confirmMaintenanceComplete',
+        noSC:ctx.id,
+        status:'COMPLETED',
+        tanggalSelesai,
+        updateBy:state.user?.nama || state.user?.username || 'PUBLIC'
+      });
+    }else{
+      await apiPost({
+        action:'updateSmallwareStatus',
+        idRequest:ctx.id,
+        role:state.user?.role || 'STORE',
+        adminToken:state.adminToken || '',
+        userStore:storeApiOfUser(),
+        status:'COMPLETED',
+        completedDate:tanggalSelesai,
+        tanggalSelesai,
+        updateBy:state.user?.nama || state.user?.username || 'PUBLIC'
+      });
+    }
+    closeCompletionModal();
+    toast('Konfirmasi selesai berhasil dikirim.');
+    if(ctx.type === 'maintenance'){
+      await loadMaintenanceHistory();
+      if($('searchSC')?.value.trim()) await searchMaintenance();
+      loadDashboard();
+    }else{
+      $('swDetail').classList.add('hidden');
+      await loadSmallware();
+      await loadSmallwareFrequency();
+    }
+  }catch(err){
+    toast('Gagal menyimpan konfirmasi: '+(err.message||err));
+  }finally{
+    showLoading(false);
+  }
+}
+
+function exportMaintenanceWhatsApp(rowIndex){
+  const rows=window.__maintenanceHistoryRows||[];
+  const x=rows[rowIndex];
+  if(!x){toast('Data Maintenance tidak ditemukan. Silakan refresh history.');return;}
+  const store=String(x.store||x.storeName||'').trim();
+  const damage=String(x.jenisKerusakan||x.keterangan||'-').trim();
+  const date=formatDateWIB(x.tanggalInput||'');
+  const detail=String(x.keterangan||'-').trim();
+  const message=[
+    'Selamat Siang Team Maintenance dan PRJ,',
+    'Berikut SC ('+store+') dibantu follow up nya :',
+    '',
+    '1. Store : '+store,
+    'Kerusakan : '+damage,
+    'No SC : '+String(x.noSC||'-').trim(),
+    'Tgl input SC : '+date,
+    'Keterangan : '+detail,
+    '',
+    'Terima kasih'
+  ].join('\n');
+  const url='https://wa.me/?text='+encodeURIComponent(message);
+  window.open(url,'_blank','noopener,noreferrer');
+}
+
+async function loadMaintenanceHistory(){if(!state.user)return;try{$('maintenanceHistoryBody').innerHTML='<tr><td colspan="11" class="empty">Memuat history Maintenance...</td></tr>';const rows=await loadDirectDatabaseHistory('maintenance');window.__maintenanceHistoryRows=rows;$('maintenanceHistoryBody').innerHTML=rows.length?rows.map((x,i)=>`<tr><td>${escapeHtml(formatDateWIB(x.tanggalInput||'-'))}</td><td><b>${escapeHtml(x.noSC||'-')}</b></td><td>${escapeHtml(x.store||'-')}</td><td>${escapeHtml(x.kategori||'-')}</td><td>${escapeHtml(x.itemAsset||'-')}</td><td>${escapeHtml(x.jenisKerusakan||'-')}</td><td>${escapeHtml(x.prioritas||'-')}</td><td>${statusBadge(x.status)}</td><td>${escapeHtml(x.teknisiVendor||'-')}</td><td>${escapeHtml(x.tanggalSelesai||'-')}</td><td><div class="actions"><button class="btn btn-peach" onclick="exportMaintenanceWhatsApp(${i})">💬 Export WA</button>${String(x.status||'').toUpperCase()==='COMPLETED'?'<span class="badge badge-done">SELESAI</span>':`<button class="btn btn-green" onclick="openCompletionModal('maintenance','${escapeAttr(x.noSC||'')}')">✓ Konfirmasi Selesai</button>`}</div></td></tr>`).join(''):'<tr><td colspan="11" class="empty">Belum ada history Maintenance.</td></tr>';__filterHistoryRows('maintenance');}catch(err){$('maintenanceHistoryBody').innerHTML='<tr><td colspan="11" class="empty">Gagal memuat history Maintenance.</td></tr>';toast('History Maintenance Semua Store: '+err.message)}}
+async function loadKPIHistory(){if(!state.user)return;try{$('kpiHistoryBody').innerHTML='<tr><td colspan="8" class="empty">Memuat history KPI...</td></tr>';const rows=await loadDirectDatabaseHistory('kpi');$('kpiHistoryBody').innerHTML=rows.length?rows.map(x=>`<tr><td>${escapeHtml(x.timestamp||'-')}</td><td>${escapeHtml(x.store||'-')}</td><td>${escapeHtml(x.bulan||'-')}</td><td>${escapeHtml(x.tahun||'-')}</td><td>${escapeHtml(x.tanggalUpload||'-')}</td><td>${escapeHtml(x.keterangan||'-')}</td><td>${x.driveUrl?`<a class="btn btn-light" target="_blank" href="${escapeAttr(x.driveUrl)}">Lihat KPI</a>`:escapeHtml(x.fileName||'-')}</td><td>${escapeHtml(x.uploadBy||'-')}</td></tr>`).join(''):'<tr><td colspan="8" class="empty">Belum ada history KPI.</td></tr>';__filterHistoryRows('kpi');}catch(err){$('kpiHistoryBody').innerHTML='<tr><td colspan="8" class="empty">Gagal memuat history KPI.</td></tr>';toast('History KPI Semua Store: '+err.message)}}
+
+async function loadSoldOutSummary(){
+  const body=document.getElementById('soldOutBody');
+  if(!body)return;
+  body.innerHTML='<tr><td colspan="7" class="empty">Memuat summary Sold Out...</td></tr>';
+  try{
+    const r=await apiGet('soldoutSummary',{
+      store:document.getElementById('soStore')?.value||'ALL',
+      from:document.getElementById('soFrom')?.value||'',
+      to:document.getElementById('soTo')?.value||'',
+      limit:5000
+    });
+    const summary=r.summary||{};
+    document.getElementById('soTotalItems').textContent=Number(summary.totalItems||0).toLocaleString('id-ID');
+    document.getElementById('soStoreItems').textContent=Number(summary.totalStoreItems||0).toLocaleString('id-ID');
+    document.getElementById('soDays').textContent=Number(summary.totalSoldOutDays||0).toLocaleString('id-ID');
+    document.getElementById('soCritical').textContent=Number(summary.critical||0).toLocaleString('id-ID');
+    const rows=Array.isArray(r.data)?r.data:[];
+    if(!rows.length){body.innerHTML='<tr><td colspan="7" class="empty">Tidak ada data Sold Out untuk filter ini.</td></tr>';return;}
+    body.innerHTML=rows.map(x=>{
+      const priority=String(x.priority||'NORMAL').toUpperCase();
+      const colors={CRITICAL:'badge-danger',HIGH:'badge-warning',MONITOR:'badge-progress',NORMAL:'badge-success'};
+      const badge=colors[priority]||'badge-progress';
+      const dates=Array.isArray(x.tanggalSoldOut)?x.tanggalSoldOut:[];
+      const datesText=dates.map(d=>formatDateWIB(d)).join(', ');
+      return `<tr><td><b>${escapeHtml(x.store||'-')}</b></td><td>${escapeHtml(x.namaMaterial||'-')}</td><td style="white-space:normal;min-width:190px">${escapeHtml(datesText||'-')}</td><td style="text-align:center;font-weight:700">${Number(x.jumlahHariSoldOut||0).toLocaleString('id-ID')} hari</td><td>${escapeHtml(x.kategori||'-')}</td><td style="white-space:normal;min-width:220px;max-width:380px">${escapeHtml(x.penyebabSoldOut||'Belum diisi oleh store')}</td><td><span class="badge ${badge}">${escapeHtml(priority)}</span></td></tr>`;
+    }).join('');
+  }catch(err){
+    body.innerHTML=`<tr><td colspan="7" class="empty">Gagal memuat Sold Out: ${escapeHtml(err.message||String(err))}</td></tr>`;
+    toast('Rekap Sold Out: '+(err.message||err));
+  }
+}
 
 /* SALES */
 [
@@ -1828,7 +2093,7 @@ async function saveSales(){
       tcConnect:num('tcConnect'),
       tips:num('salesTips'),
       keterangan:$('salesNote').value.trim(),
-      inputBy:'PUBLIC USER'
+      inputBy:state.user?.nama || state.user?.username || state.user?.userId || 'USER'
     };
 
     showLoading(true);
@@ -1892,9 +2157,11 @@ function resetWaste(){
 
 /* MAINTENANCE */
 async function saveMaintenance(){
+  // Maintenance harus memakai store yang dipilih pada form, bukan store akun (bisa ALL).
   const targetStore=selectedStore('mtStore');
-  if(!targetStore){
-    toast('Pilih Store terlebih dahulu.');
+  const validMaintenanceStores=['CITYWALK','CITRA TOWER','MENTENG'];
+  if(!targetStore || !validMaintenanceStores.includes(targetStore)){
+    toast('Pilih Store Maintenance yang valid: CITYWALK, CITRA TOWER, atau MENTENG.');
     return;
   }
 
@@ -1913,7 +2180,7 @@ async function saveMaintenance(){
       noSC,
       tanggalInput:$('mtInputDate').value,
       tanggalKejadian:$('mtIncidentDate').value,
-      store:storeApiOfUser(),
+      store:targetStore, // Backend menerima store terpilih: CITYWALK / CITRA TOWER / MENTENG.
       kategori:$('mtCategory').value,
       itemAsset:$('mtAsset').value.trim(),
       jenisKerusakan:$('mtDamage').value.trim(),
@@ -2010,7 +2277,7 @@ async function saveKPI(){
     return;
   }
 
-  const file=$('kpiPhoto').files[0];
+  const file=$('kpiPhotoGallery').files[0] || $('kpiPhotoCamera').files[0];
   if(!file){
     toast('Foto KPI wajib dipilih.');
     return;
@@ -2032,7 +2299,8 @@ async function saveKPI(){
 
     const r=await apiPost(payload);
     toast('KPI berhasil diupload ke Google Drive.');
-    $('kpiPhoto').value='';
+    $('kpiPhotoGallery').value='';
+    $('kpiPhotoCamera').value='';
     $('kpiPreview').innerHTML='';
     $('kpiNote').value='';
     await loadKPIHistory();
@@ -2044,6 +2312,12 @@ async function saveKPI(){
 /* UTILS */
 function num(id){
   return Number($(id).value||0)||0;
+}
+
+function handleImageChoice(input, otherInputId, targetId){
+  const other = $(otherInputId);
+  if(other) other.value = '';
+  previewFile(input, targetId);
 }
 
 function previewFile(input,targetId){
@@ -2210,8 +2484,15 @@ async function viewWalkthroughDetail(id){
       throw new Error('Detail temuan tidak ditemukan.');
     }
 
+    // Detail card berada di panel Follow-up yang tersembunyi saat halaman History aktif.
+    // Pindahkan tampilan ke panel Follow-up sebelum merender detail agar temuan dan foto terlihat.
+    __setupModulePanels();
+    __setModuleView('walkthrough','followup');
     renderWalkthroughDetail(r.data);
-    $('walkthroughDetail').scrollIntoView({behavior:'smooth',block:'start'});
+    $('walkthroughDetail').classList.remove('hidden');
+    requestAnimationFrame(function(){
+      $('walkthroughDetail').scrollIntoView({behavior:'smooth',block:'start'});
+    });
   }catch(err){
     toast(err.message);
   }finally{
@@ -2549,15 +2830,18 @@ function renderSmallwareHistory(){
 
   const q = String($('swSearch')?.value||'').trim().toLowerCase();
   const status = String($('swStatusFilter')?.value||'').toUpperCase();
+  const selectedStore = canonicalStore($('swHistoryStoreFilter')?.value||'ALL');
 
   const rows = smallwareRows.filter(x=>{
     const text = [
       x.idRequest, x.store, x.namaSmallware,
       x.jenisRequest, x.keterangan, x.status
     ].join(' ').toLowerCase();
+    const rowStore = canonicalStore(x.store||x.storeName||'');
 
     return (!q || text.includes(q))
-      && (!status || String(x.status||'').toUpperCase()===status);
+      && (!status || String(x.status||'').toUpperCase()===status)
+      && (!selectedStore || selectedStore==='ALL' || rowStore===selectedStore);
   });
 
   if(!rows.length){
@@ -2721,7 +3005,7 @@ function openSmallwareDetail(index){
         </div>
       </div>` : ''}
 
-    ${am ? renderSmallwareAdminActions(row) : ''}
+    ${renderSmallwareAdminActions(row)}
   `;
 
   $('swDetail').scrollIntoView({behavior:'smooth',block:'start'});
@@ -2729,23 +3013,32 @@ function openSmallwareDetail(index){
 
 function renderSmallwareAdminActions(row){
   const s = String(row.status||'').toUpperCase();
+  const am = isAM();
 
   let html = `
-    <div class="section-title">⚙️ Approval / Processing</div>
+    <div class="section-title">${am ? '⚙️ Approval / Processing' : '📦 Konfirmasi Barang'}</div>
     <div class="actions">
   `;
 
-  if(s==='PENDING'){
+  if(s==='PENDING' && am){
     html += `
       <button class="btn btn-green" onclick="approveSmallwareUI('${escapeAttr(row.idRequest)}')">✓ APPROVE</button>
       <button class="btn btn-danger" onclick="rejectSmallwareUI('${escapeAttr(row.idRequest)}')">✕ REJECT</button>`;
   }
 
-  if(['APPROVED','ORDERED','RECEIVED'].includes(s)){
-    const next = s==='APPROVED' ? 'ORDERED' : s==='ORDERED' ? 'RECEIVED' : 'COMPLETED';
+  if(s==='APPROVED' && am){
     html += `
-      <button class="btn btn-primary" onclick="updateSmallwareStatusUI('${escapeAttr(row.idRequest)}','${next}')">
-        Ubah → ${next}
+      <button class="btn btn-primary" onclick="updateSmallwareStatusUI('${escapeAttr(row.idRequest)}','ORDERED')">
+        Tandai Sudah Dipesan
+      </button>`;
+  }
+
+  // Konfirmasi selesai boleh dilakukan dari akun Store, Admin/AM, maupun portal publik.
+  // Backend tetap memvalidasi bahwa status saat ini ORDERED dan tanggal selesai diisi.
+  if(s==='ORDERED'){
+    html += `
+      <button class="btn btn-green" onclick="openCompletionModal('smallware','${escapeAttr(row.idRequest)}')">
+        ✓ Konfirmasi Selesai
       </button>`;
   }
 
@@ -2763,7 +3056,8 @@ async function saveSmallwareRequestUI(){
   const name = $('swName').value.trim();
   const qty = Number($('swQty').value||0);
   const type = $('swType').value;
-  const file = $('swPhoto').files[0];
+  const targetStore = selectedStore('swStore') || storeApiOfUser();
+  const file = $('swPhotoGallery').files[0] || $('swPhotoCamera').files[0];
 
   if(!name){
     toast('Nama Smallware wajib diisi.');
@@ -2887,6 +3181,7 @@ async function updateSmallwareStatusUI(id,status){
       action:'updateSmallwareStatus',
       idRequest:id,
       role:state.user.role,
+      userStore:(selectedStore('swStore') || storeApiOfUser()),
       status,
       updateBy:state.user.nama || state.user.username || ''
     });
@@ -2906,7 +3201,8 @@ function resetSmallwareForm(){
   $('swName').value='';
   $('swQty').value='';
   $('swType').value='';
-  $('swPhoto').value='';
+  $('swPhotoGallery').value='';
+  $('swPhotoCamera').value='';
   $('swPhotoPreview').innerHTML='';
   $('swNote').value='';
   toggleSmallwarePhoto();
@@ -2964,42 +3260,563 @@ document.addEventListener('DOMContentLoaded', function(){
 });
 
 
-/* V20 scenic wallpaper: changes on the hour, using the same image for everyone during that hour. */
+/* V16 scenic wallpaper: one landscape per 3-hour block, consistent for all visitors in that block. */
 (function initScenicBackground(){
   const scenicPhotos = [
     'https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=2200&q=85',
     'https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=2200&q=85',
     'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=2200&q=85',
-    'https://images.unsplash.com/photo-1500530855697-b586d89ee3?auto=format&fit=crop&w=2200&q=85'
+    'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=2200&q=85'
   ];
   const applyScenic = () => {
-    const hourBlock = Math.floor(Date.now() / (60 * 60 * 1000));
-    const url = scenicPhotos[hourBlock % scenicPhotos.length];
+    const threeHourBlock = Math.floor(Date.now() / (3 * 60 * 60 * 1000));
+    const url = scenicPhotos[threeHourBlock % scenicPhotos.length];
     document.documentElement.style.setProperty('--scenic-image', `url("${url}")`);
   };
   applyScenic();
   window.setInterval(applyScenic, 60 * 1000);
 })();
 
-/* Rotate only the motivation text; do not change navigation or page layout. */
-(function initHeaderMotivation(){
-  const quotes = [
-    ['Tidak Menunggu Hasil Berubah — Kita yang Mengubah Hasil.', 'Ambil tanggung jawab • Berikan solusi • Tuntaskan aksi'],
-    ['Target adalah Komitmen, Kualitas adalah Standar.', 'Disiplin dalam proses • Konsisten dalam eksekusi'],
-    ['Bergerak Bersama, Bertumbuh Bersama, Menang Bersama.', 'Satu tim • Satu tujuan • Hasil terbaik'],
-    ['Konsistensi Kecil Menghasilkan Pencapaian Besar.', 'Fokus pada solusi • Unggul dalam pelayanan']
-  ];
-  let index = 0;
-  const main = document.getElementById('headerMotivationMain');
-  const sub = document.getElementById('headerMotivationSub');
-  if (!main || !sub) return;
-  window.setInterval(function(){
-    index = (index + 1) % quotes.length;
-    main.textContent = quotes[index][0];
-    sub.textContent = quotes[index][1];
-  }, 8000);
-})();
+
+
+/* =========================================================
+   V17: MODULE SUBMENUS, HISTORY ACCESS, AND FAST TRANSITIONS
+   Keeps existing forms, history loaders, and backend calls.
+   ========================================================= */
+let __moduleMenusReady = false;
+const __moduleViewState = { module:'dashboard', view:'menu' };
+const __moduleSpecs = {
+  sales:{title:'💰 Sales',subtitle:'Pilih input sales atau lihat history berdasarkan store.',items:[
+    {key:'input',icon:'➕',title:'Input Sales',desc:'Input laporan sales harian.',tone:'green'},
+    {key:'history',icon:'📋',title:'History Sales',desc:'Riwayat transaksi dan filter store.',tone:'blue'},
+    {key:'comparison',icon:'📊',title:'Sales Pembanding',desc:'Lihat sales gross dan nett dari sheet pembanding.',tone:'purple'}]},
+  waste:{title:'♻️ Waste',subtitle:'Pilih dashboard Waste atau buka riwayat seluruh store.',items:[
+    {key:'dashboard',icon:'📊',title:'Dashboard Waste',desc:'Ringkasan, top waste, dan periode terbaru.',tone:'orange'},
+    {key:'history',icon:'📋',title:'History Waste',desc:'Riwayat Waste semua store.',tone:'blue'}]},
+  maintenance:{title:'🔧 Maintenance',subtitle:'Buat ticket, cari ticket, atau lihat history maintenance.',items:[
+    {key:'input',icon:'➕',title:'Input Ticket',desc:'Buat ticket kerusakan/perbaikan baru.',tone:'peach'},
+    {key:'history',icon:'📋',title:'History Maintenance',desc:'Riwayat ticket seluruh store.',tone:'blue'},
+    {key:'search',icon:'🔎',title:'Cari Ticket',desc:'Cari ticket berdasarkan nomor SC.',tone:'purple'}]},
+  kpi:{title:'📊 KPI Store',subtitle:'Kelola upload KPI dan periksa riwayat setiap store.',items:[
+    {key:'input',icon:'📤',title:'Input KPI',desc:'Upload foto dashboard KPI store.',tone:'purple'},
+    {key:'history',icon:'📋',title:'History KPI',desc:'Riwayat upload KPI semua store.',tone:'blue'}]},
+  walkthrough:{title:'📝 Walkthrough',subtitle:'Buka temuan dan tindak lanjut walkthrough.',items:[
+    {key:'history',icon:'📋',title:'History Temuan',desc:'Cari dan lihat temuan berdasarkan store.',tone:'cyan'},
+    {key:'followup',icon:'✅',title:'Detail / Follow Up Temuan',desc:'Pilih temuan untuk melihat detail dan tindak lanjut.',tone:'green'}]},
+  soldout:{title:'🚫 Rekap Sold Out',subtitle:'Lihat rekap item Sold Out berdasarkan store dan periode.',items:[{key:'history',icon:'📋',title:'Rekap Sold Out',desc:'Ringkasan dan prioritas item Sold Out.',tone:'orange'}]},
+  smallware:{title:'🍴 Smallware',subtitle:'Pilih request baru, history request, atau frequency.',items:[
+    {key:'request',icon:'➕',title:'Request Baru',desc:'Buat permintaan Smallware.',tone:'green'},
+    {key:'history',icon:'📋',title:'History Request',desc:'Lihat status seluruh request.',tone:'blue'},
+    {key:'frequency',icon:'📈',title:'Frequency',desc:'Analisis frekuensi request Smallware.',tone:'purple'}]}
+};
+function __el(id){return document.getElementById(id)}
+function __makeMenuCard(module,key,item){
+  const b=document.createElement('button');b.type='button';b.className='module-menu-card tone-'+item.tone;
+  b.innerHTML='<span class="module-menu-icon">'+item.icon+'</span><span><strong>'+item.title+'</strong><small>'+item.desc+'</small></span>';
+  b.addEventListener('click',()=>openModuleView(module,key));return b;
+}
+function __findCardByChild(id){const e=__el(id);return e?e.closest('.card'):null}
+function __moveToPanel(panel,node){if(panel&&node&&node!==panel&&!panel.contains(node))panel.appendChild(node)}
+function __newPanel(id){const p=document.createElement('div');p.id=id;p.className='module-content-panel hidden';return p}
+function __makeLanding(section,module){
+  const spec=__moduleSpecs[module];if(!spec||section.querySelector('.module-menu'))return;
+  const hero=section.querySelector('.hero');
+  if(hero){const h=hero.querySelector('h2');const p=hero.querySelector('p');if(h)h.textContent=spec.title;if(p)p.textContent=spec.subtitle;}
+  const menu=document.createElement('div');menu.className='module-menu';menu.setAttribute('aria-label','Pilihan '+module);
+  spec.items.forEach(item=>menu.appendChild(__makeMenuCard(module,item.key,item)));
+  if(hero)hero.insertAdjacentElement('afterend',menu);else section.insertBefore(menu,section.firstChild);
+  const back=document.createElement('div');back.className='module-backbar hidden';back.innerHTML='<button type="button" class="btn btn-light" onclick="backToModuleMenu(\''+module+'\')">← Kembali ke pilihan '+spec.title.replace(/^\S+\s*/, '')+'</button><span class="module-page-title"></span>';
+  menu.insertAdjacentElement('afterend',back);
+  section.dataset.moduleName=module;
+  section._moduleLanding=menu;section._moduleBack=back;section._moduleHero=hero;
+}
+function __setupModulePanels(){
+  if(__moduleMenusReady)return;
+  // Repair the legacy Sales history block, which in some builds sits outside page-sales.
+  const salesSection=__el('page-sales');const salesHistory=__findCardByChild('salesHistoryBody');
+  if(salesSection&&salesHistory&&!salesSection.contains(salesHistory))salesSection.appendChild(salesHistory);
+  const configs={
+    sales:{panels:{input:()=>[__findCardByChild('salesDineIn')],history:()=>[__findCardByChild('salesHistoryBody')],comparison:()=>[__el('salesComparisonCard')] }},
+    waste:{panels:{dashboard:()=>[],history:()=>[__findCardByChild('wasteHistoryBody')]}},
+    maintenance:{panels:{input:()=>[__findCardByChild('mtNoSC')],search:()=>[__findCardByChild('searchSC')],history:()=>[__findCardByChild('maintenanceHistoryBody')]}},
+    kpi:{panels:{input:()=>[__findCardByChild('kpiStore')],history:()=>[__findCardByChild('kpiHistoryBody')]}},
+    walkthrough:{panels:{history:()=>[],followup:()=>[]}},
+    smallware:{panels:{request:()=>[__el('swPanelRequest')],history:()=>[__el('swPanelHistory')],frequency:()=>[__el('swPanelFrequency')]}}
+  };
+  Object.keys(configs).forEach(module=>{
+    const section=__el('page-'+module);if(!section)return;
+    __makeLanding(section,module);
+    const spec=configs[module];section._modulePanels={};
+    if(module==='waste'){
+      const history=__findCardByChild('wasteHistoryBody');
+      const dash=__newPanel('module-waste-dashboard-panel');
+      const nodes=Array.from(section.children).filter(n=>n!==section._moduleHero&&n!==section._moduleLanding&&n!==section._moduleBack&&n!==history);
+      nodes.forEach(n=>dash.appendChild(n));
+      if(history){const hp=__newPanel('module-waste-history-panel');hp.appendChild(history);section.appendChild(hp);section._modulePanels.history=hp;}
+      section.appendChild(dash);section._modulePanels.dashboard=dash;
+    }else if(module==='walkthrough'){
+      const detail=__el('walkthroughDetail');
+      const main=__newPanel('module-walkthrough-history-panel');
+      Array.from(section.children).filter(n=>n!==section._moduleHero&&n!==section._moduleLanding&&n!==section._moduleBack&&n!==detail).forEach(n=>main.appendChild(n));
+      if(detail&&detail.parentElement!==section){};
+      section.appendChild(main);section._modulePanels.history=main;
+      // Follow-up reuses the temuan list and detail card so selecting a temuan still works.
+      const follow=__newPanel('module-walkthrough-followup-panel');
+      const note=document.createElement('div');note.className='store-only-note';note.textContent='Pilih temuan dari daftar untuk membuka detail dan tindak lanjut.';follow.appendChild(note);
+      if(detail)follow.appendChild(detail);
+      section.appendChild(follow);section._modulePanels.followup=follow;
+    }else{
+      Object.keys(spec.panels).forEach(key=>{
+        const panel=__newPanel('module-'+module+'-'+key+'-panel');
+        const nodes=(spec.panels[key]&&spec.panels[key]())||[];
+        nodes.filter(Boolean).forEach(n=>__moveToPanel(panel,n));
+        section.appendChild(panel);section._modulePanels[key]=panel;
+      });
+      if(module==='smallware'){
+        // Smallware's own request/history/frequency tabs are retained inside the selected submenu view.
+        const tabs=section.querySelector('.stats')?.nextElementSibling;
+        if(tabs&&tabs.classList.contains('nav'))tabs.classList.add('smallware-subtabs');
+      }
+    }
+    // History store filters are client-side and never alter source data.
+    if(module==='sales'){__addHistoryFilter('sales',__findCardByChild('salesHistoryBody'));}
+    if(module==='waste')__addHistoryFilter('waste',__findCardByChild('wasteHistoryBody'));
+    if(module==='maintenance')__addHistoryFilter('maintenance',__findCardByChild('maintenanceHistoryBody'));
+    if(module==='kpi')__addHistoryFilter('kpi',__findCardByChild('kpiHistoryBody'));
+  });
+  __moduleMenusReady=true;
+}
+function __addHistoryFilter(module,card){
+  if(!card||card.querySelector('.module-history-filter'))return;
+  const labels={sales:'History Sales',waste:'History Waste',maintenance:'History Maintenance',kpi:'History KPI'};
+  const box=document.createElement('div');box.className='module-history-filter';
+  const label=document.createElement('label');label.textContent='FILTER STORE';label.htmlFor=module+'HistoryStoreFilter';
+  const select=document.createElement('select');select.id=module+'HistoryStoreFilter';select.innerHTML='<option value="ALL">SEMUA STORE</option><option value="CITYWALK">CITYWALK</option><option value="CITRA TOWER">CITRA TOWER</option><option value="MENTENG">MENTENG</option>';
+  select.addEventListener('change',()=>__filterHistoryRows(module));box.append(label,select);const tableWrap=card.querySelector('.table-wrap');if(tableWrap)card.insertBefore(box,tableWrap);else card.appendChild(box);
+}
+function __filterHistoryRows(module){
+  const select=__el(module+'HistoryStoreFilter');
+  const body=__el(({sales:'salesHistoryBody',waste:'wasteHistoryBody',maintenance:'maintenanceHistoryBody',kpi:'kpiHistoryBody'})[module]);
+  if(!body)return;
+  const wanted=select?canonicalStore(select.value):'ALL';
+  const storeIndex=module==='sales'?0:module==='waste'?5:module==='maintenance'?2:1;
+  Array.from(body.querySelectorAll('tr')).forEach(tr=>{
+    const first=(tr.cells[0]?.textContent||'').trim().toUpperCase();
+    const store=canonicalStore((tr.cells[storeIndex]?.textContent||'').trim());
+    const isEmpty=/BELUM ADA HISTORY|MEMUAT HISTORY|GAGAL MEMUAT/.test(first);
+    tr.hidden=!!(wanted&&wanted!=='ALL'&&!isEmpty&&store!==wanted);
+  });
+}
+function __setModuleView(module,view){
+  const section=__el('page-'+module);if(!section)return;
+  document.querySelectorAll('.page-section').forEach(x=>x.classList.add('hidden'));
+  section.classList.remove('hidden');section.classList.remove('module-transition-in');void section.offsetWidth;section.classList.add('module-transition-in');
+  const menu=section._moduleLanding,back=section._moduleBack,hero=section._moduleHero;
+  if(menu)menu.classList.toggle('hidden',view!=='menu');if(back)back.classList.toggle('hidden',view==='menu');
+  if(hero)hero.classList.remove('hidden');
+  Object.entries(section._modulePanels||{}).forEach(([key,panel])=>panel.classList.toggle('hidden',view==='menu'||key!==view));
+  if(module==='smallware'){
+    const stats=section.querySelector('.stats');const tabs=section.querySelector('.smallware-subtabs');
+    if(stats)stats.classList.toggle('hidden',view==='menu');if(tabs)tabs.classList.toggle('hidden',view==='menu');
+  }
+  if(module==='walkthrough'){
+    const detail=__el('walkthroughDetail');if(detail&&view==='followup')detail.classList.remove('hidden');
+  }
+  if(view==='menu'){
+    // For Waste, dashboard and history panels are hidden while choosing a submenu.
+    if(back)back.querySelector('.module-page-title').textContent='';
+  }else if(back){const title=__moduleSpecs[module]?.items.find(x=>x.key===view)?.title||view;back.querySelector('.module-page-title').textContent=title;}
+  __moduleViewState.module=module;__moduleViewState.view=view;
+  document.querySelectorAll('#nav button').forEach(btn=>btn.classList.toggle('active',btn.dataset.page===module));
+}
+function backToModuleMenu(module){
+  showLoading(true);
+  requestAnimationFrame(()=>{__setModuleView(module,'menu');setTimeout(()=>showLoading(false),100);});
+}
+async function openModuleView(module,view){
+  __setupModulePanels();showLoading(true);
+  requestAnimationFrame(async()=>{
+    try{
+      __setModuleView(module,view);
+      if(module==='sales'){
+        if(view==='input'&&__el('salesDate'))__el('salesDate').value=todayISO();
+        if(view==='history')await loadSalesHistory();
+        if(view==='comparison')await loadSalesComparison();
+      }else if(module==='waste'){
+        if(view==='dashboard'){initWastePage();await loadWasteDashboard();}
+        if(view==='history')await loadWasteHistory();
+      }else if(module==='maintenance'){
+        if(view==='input'){if(__el('mtInputDate'))__el('mtInputDate').value=todayISO();}
+        if(view==='history')await loadMaintenanceHistory();
+      }else if(module==='kpi'){
+        if(view==='input'){if(__el('kpiYear'))__el('kpiYear').value=new Date().getFullYear();}
+        if(view==='history')await loadKPIHistory();
+      }else if(module==='walkthrough'){
+        if(view==='history')await initWalkthrough();
+        if(view==='followup')await initWalkthrough();
+      }else if(module==='soldout'){
+        if(view==='history')await loadSoldOutSummary();
+      }else if(module==='smallware'){
+        if(typeof initSmallware==='function')await initSmallware();
+        if(typeof showSmallwareTab==='function')showSmallwareTab(view);
+        if(view==='history'&&typeof loadSmallware==='function')await loadSmallware();
+        if(view==='frequency'&&typeof loadSmallwareFrequency==='function')await loadSmallwareFrequency();
+      }
+      __filterHistoryRows(module);
+    }catch(err){console.error(err);toast('Gagal membuka tampilan: '+(err.message||err));}
+    finally{showLoading(false);}
+  });
+}
+function showPage(page){
+  __setupModulePanels();
+  if(page==='admin'){
+    document.querySelectorAll('.page-section').forEach(x=>x.classList.add('hidden'));
+    const admin=__el('page-admin');if(admin)admin.classList.remove('hidden');
+    document.querySelectorAll('#nav button').forEach(btn=>btn.classList.toggle('active',btn.dataset.page==='admin'));
+    __moduleViewState.module='admin';__moduleViewState.view='dashboard';
+    if(isAM() && typeof loadAdminRequests==='function') loadAdminRequests();
+    return;
+  }
+  if(page==='dashboard'){
+    document.querySelectorAll('.page-section').forEach(x=>x.classList.add('hidden'));
+    const dash=__el('page-dashboard');if(dash)dash.classList.remove('hidden');
+    document.querySelectorAll('#nav button').forEach(btn=>btn.classList.toggle('active',btn.dataset.page==='dashboard'));
+    __moduleViewState.module='dashboard';__moduleViewState.view='dashboard';
+    if(typeof loadDashboard==='function')loadDashboard();return;
+  }
+  if(__moduleSpecs[page]){
+    __setModuleView(page,'menu');
+    return;
+  }
+  document.querySelectorAll('.page-section').forEach(x=>x.classList.add('hidden'));
+  const target=__el('page-'+page);if(target)target.classList.remove('hidden');
+}
+
+
+// ADMIN HUB V1: verifikasi memakai akun AM/Admin yang sudah ada.
+// Data Smallware tetap dibaca/ditulis ke SMALLWARE DATABASE melalui API modul aslinya.
+let adminRequestsCache = [];
+let adminMaintenanceCache = [];
+
+async function verifyAdminPortal(){
+  const username = ($('adminUsername')?.value || '').trim();
+  const password = $('adminPassword')?.value || '';
+  if(!username || !password){ toast('Username dan password wajib diisi.'); return; }
+  try{
+    showLoading(true);
+    const result = await apiPost({action:'login', username, password});
+    const user = result && result.user;
+    const role = String(user?.role || '').trim().toUpperCase();
+    if(!result.success || !user){ throw new Error(result.message || 'Verifikasi gagal.'); }
+    if(!['AM','AREA MANAGER','ADMIN','SUPER ADMIN','SUPERADMIN'].includes(role)){
+      throw new Error('Akun ini bukan role AM/Admin. Menu Admin tidak dibuka.');
+    }
+    state.user = {
+      username:user.username, nama:user.nama || user.username,
+      role:role, store:user.store || 'ALL', userId:user.userId || ''
+    };
+    state.adminToken = result.adminToken || '';
+    $('adminLocked').classList.add('hidden');
+    $('adminUnlocked').classList.remove('hidden');
+    $('adminWelcome').textContent = 'Admin aktif: ' + (state.user.nama || state.user.username);
+    $('userPill').textContent = 'ADMIN • ' + (state.user.nama || state.user.username);
+    $('adminPassword').value = '';
+    toast('Verifikasi Admin berhasil.');
+    await loadAdminRequests();
+  }catch(err){
+    toast(err.message || 'Verifikasi Admin gagal.');
+  }finally{ showLoading(false); }
+}
+
+function lockAdminPortal(){
+  state.user = {username:'PUBLIC',nama:'PUBLIC USER',role:'STORE',store:'ALL'};
+  state.adminToken = '';
+  $('adminUnlocked').classList.add('hidden');
+  $('adminLocked').classList.remove('hidden');
+  $('userPill').textContent = 'PUBLIC STORE PORTAL';
+  $('adminPassword').value = '';
+  toast('Menu Admin dikunci kembali.');
+}
+
+async function loadAdminRequests(){
+  if(!isAM()){ $('adminLocked')?.classList.remove('hidden'); $('adminUnlocked')?.classList.add('hidden'); return; }
+  const module = $('adminModule')?.value || 'smallware';
+  try{
+    showLoading(true);
+    if(module === 'smallware'){
+      const res = await apiGet('smallware',{store:'',limit:500,role:state.user.role});
+      adminRequestsCache = res.data || [];
+      $('adminListTitle').textContent = 'Request Smallware';
+      $('adminListInfo').textContent = 'Sumber: SMALLWARE DATABASE. Approval dan perubahan status disimpan kembali ke database ini.';
+    }else{
+      // Maintenance belum mempunyai tahap approval tersendiri pada struktur database saat ini.
+      const res = await apiGet('recentMaintenance',{store:'',limit:500});
+      adminMaintenanceCache = res.data || [];
+      adminRequestsCache = adminMaintenanceCache;
+      $('adminListTitle').textContent = 'Monitoring Maintenance';
+      $('adminListInfo').textContent = 'Maintenance ditampilkan untuk monitoring. Status approval khusus belum tersedia pada skema modul ini.';
+    }
+    renderAdminRequests();
+  }catch(err){
+    $('adminRequestList').innerHTML = `<div class="empty">Gagal memuat request: ${escapeHtml(err.message || err)}</div>`;
+    toast(err.message || 'Gagal memuat request.');
+  }finally{ showLoading(false); }
+}
+
+function renderAdminRequests(){
+  const module = $('adminModule')?.value || 'smallware';
+  const filter = $('adminStatus')?.value || 'ALL';
+  const rows = adminRequestsCache || [];
+  const statusOf = r => String(r.status || '').trim().toUpperCase();
+  $('adminTotal').textContent = rows.length;
+  $('adminPending').textContent = rows.filter(r=>statusOf(r)==='PENDING').length;
+  $('adminProgress').textContent = rows.filter(r=>['APPROVED','ORDERED','RECEIVED','ON PROGRESS','WAITING PART','OPEN'].includes(statusOf(r))).length;
+  $('adminCompleted').textContent = rows.filter(r=>['COMPLETED','CLOSED'].includes(statusOf(r))).length;
+  const filtered = rows.filter(r=>filter==='ALL' || statusOf(r)===filter);
+  if(!filtered.length){ $('adminRequestList').innerHTML='<div class="empty">Tidak ada request untuk filter ini.</div>'; return; }
+  if(module==='maintenance'){
+    $('adminRequestList').innerHTML = `<div class="table-wrap"><table><thead><tr><th>No SC / ID</th><th>Tanggal</th><th>Store</th><th>Item / Asset</th><th>Prioritas</th><th>Status</th><th>Keterangan</th></tr></thead><tbody>${filtered.map(r=>`<tr><td>${escapeHtml(r.noSC||r.id||'-')}</td><td>${escapeHtml(formatDateWIB(r.tanggalInput||r.tanggalKejadian||''))}</td><td>${escapeHtml(r.store||'-')}</td><td>${escapeHtml(r.itemAsset||r.item||'-')}</td><td>${escapeHtml(r.prioritas||'-')}</td><td>${escapeHtml(statusOf(r)||'-')}</td><td>${escapeHtml(r.keterangan||'-')}</td></tr>`).join('')}</tbody></table></div>`;
+    return;
+  }
+  $('adminRequestList').innerHTML = filtered.map((r,idx)=>{
+    const status = statusOf(r) || 'PENDING';
+    const id = String(r.idRequest||r.id||'');
+    const canApprove = status==='PENDING';
+    const canOrder = status==='APPROVED';
+    const canComplete = status==='ORDERED'; // Admin/AM dapat mengonfirmasi melalui menu Admin Approval.
+    const photo = r.fotoKerusakan ? `<a class="photo-link" href="${escapeAttr(r.fotoKerusakan)}" target="_blank" rel="noopener">Lihat Foto</a>` : 'Tidak ada foto';
+    return `<div class="walk-card">
+      <div class="walk-card-head"><div><strong>${escapeHtml(r.namaSmallware||'Smallware request')}</strong><div class="small">${escapeHtml(id)} • ${escapeHtml(r.store||'-')} • ${escapeHtml(r.jenisRequest||'-')}</div></div><span class="badge ${status==='PENDING'?'badge-open':(['COMPLETED','REJECTED'].includes(status)?'badge-done':'badge-progress')}">${escapeHtml(status)}</span></div>
+      <div class="walk-meta">
+        <div class="walk-meta-item"><div class="label">TANGGAL REQUEST</div><strong>${escapeHtml(formatDateWIB(r.tanggalRequest||r.timestamp||''))}</strong></div>
+        <div class="walk-meta-item"><div class="label">QTY</div><strong>${escapeHtml(r.qtyRequest||0)}</strong></div>
+        <div class="walk-meta-item"><div class="label">AREA</div><strong>${escapeHtml(r.area||'-')}</strong></div>
+        <div class="walk-meta-item"><div class="label">FOTO</div><strong>${photo}</strong></div>
+      </div>
+      <div class="walk-finding"><b>Keterangan:</b> ${escapeHtml(r.keterangan||'-')}<br><b>Catatan approval:</b> ${escapeHtml(r.approvalNote||'-')}<br><b>Approval oleh:</b> ${escapeHtml(r.approvalBy||'-')}</div>
+      <div class="actions">
+        <button class="btn btn-light" onclick="toggleAdminRequestDetail('${escapeAttr(id)}')">Lihat Detail</button>
+        ${canApprove?`<button class="btn btn-green" onclick="adminApproveSmallware('${escapeAttr(id)}')">✓ APPROVE</button><button class="btn btn-danger" onclick="adminRejectSmallware('${escapeAttr(id)}')">✕ REJECT</button>`:''}
+        ${canOrder?`<button class="btn btn-primary" onclick="adminSetSmallwareStatus('${escapeAttr(id)}','ORDERED')">Tandai Sudah Dipesan</button>`:''}
+        ${canComplete?`<button class="btn btn-green" onclick="openCompletionModal('smallware','${escapeAttr(id)}')">Konfirmasi Selesai</button>`:''}
+      </div>
+      <div id="admin-detail-${escapeAttr(id)}" class="hidden walk-finding"><b>Detail request</b><br>ID: ${escapeHtml(id)}<br>Smallware ID: ${escapeHtml(r.smallwareId||'-')}<br>Input oleh: ${escapeHtml(r.inputBy||'-')}<br>Tanggal proses: ${escapeHtml(formatDateWIB(r.processingDate||''))}<br>Tanggal selesai: ${escapeHtml(formatDateWIB(r.completedDate||''))}<br>${r.fotoKerusakan?`<img src="${escapeAttr(r.fotoKerusakan)}" alt="Foto smallware" style="max-width:220px;max-height:180px;border-radius:12px;margin-top:8px">`:''}</div>
+    </div>`;
+  }).join('');
+}
+
+function toggleAdminRequestDetail(id){
+  const el = $('admin-detail-'+id);
+  if(el) el.classList.toggle('hidden');
+}
+
+async function adminApproveSmallware(id){
+  const note = prompt('Catatan approval (opsional):','');
+  if(note===null) return;
+  await adminSmallwareAction({action:'approveSmallwareRequest',idRequest:id,role:state.user.role,adminToken:state.adminToken,approvalBy:state.user.nama||state.user.username,approvalNote:note},'Request berhasil APPROVED.');
+}
+async function adminRejectSmallware(id){
+  const note = prompt('Alasan REJECT wajib diisi:','');
+  if(note===null) return;
+  if(!note.trim()){toast('Alasan reject wajib diisi.');return;}
+  await adminSmallwareAction({action:'rejectSmallwareRequest',idRequest:id,role:state.user.role,adminToken:state.adminToken,approvalBy:state.user.nama||state.user.username,approvalNote:note},'Request berhasil REJECTED.');
+}
+async function adminSetSmallwareStatus(id,status){
+  if(!confirm('Ubah status request menjadi '+status+'?')) return;
+  await adminSmallwareAction({action:'updateSmallwareStatus',idRequest:id,role:state.user.role,adminToken:state.adminToken,status,updateBy:state.user.nama||state.user.username},'Status berubah menjadi '+status+'.');
+}
+async function adminSmallwareAction(payload,successMessage){
+  if(!isAM()){toast('Verifikasi Admin diperlukan.');return;}
+  try{
+    showLoading(true);
+    await apiPost(payload);
+    toast(successMessage);
+    await loadAdminRequests();
+    if(typeof loadSmallware==='function') await loadSmallware();
+    if(typeof loadSmallwareFrequency==='function') await loadSmallwareFrequency();
+  }catch(err){toast(err.message||'Aksi Admin gagal.');}
+  finally{showLoading(false);}
+}
 
 </script>
+
+
+<!-- V18.5 VISUAL-ONLY THEME OVERRIDE: preserves existing JavaScript and workflows -->
+<style id="v185-soft-color-theme">
+:root{
+  --bg:#edf3f9;
+  --card:#f7f9fc;
+  --line:#d5e0ec;
+  --text:#26364b;
+  --muted:#60738b;
+  --shadow:0 8px 24px rgba(47,70,100,.09);
+}
+body{background-color:#edf3f9;color:#26364b}
+/* Soft, bright surfaces instead of stark white */
+.card,.panel,.section-card,.content-card,.stat-card,.kpi-card,.history-card,
+header,.topbar,.page-header,.hero,.module-header,.dashboard-header,
+.modal-content,.dialog,.form-card,.walk-card,.module-menu-card,
+#page-dashboard .card,#page-dashboard .panel,
+.page-section .card,.page-section .panel{
+  background-color:#f5f8fc;
+  border-color:#d5e0ec;
+  box-shadow:0 6px 18px rgba(55,78,108,.07);
+}
+/* Soft color variation for common dashboard/form panels */
+#page-dashboard .card:nth-of-type(4n+1),
+.page-section .card:nth-of-type(4n+1){background-color:#f0f6ff}
+#page-dashboard .card:nth-of-type(4n+2),
+.page-section .card:nth-of-type(4n+2){background-color:#eff9f4}
+#page-dashboard .card:nth-of-type(4n+3),
+.page-section .card:nth-of-type(4n+3){background-color:#fff7ed}
+#page-dashboard .card:nth-of-type(4n),
+.page-section .card:nth-of-type(4n){background-color:#f7f2ff}
+/* Readable form controls with a gentle tint */
+input:not([type="file"]),select,textarea{
+  background-color:#f8faff;
+  color:#2c3b50;
+  border-color:#d3dfed;
+}
+input:not([type="file"]):focus,select:focus,textarea:focus{
+  background-color:#fff;
+  border-color:#8fb5e8;
+  box-shadow:0 0 0 3px rgba(116,164,224,.16);
+}
+/* Table surfaces: subtle blue tint, alternating rows, clearer typography */
+table{border-color:#d4e0ed}
+thead th,table thead th{
+  background:#e4edf8!important;
+  color:#304a69!important;
+  font-weight:700!important;
+  border-color:#d1deec!important;
+}
+tbody td,table tbody td{
+  background-color:#f7f9fd;
+  color:#33445b;
+  font-weight:500;
+  border-color:#dce5ef;
+}
+tbody tr:nth-child(even) td,table tbody tr:nth-child(even) td{
+  background-color:#edf4fb!important;
+}
+tbody tr:hover td,table tbody tr:hover td{
+  background-color:#e1efff!important;
+}
+/* Existing history row accents remain gentle, not stark white */
+#salesHistoryBody tr:nth-child(odd) td{background:#f7f9fd!important}
+#salesHistoryBody tr:nth-child(even) td{background:#edf4fb!important}
+#salesHistoryBody tr:hover td{background:#e1efff!important}
+/* Buttons retain their existing module colors; neutral buttons become soft blue */
+button,.btn{
+  transition:filter .16s ease,transform .16s ease,box-shadow .16s ease;
+}
+.btn:not(.btn-peach):not(.btn-orange):not(.btn-danger):not(.btn-success),
+button.btn-light{
+  background-color:#eaf1fa;
+  color:#304b6b;
+  border-color:#d0deed;
+}
+button:hover,.btn:hover{filter:brightness(.98);box-shadow:0 4px 12px rgba(47,70,100,.10)}
+/* Soft notice and empty-state backgrounds */
+.empty,.empty-state,.notice,.info-box{background-color:#eef4fb;color:#52677f;border-color:#d7e3f0}
+/* Keep text contrast clear on light backgrounds */
+.card h1,.card h2,.card h3,.panel h1,.panel h2,.panel h3,
+.page-section h1,.page-section h2,.page-section h3{color:#293a50}
+</style>
+
+
+
+<!-- V19: SARIRASA-INSPIRED LAYOUT ONLY. Existing API, data flow, and module logic preserved. -->
+<style id="v19-sarirasa-layout">
+:root{--brand-maroon:#633b43;--brand-maroon-dark:#4b2b32;--brand-black:#171717;--workspace:#dedede;--nav-text:#f8ecee;--nav-muted:#e4cfd3}
+html,body{min-height:100%;background:var(--workspace)!important;color:#202020}
+body::before,body::after{display:none!important}
+#appView{min-height:100vh;background:var(--workspace)!important}
+.topbar{position:fixed;left:0;right:0;top:0;height:44px;min-height:44px;padding:0 14px!important;z-index:80;background:var(--brand-black)!important;color:#f7f7f7;border:0!important;border-bottom:1px solid #303030!important;border-radius:0!important;box-shadow:none!important;backdrop-filter:none!important}
+.brand{gap:9px}.brand .logo{width:28px;height:28px;flex:0 0 28px;border-radius:5px;background:transparent!important;color:#fff;box-shadow:none!important;font-size:20px}.brand h1{font-size:16px!important;font-weight:500;letter-spacing:.1px;color:#f4d600!important}.brand small{display:none!important}.userbox{gap:8px}.userpill{background:transparent!important;border:0!important;color:#f4d600!important;border-radius:0!important;padding:5px 8px!important;font-size:12px!important}
+.page{max-width:none!important;width:auto;margin:0 10px 10px 222px!important;padding:62px 22px 22px!important;min-height:100vh;background:var(--workspace)!important;overflow-x:hidden;border-radius:0!important}
+#nav{position:fixed;z-index:70;left:0;top:44px;bottom:0;width:210px;display:flex!important;flex-direction:column;align-items:stretch;gap:0!important;overflow-y:auto!important;overflow-x:hidden!important;padding:12px 9px 22px!important;background:var(--brand-maroon)!important;border:0!important;border-radius:0!important;box-shadow:none!important;scrollbar-width:thin}
+.nav-group{display:flex;flex-direction:column;gap:2px;margin:0 0 17px;padding:0;min-width:0}
+.nav-group-title{padding:11px 12px 7px;color:#e7cdd1;font-size:10px;font-weight:800;letter-spacing:1.3px;text-transform:uppercase}
+#nav button{display:flex!important;align-items:center;gap:11px;width:100%;min-width:0;white-space:normal!important;text-align:left;border:0!important;border-radius:5px!important;background:transparent!important;color:var(--nav-text)!important;padding:10px 12px!important;margin:0!important;font-size:13px!important;font-weight:500!important;box-shadow:none!important;outline:0!important;transform:none!important}
+#nav button .nav-icon{display:inline-grid;place-items:center;flex:0 0 23px;width:23px;height:23px;font-size:19px;line-height:1;color:#fff}
+#nav button:hover{background:rgba(255,255,255,.12)!important;color:#fff!important;box-shadow:none!important;filter:none!important}
+#nav button.active{background:#f0e6e7!important;color:#4b2b32!important;font-weight:700!important;box-shadow:inset 3px 0 #f4d600!important;outline:0!important;filter:none!important}
+#nav button.active .nav-icon{color:#4b2b32!important}
+.nav-utility-note{margin:0 12px;color:#e7cdd1;font-size:11px;line-height:1.5}
+.store-only-note{border-radius:3px!important;background:#f1eeee!important;border:1px solid #d2c8ca!important;color:#5a4347!important;box-shadow:none!important}
+.hero{border-radius:3px!important;background:#e9e9e9!important;border:0!important;box-shadow:none!important;padding:4px 14px 18px!important;margin:0 0 18px!important}
+.hero h2{font-size:24px!important;font-weight:500;color:#161616!important}.hero p{color:#5d5d5d!important}
+.card,.stat,.panel,.walk-card,.module-menu-card,#page-dashboard .card,#page-dashboard .panel,.page-section .card,.page-section .panel{border-radius:4px!important;box-shadow:none!important;border:1px solid #d0d0d0!important}
+.card h3,.page-section h3{color:#272727}
+#page-dashboard .card:nth-of-type(n),.page-section .card:nth-of-type(n){background:#e8e8e8!important}
+input:not([type="file"]),select,textarea{border-radius:3px!important;background:#fff!important;border:1px solid #c9c9c9!important;color:#222!important;box-shadow:none!important}
+.btn,button.btn,.module-menu-card{border-radius:4px!important}
+.table-wrap{border-radius:3px!important;border-color:#ccc!important}th,thead th,table thead th{background:#d0d0d0!important;color:#262626!important}
+#loading{z-index:150;background:rgba(220,220,220,.72)!important}
+#toast{border-radius:4px!important}
+@media(max-width:760px){
+ .topbar{height:48px;min-height:48px;padding:0 9px!important}.brand h1{font-size:13px!important}.userpill{font-size:10px!important;padding:4px!important;max-width:42vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+ #nav{top:48px;bottom:0;width:58px;padding:8px 5px 16px!important;overflow-x:hidden}
+ .nav-group{margin-bottom:12px}.nav-group-title{font-size:0;padding:8px 0 5px;text-align:center}.nav-group-title:after{content:"•";font-size:12px;color:#d5b7bd}
+ #nav button{justify-content:center;padding:10px 2px!important;gap:0;font-size:0!important;min-height:42px}
+ #nav button .nav-icon{flex-basis:26px;width:26px;font-size:21px}
+ .nav-utility-note{display:none}
+ .page{margin:0 0 0 58px!important;padding:60px 10px 16px!important;width:auto;max-width:calc(100% - 58px)!important}
+ .hero{padding:8px 10px 14px!important}.hero h2{font-size:20px!important}
+ .store-only-note{font-size:11px;padding:8px!important}
+}
+@media(max-width:420px){.brand .logo{display:none}.brand h1{font-size:12px!important}.page{padding-left:7px!important;padding-right:7px!important}}
+
+
+/* USER REQUEST ONLY: scenic background + centered motivation; preserve original layout and logic */
+#appView{position:relative;isolation:isolate;background:transparent!important}
+#appView::before{
+  content:"";position:fixed;z-index:-1;left:222px;right:0;top:44px;bottom:0;
+  background-image:linear-gradient(rgba(245,248,252,.28),rgba(245,248,252,.28)),url("https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=2000&q=85");
+  background-size:cover;background-position:center;background-repeat:no-repeat;
+  pointer-events:none;transition:background-image .5s ease;
+}
+.page{background:transparent!important}
+.topbar{position:fixed}
+.topbar::after{
+  content:"Tidak Menunggu Hasil Berubah — Kita yang Mengubah Hasil.\A Ambil tanggung jawab • Berikan solusi • Tuntaskan aksi";
+  white-space:pre;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:max-content;max-width:48%;text-align:center;color:#ffd43b;font-weight:800;font-size:clamp(10px,1.25vw,17px);
+  line-height:1.25;pointer-events:none;text-shadow:0 1px 2px rgba(0,0,0,.55)
+}
+.topbar::before{content:"";display:none}
+@media(max-width:760px){
+ #appView::before{left:58px;top:48px}
+ .topbar::after{left:50%;max-width:46%;font-size:9px;line-height:1.15}
+ .brand h1{max-width:27vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+}
+@media(max-width:420px){.topbar::after{font-size:8px;max-width:43%}}
+</style>
+
+
+<script>
+/* USER REQUEST ONLY: rotate scenic background once per hour */
+(function(){
+  var scenes=[
+    'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=2000&q=85',
+    'https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=2000&q=85',
+    'https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=2000&q=85',
+    'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=2000&q=85',
+    'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=2000&q=85',
+    'https://images.unsplash.com/photo-1472396961693-142e6e269027?auto=format&fit=crop&w=2000&q=85'
+  ];
+  function applyScene(){
+    var hour=Math.floor(Date.now()/3600000);
+    var url=scenes[((hour%scenes.length)+scenes.length)%scenes.length];
+    var style=document.getElementById('hourlyScenicBackground');
+    if(!style){style=document.createElement('style');style.id='hourlyScenicBackground';document.head.appendChild(style);}
+    style.textContent='#appView::before{background-image:linear-gradient(rgba(245,248,252,.28),rgba(245,248,252,.28)),url("'+url+'")}';
+  }
+  applyScene();
+  window.setInterval(function(){applyScene();},60000);
+})();
+</script>
+
 </body>
 </html>
