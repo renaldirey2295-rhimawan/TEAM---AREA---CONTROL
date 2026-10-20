@@ -679,19 +679,8 @@ button.btn:not(:disabled):hover{filter:saturate(1.12);box-shadow:0 7px 15px rgba
       <div class="card" style="margin-top:16px"><div class="card-head"><div><h3>📋 History Sales</h3><div class="small">Seluruh history input Sales langsung dari SALES DATABASE. Data tetap terpisah per Store.</div></div><button class="btn btn-light" onclick="loadSalesHistory()">↻ Refresh</button></div><div class="table-wrap"><table style="min-width:1400px"><thead><tr><th>STORE</th><th>TANGGAL</th><th>DINE IN SALES</th><th>DINE IN TC</th><th>DELIVERY SALES</th><th>DELIVERY TC</th><th>TAKE AWAY SALES</th><th>TAKE AWAY TC</th><th>CONNECT / BO SALES</th><th>CONNECT / BO TC</th><th>TIPS</th><th>TOTAL SALES</th><th>TOTAL TC</th><th>KETERANGAN</th><th>INPUT BY</th></tr></thead><tbody id="salesHistoryBody"></tbody></table></div></div>
 
       <div class="card" id="salesComparisonCard" style="margin-top:16px">
-        <div class="card-head"><div><h3>📊 Sales Pembanding</h3><div class="small">Sumber: spreadsheet SALES CONTROL → sheet SALES PEMBANDING. Data hanya dibaca.</div></div><button class="btn btn-light" onclick="loadSalesComparison()">↻ Refresh</button></div>
-        <div class="form-grid" style="margin-bottom:14px">
-          <div class="field"><label>DARI TANGGAL</label><input id="salesComparisonFrom" type="date"></div>
-          <div class="field"><label>SAMPAI TANGGAL</label><input id="salesComparisonTo" type="date"></div>
-          <div class="field"><label>STORE</label><select id="salesComparisonStore"><option value="ALL">SEMUA STORE</option><option value="MENTENG">MENTENG</option><option value="CITYWALK">CITYWALK</option><option value="CITRA TOWER">CITRA TOWER</option></select></div>
-          <div class="field" style="align-self:end"><button class="btn btn-blue" onclick="loadSalesComparison()">Tampilkan Pembanding</button></div>
-        </div>
-        <div class="stats" style="margin-bottom:14px">
-          <div class="stat"><div class="label">JUMLAH DATA</div><div class="value" id="salesComparisonCount">0</div></div>
-          <div class="stat"><div class="label">TOTAL SALES GROSS</div><div class="value" id="salesComparisonGross">Rp 0</div></div>
-          <div class="stat"><div class="label">TOTAL SALES NETT</div><div class="value" id="salesComparisonNett">Rp 0</div></div>
-        </div>
-        <div class="table-wrap"><table style="min-width:900px"><thead><tr><th>TANGGAL</th><th>HARI</th><th>STORE</th><th>SALES GROSS</th><th>SALES NETT</th><th>15%</th><th>KETERANGAN</th></tr></thead><tbody id="salesComparisonBody"><tr><td colspan="7" class="empty">Klik Refresh untuk memuat data Sales Pembanding.</td></tr></tbody></table></div>
+        <div class="card-head"><div><h3>📊 Sales Pembanding</h3><div class="small">Ringkasan SALES NETT vs TARGET setiap store. Data dibaca langsung dari sheet SALES PEMBANDING.</div><div class="small" id="salesComparisonPeriod" style="margin-top:5px;font-weight:600"></div></div><button class="btn btn-light" onclick="loadSalesComparison()">↻ Refresh</button></div>
+        <div class="table-wrap"><table style="min-width:1500px"><thead><tr><th>STORE</th><th>SALES NETT BULAN LALU</th><th>TARGET NETT BULAN LALU</th><th>PENCAPAIAN TARGET LALU %</th><th>SALES NETT BULAN BERJALAN (MTD)</th><th>TARGET NETT BULAN BERJALAN</th><th>PENCAPAIAN TARGET BERJALAN %</th><th>SELISIH SALES NETT</th><th>GROWTH SALES NETT %</th><th>STATUS GROWTH</th><th>KETERANGAN</th></tr></thead><tbody id="salesComparisonBody"><tr><td colspan="11" class="empty">Klik Refresh untuk memuat Sales Pembanding.</td></tr></tbody></table></div>
       </div>
     </section>
 
@@ -1899,32 +1888,28 @@ let __salesComparisonCache = [];
 async function loadSalesComparison(){
   const body=$('salesComparisonBody');
   if(!body)return;
-  body.innerHTML='<tr><td colspan="7" class="empty">Memuat Sales Pembanding...</td></tr>';
+  body.innerHTML='<tr><td colspan="11" class="empty">Memuat Sales Pembanding...</td></tr>';
   try{
     const result=await apiGet('salesComparison',{limit:5000});
     __salesComparisonCache=Array.isArray(result.data)?result.data:[];
+    const period=$('salesComparisonPeriod');
+    if(period)period.textContent=result.period||'';
     renderSalesComparison();
   }catch(err){
-    body.innerHTML='<tr><td colspan="7" class="empty">Gagal memuat Sales Pembanding: '+escapeHtml(err.message||'Kesalahan backend')+'</td></tr>';
+    body.innerHTML='<tr><td colspan="11" class="empty">Gagal memuat Sales Pembanding: '+escapeHtml(err.message||'Kesalahan backend')+'</td></tr>';
     toast('Sales Pembanding: '+(err.message||err));
   }
 }
 function renderSalesComparison(){
   const body=$('salesComparisonBody');if(!body)return;
-  const from=$('salesComparisonFrom')?.value||'';
-  const to=$('salesComparisonTo')?.value||'';
-  const store=canonicalStore($('salesComparisonStore')?.value||'ALL');
-  const rows=__salesComparisonCache.filter(x=>{
-    const d=String(x.tanggalISO||'').slice(0,10);
-    const s=canonicalStore(x.store||'');
-    return (!from||d>=from)&&(!to||d<=to)&&(store==='ALL'||s===store);
-  }).sort((a,b)=>String(b.tanggalISO||'').localeCompare(String(a.tanggalISO||''))||String(a.store||'').localeCompare(String(b.store||'')));
-  const gross=rows.reduce((sum,x)=>sum+(Number(x.salesGross)||0),0);
-  const nett=rows.reduce((sum,x)=>sum+(Number(x.salesNett)||0),0);
-  if($('salesComparisonCount'))$('salesComparisonCount').textContent=rows.length.toLocaleString('id-ID');
-  if($('salesComparisonGross'))$('salesComparisonGross').textContent=formatRupiah(gross);
-  if($('salesComparisonNett'))$('salesComparisonNett').textContent=formatRupiah(nett);
-  body.innerHTML=rows.length?rows.map(x=>`<tr><td>${escapeHtml(formatDateWIB(x.tanggalISO||x.tanggal))}</td><td>${escapeHtml(x.hari||'-')}</td><td><b>${escapeHtml(x.store||'-')}</b></td><td>${formatRupiah(x.salesGross)}</td><td>${formatRupiah(x.salesNett)}</td><td>${formatRupiah(x.potongan15)}</td><td>${escapeHtml(x.keterangan||'-')}</td></tr>`).join(''):'<tr><td colspan="7" class="empty">Tidak ada data Sales Pembanding untuk filter ini.</td></tr>';
+  const rows=__salesComparisonCache;
+  body.innerHTML=rows.length?rows.map(x=>{
+    const status=String(x.statusGrowth||'-').toUpperCase();
+    const growth=String(x.growthSalesNett||'').trim();
+    const statusStyle=/TURUN|DOWN/.test(status)?'color:#c62828;font-weight:700':(/NAIK|UP/.test(status)?'color:#16803d;font-weight:700':'font-weight:700');
+    const growthStyle=/-/.test(growth)?'color:#c62828;font-weight:700':(/\+/.test(growth)?'color:#16803d;font-weight:700':'font-weight:700');
+    return `<tr><td><b>${escapeHtml(x.store||'-')}</b></td><td>${escapeHtml(x.salesNettBulanLalu||'-')}</td><td>${escapeHtml(x.targetNettBulanLalu||'-')}</td><td>${escapeHtml(x.pencapaianTargetLalu||'-')}</td><td>${escapeHtml(x.salesNettBulanBerjalan||'-')}</td><td>${escapeHtml(x.targetNettBulanBerjalan||'-')}</td><td>${escapeHtml(x.pencapaianTargetBerjalan||'-')}</td><td>${escapeHtml(x.selisihSalesNett||'-')}</td><td style="${growthStyle}">${escapeHtml(x.growthSalesNett||'-')}</td><td style="${statusStyle}">${escapeHtml(x.statusGrowth||'-')}</td><td>${escapeHtml(x.keterangan||'-')}</td></tr>`;
+  }).join(''):'<tr><td colspan="11" class="empty">Tidak ada data Sales Pembanding pada sheet sumber.</td></tr>';
 }
 
 async function loadWasteHistory(){if(!state.user)return;try{$('wasteHistoryBody').innerHTML='<tr><td colspan="6" class="empty">Memuat history Waste...</td></tr>';const r=await apiGet('wasteData',{store:'ALL',role:'PUBLIC',userStore:'',limit:5000});const rows=Array.isArray(r.allRows)?r.allRows:(Array.isArray(r.data)?r.data:[]);$('wasteHistoryBody').innerHTML=rows.length?rows.slice().sort((a,b)=>String(b.periodeAkhir||'').localeCompare(String(a.periodeAkhir||''))).map(x=>`<tr><td>${escapeHtml(x.periodeMulai||'-')} s/d ${escapeHtml(x.periodeAkhir||'-')}</td><td>${escapeHtml(x.kode||'-')}</td><td>${escapeHtml(x.namaBarang||'-')}</td><td>${escapeHtml(x.satuan||'-')}</td><td><b>${Number(x.totalWaste||0).toLocaleString('id-ID',{maximumFractionDigits:2})}</b></td><td>${escapeHtml(x.storeName||'-')}</td></tr>`).join(''):'<tr><td colspan="6" class="empty">Belum ada history Waste.</td></tr>';__filterHistoryRows('waste');}catch(err){$('wasteHistoryBody').innerHTML='<tr><td colspan="6" class="empty">Gagal memuat history Waste.</td></tr>';toast('History Waste: '+err.message)}}
@@ -3394,7 +3379,7 @@ function __setupModulePanels(){
       }
     }
     // History store filters are client-side and never alter source data.
-    if(module==='sales'){__addHistoryFilter('sales',__findCardByChild('salesHistoryBody'));['salesComparisonFrom','salesComparisonTo','salesComparisonStore'].forEach(id=>{const el=__el(id);if(el&&!el.dataset.bound){el.addEventListener('change',renderSalesComparison);el.dataset.bound='1';}});}
+    if(module==='sales'){__addHistoryFilter('sales',__findCardByChild('salesHistoryBody'));}
     if(module==='waste')__addHistoryFilter('waste',__findCardByChild('wasteHistoryBody'));
     if(module==='maintenance')__addHistoryFilter('maintenance',__findCardByChild('maintenanceHistoryBody'));
     if(module==='kpi')__addHistoryFilter('kpi',__findCardByChild('kpiHistoryBody'));
