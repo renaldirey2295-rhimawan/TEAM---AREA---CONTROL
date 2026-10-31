@@ -680,8 +680,14 @@ button.btn:not(:disabled):hover{filter:saturate(1.12);box-shadow:0 7px 15px rgba
       <div class="card" style="margin-top:16px"><div class="card-head"><div><h3>📋 History Sales</h3><div class="small">Seluruh history input Sales langsung dari SALES DATABASE. Data tetap terpisah per Store.</div></div><button class="btn btn-light" onclick="loadSalesHistory()">↻ Refresh</button></div><div class="table-wrap"><table style="min-width:1400px"><thead><tr><th>STORE</th><th>TANGGAL</th><th>DINE IN SALES</th><th>DINE IN TC</th><th>DELIVERY SALES</th><th>DELIVERY TC</th><th>TAKE AWAY SALES</th><th>TAKE AWAY TC</th><th>CONNECT / BO SALES</th><th>CONNECT / BO TC</th><th>TIPS</th><th>TOTAL SALES</th><th>TOTAL TC</th><th>KETERANGAN</th><th>INPUT BY</th></tr></thead><tbody id="salesHistoryBody"></tbody></table></div></div>
 
       <div class="card" id="salesComparisonCard" style="margin-top:16px">
-        <div class="card-head"><div><h3>📊 Sales Pembanding</h3><div class="small">Ringkasan SALES NETT vs TARGET setiap store. Data dibaca langsung dari sheet SALES PEMBANDING.</div><div class="small" id="salesComparisonPeriod" style="margin-top:5px;font-weight:600"></div></div><button class="btn btn-light" onclick="loadSalesComparison()">↻ Refresh</button></div>
-        <div class="table-wrap"><table style="min-width:1500px"><thead><tr><th>STORE</th><th>SALES NETT BULAN LALU</th><th>TARGET NETT BULAN LALU</th><th>PENCAPAIAN TARGET LALU %</th><th>SALES NETT BULAN BERJALAN (MTD)</th><th>TARGET NETT BULAN BERJALAN</th><th>PENCAPAIAN TARGET BERJALAN %</th><th>SELISIH SALES NETT</th><th>GROWTH SALES NETT %</th><th>STATUS GROWTH</th><th>KETERANGAN</th></tr></thead><tbody id="salesComparisonBody"><tr><td colspan="11" class="empty">Klik Refresh untuk memuat Sales Pembanding.</td></tr></tbody></table></div>
+        <div class="card-head"><div><h3>📊 Sales Pembanding</h3><div class="small">Bandingkan SALES NETT dan TARGET dari dua bulan pilihan. Bulan yang sudah selesai memakai data penuh; bulan berjalan memakai MTD.</div><div class="small" id="salesComparisonPeriod" style="margin-top:5px;font-weight:600"></div></div></div>
+        <div class="form-grid" style="margin:12px 0 16px">
+          <div class="field"><label>STORE</label><select id="salesComparisonStore"><option value="ALL">SEMUA STORE</option><option value="CITYWALK">CITYWALK</option><option value="CITRA TOWER">CITRA TOWER</option><option value="MENTENG">MENTENG</option></select></div>
+          <div class="field"><label>BULAN PERTAMA</label><input id="salesComparisonMonthA" type="month"></div>
+          <div class="field"><label>BULAN KEDUA</label><input id="salesComparisonMonthB" type="month"></div>
+          <div class="field" style="display:flex;align-items:end"><button class="btn btn-primary full" onclick="loadSalesComparison()">🔎 Compare Sales</button></div>
+        </div>
+        <div class="table-wrap"><table style="min-width:1500px"><thead><tr><th>STORE</th><th>SALES NETT BULAN 1</th><th>TARGET NETT BULAN 1</th><th>PENCAPAIAN TARGET BULAN 1 %</th><th>SALES NETT BULAN 2</th><th>TARGET NETT BULAN 2</th><th>PENCAPAIAN TARGET BULAN 2 %</th><th>SELISIH SALES NETT</th><th>GROWTH SALES NETT %</th><th>STATUS GROWTH</th><th>KETERANGAN</th></tr></thead><tbody id="salesComparisonBody"><tr><td colspan="11" class="empty">Pilih dua bulan, lalu klik Compare Sales.</td></tr></tbody></table></div>
       </div>
     </section>
 
@@ -1328,6 +1334,8 @@ function isAM(){
 }
 
 const WT_AM_API_URL = 'https://script.google.com/macros/s/AKfycbynW54Eknu6qCi77Z-tRZdF26Pa3xfpylqbtd1fmFAUcvK-pxPq4fP2I57CkM7l5jhuKg/exec';
+// SALES PEMBANDING memakai Web App khusus SALES CONTROL V3; API modul lain tetap memakai WT_AM_API_URL.
+const SALES_CONTROL_API_URL = 'https://script.google.com/macros/s/AKfycbxHHONwMxABIadjAv7Xugckj8cbpPOc8Y119Skjt5v_0Wgin_Z6vARooLhqsfUoZ63J/exec';
 
 function buildApiUrl(action, params={}){
   const url = new URL(WT_AM_API_URL);
@@ -1886,17 +1894,56 @@ async function loadDirectDatabaseHistory(moduleName){
 async function loadSalesHistory(){if(!state.user)return;try{$('salesHistoryBody').innerHTML='<tr><td colspan="15" class="empty">Memuat history Sales...</td></tr>';const rows=await loadDirectDatabaseHistory('sales');$('salesHistoryBody').innerHTML=rows.length?rows.map(x=>`<tr><td><b>${escapeHtml(x.store||'-')}</b></td><td>${escapeHtml(formatDateWIB(x.tanggal))}</td><td>${formatRupiah(x.dineIn)}</td><td>${Number(x.tcDineIn||0).toLocaleString('id-ID')}</td><td>${formatRupiah(x.delivery)}</td><td>${Number(x.tcDelivery||0).toLocaleString('id-ID')}</td><td>${formatRupiah(x.takeAway)}</td><td>${Number(x.tcTakeAway||0).toLocaleString('id-ID')}</td><td>${formatRupiah(x.connectBO)}</td><td>${Number(x.tcConnectBO||0).toLocaleString('id-ID')}</td><td>${formatRupiah(x.tips)}</td><td><b>${formatRupiah(x.totalSales)}</b></td><td><b>${Number(x.totalTc||0).toLocaleString('id-ID')}</b></td><td>${escapeHtml(x.keterangan||'-')}</td><td>${escapeHtml(x.inputBy||'-')}</td></tr>`).join(''):'<tr><td colspan="15" class="empty">Belum ada history Sales.</td></tr>';__filterHistoryRows('sales');}catch(err){$('salesHistoryBody').innerHTML='<tr><td colspan="15" class="empty">Gagal memuat history Sales.</td></tr>';toast('History Sales: '+err.message)}}
 
 let __salesComparisonCache = [];
+function initializeSalesComparisonFilters(){
+  const a=$('salesComparisonMonthA'), b=$('salesComparisonMonthB');
+  if(!a || !b) return;
+  const now=new Date();
+  const current=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
+  const previousDate=new Date(now.getFullYear(),now.getMonth()-1,1);
+  const previous=previousDate.getFullYear()+'-'+String(previousDate.getMonth()+1).padStart(2,'0');
+  if(!a.value)a.value=previous;
+  if(!b.value)b.value=current;
+}
+function comparisonMonthText(value){
+  if(!/^\d{4}-\d{2}$/.test(String(value||'')))return value||'-';
+  const [y,m]=value.split('-').map(Number);
+  return new Date(y,m-1,1).toLocaleDateString('id-ID',{month:'long',year:'numeric'}).toUpperCase();
+}
+function comparisonMoney(value){
+  if(value===null || value===undefined || value==='')return '-';
+  return formatRupiah(Number(value)||0);
+}
+function comparisonPercent(value){
+  if(value===null || value===undefined || value==='')return '-';
+  return (Number(value)*100).toLocaleString('id-ID',{minimumFractionDigits:1,maximumFractionDigits:1})+'%';
+}
 async function loadSalesComparison(){
   const body=$('salesComparisonBody');
   if(!body)return;
-  body.innerHTML='<tr><td colspan="11" class="empty">Memuat Sales Pembanding...</td></tr>';
+  initializeSalesComparisonFilters();
+  const monthA=$('salesComparisonMonthA').value;
+  const monthB=$('salesComparisonMonthB').value;
+  const store=$('salesComparisonStore')?.value||'ALL';
+  if(!monthA || !monthB){toast('Pilih kedua bulan terlebih dahulu.');return;}
+  if(monthA===monthB){toast('Bulan pertama dan kedua harus berbeda.');return;}
+  body.innerHTML='<tr><td colspan="11" class="empty">Memuat perbandingan '+escapeHtml(comparisonMonthText(monthA))+' vs '+escapeHtml(comparisonMonthText(monthB))+'...</td></tr>';
   try{
-    const result=await apiGet('salesComparison',{limit:5000});
-    __salesComparisonCache=Array.isArray(result.data)?result.data:[];
+    const url=new URL(SALES_CONTROL_API_URL);
+    url.searchParams.set('action','salesComparison');
+    url.searchParams.set('monthA',monthA);
+    url.searchParams.set('monthB',monthB);
+    url.searchParams.set('store',store);
+    const response=await fetch(url.toString(),{method:'GET',mode:'cors',cache:'no-store'});
+    const raw=await response.text();
+    let result;
+    try{result=JSON.parse(raw);}catch(e){throw new Error('Respons API SALES CONTROL bukan JSON. Periksa deployment Web App.');}
+    if(!response.ok || result.success===false)throw new Error(result.error||result.message||'Permintaan perbandingan gagal.');
+    __salesComparisonCache=Array.isArray(result.rows)?result.rows:[];
     const period=$('salesComparisonPeriod');
-    if(period)period.textContent=result.period||'';
+    if(period)period.textContent=(result.periodALabel||comparisonMonthText(monthA))+' ('+(result.periodAType||'bulan penuh')+') vs '+(result.periodBLabel||comparisonMonthText(monthB))+' ('+(result.periodBType||'bulan penuh')+') · '+(store==='ALL'?'SEMUA STORE':store);
     renderSalesComparison();
   }catch(err){
+    __salesComparisonCache=[];
     body.innerHTML='<tr><td colspan="11" class="empty">Gagal memuat Sales Pembanding: '+escapeHtml(err.message||'Kesalahan backend')+'</td></tr>';
     toast('Sales Pembanding: '+(err.message||err));
   }
@@ -1904,13 +1951,16 @@ async function loadSalesComparison(){
 function renderSalesComparison(){
   const body=$('salesComparisonBody');if(!body)return;
   const rows=__salesComparisonCache;
-  body.innerHTML=rows.length?rows.map(x=>{
-    const status=String(x.statusGrowth||'-').toUpperCase();
-    const growth=String(x.growthSalesNett||'').trim();
-    const statusStyle=/TURUN|DOWN/.test(status)?'color:#c62828;font-weight:700':(/NAIK|UP/.test(status)?'color:#16803d;font-weight:700':'font-weight:700');
-    const growthStyle=/-/.test(growth)?'color:#c62828;font-weight:700':(/\+/.test(growth)?'color:#16803d;font-weight:700':'font-weight:700');
-    return `<tr><td><b>${escapeHtml(x.store||'-')}</b></td><td>${escapeHtml(x.salesNettBulanLalu||'-')}</td><td>${escapeHtml(x.targetNettBulanLalu||'-')}</td><td>${escapeHtml(x.pencapaianTargetLalu||'-')}</td><td>${escapeHtml(x.salesNettBulanBerjalan||'-')}</td><td>${escapeHtml(x.targetNettBulanBerjalan||'-')}</td><td>${escapeHtml(x.pencapaianTargetBerjalan||'-')}</td><td>${escapeHtml(x.selisihSalesNett||'-')}</td><td style="${growthStyle}">${escapeHtml(x.growthSalesNett||'-')}</td><td style="${statusStyle}">${escapeHtml(x.statusGrowth||'-')}</td><td>${escapeHtml(x.keterangan||'-')}</td></tr>`;
-  }).join(''):'<tr><td colspan="11" class="empty">Tidak ada data Sales Pembanding pada sheet sumber.</td></tr>';
+  body.innerHTML=rows.length?rows.map(row=>{
+    const x=Array.isArray(row)?row:[];
+    const store=String(x[0]||'-');
+    const status=String(x[9]||'BELUM ADA DATA').toUpperCase();
+    const growth=x[8];
+    const statusStyle=/TURUN|DOWN/.test(status)?'color:#c62828;font-weight:800':(/NAIK|UP/.test(status)?'color:#16803d;font-weight:800':(/FLUKTUATIF/.test(status)?'color:#8a5a16;font-weight:800':'font-weight:700'));
+    const growthStyle=growth!=='' && growth!==null && Number(growth)<0?'color:#c62828;font-weight:800':(growth!=='' && growth!==null && Number(growth)>0?'color:#16803d;font-weight:800':'font-weight:700');
+    const total=store==='GRAND TOTAL'?' style="font-weight:800;background:#d9eaf7"':'';
+    return `<tr${total}><td><b>${escapeHtml(store)}</b></td><td>${comparisonMoney(x[1])}</td><td>${comparisonMoney(x[2])}</td><td>${comparisonPercent(x[3])}</td><td>${comparisonMoney(x[4])}</td><td>${comparisonMoney(x[5])}</td><td>${comparisonPercent(x[6])}</td><td>${comparisonMoney(x[7])}</td><td style="${growthStyle}">${comparisonPercent(growth)}</td><td style="${statusStyle}">${escapeHtml(status)}</td><td>${escapeHtml(x[10]||'-')}</td></tr>`;
+  }).join(''):'<tr><td colspan="11" class="empty">Tidak ada data Sales Pembanding untuk pilihan periode dan store tersebut.</td></tr>';
 }
 
 async function loadWasteHistory(){if(!state.user)return;try{$('wasteHistoryBody').innerHTML='<tr><td colspan="6" class="empty">Memuat history Waste...</td></tr>';const r=await apiGet('wasteData',{store:'ALL',role:'PUBLIC',userStore:'',limit:5000});const rows=Array.isArray(r.allRows)?r.allRows:(Array.isArray(r.data)?r.data:[]);$('wasteHistoryBody').innerHTML=rows.length?rows.slice().sort((a,b)=>String(b.periodeAkhir||'').localeCompare(String(a.periodeAkhir||''))).map(x=>`<tr><td>${escapeHtml(x.periodeMulai||'-')} s/d ${escapeHtml(x.periodeAkhir||'-')}</td><td>${escapeHtml(x.kode||'-')}</td><td>${escapeHtml(x.namaBarang||'-')}</td><td>${escapeHtml(x.satuan||'-')}</td><td><b>${Number(x.totalWaste||0).toLocaleString('id-ID',{maximumFractionDigits:2})}</b></td><td>${escapeHtml(x.storeName||'-')}</td></tr>`).join(''):'<tr><td colspan="6" class="empty">Belum ada history Waste.</td></tr>';__filterHistoryRows('waste');}catch(err){$('wasteHistoryBody').innerHTML='<tr><td colspan="6" class="empty">Gagal memuat history Waste.</td></tr>';toast('History Waste: '+err.message)}}
