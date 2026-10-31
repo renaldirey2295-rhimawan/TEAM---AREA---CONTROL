@@ -687,7 +687,7 @@ button.btn:not(:disabled):hover{filter:saturate(1.12);box-shadow:0 7px 15px rgba
           <div class="field"><label>BULAN KEDUA</label><input id="salesComparisonMonthB" type="month"></div>
           <div class="field" style="display:flex;align-items:end"><button class="btn btn-primary full" onclick="loadSalesComparison()">🔎 Compare Sales</button></div>
         </div>
-        <div class="table-wrap"><table style="min-width:1500px"><thead><tr><th>STORE</th><th>SALES NETT BULAN 1</th><th>TARGET NETT BULAN 1</th><th>PENCAPAIAN TARGET BULAN 1 %</th><th>SALES NETT BULAN 2</th><th>TARGET NETT BULAN 2</th><th>PENCAPAIAN TARGET BULAN 2 %</th><th>SELISIH SALES NETT</th><th>GROWTH SALES NETT %</th><th>STATUS GROWTH</th><th>KETERANGAN</th></tr></thead><tbody id="salesComparisonBody"><tr><td colspan="11" class="empty">Pilih dua bulan, lalu klik Compare Sales.</td></tr></tbody></table></div>
+        <div class="table-wrap"><table style="min-width:2400px"><thead><tr><th>STORE</th><th>SALES NETT BULAN 1</th><th>TARGET NETT BULAN 1</th><th>PENCAPAIAN TARGET BULAN 1 %</th><th>SALES NETT BULAN 2</th><th>TARGET NETT BULAN 2</th><th>PENCAPAIAN TARGET BULAN 2 %</th><th>SELISIH SALES NETT</th><th>GROWTH SALES NETT %</th><th>STATUS GROWTH</th><th>KETERANGAN</th><th>TC BULAN 1</th><th>AVERAGE CHECK BULAN 1</th><th>TC BULAN 2</th><th>AVERAGE CHECK BULAN 2</th><th>SELISIH TC</th><th>GROWTH TC %</th><th>SELISIH AVERAGE CHECK</th><th>GROWTH AVERAGE CHECK %</th></tr></thead><tbody id="salesComparisonBody"><tr><td colspan="19" class="empty">Pilih dua bulan, lalu klik Compare Sales.</td></tr></tbody></table></div>
       </div>
     </section>
 
@@ -1926,7 +1926,7 @@ async function loadSalesComparison(){
   const store=$('salesComparisonStore')?.value||'ALL';
   if(!monthA || !monthB){toast('Pilih kedua bulan terlebih dahulu.');return;}
   if(monthA===monthB){toast('Bulan pertama dan kedua harus berbeda.');return;}
-  body.innerHTML='<tr><td colspan="11" class="empty">Memuat perbandingan '+escapeHtml(comparisonMonthText(monthA))+' vs '+escapeHtml(comparisonMonthText(monthB))+'...</td></tr>';
+  body.innerHTML='<tr><td colspan="19" class="empty">Memuat perbandingan '+escapeHtml(comparisonMonthText(monthA))+' vs '+escapeHtml(comparisonMonthText(monthB))+'...</td></tr>';
   try{
     const url=new URL(SALES_CONTROL_API_URL);
     url.searchParams.set('action','salesComparison');
@@ -1944,7 +1944,7 @@ async function loadSalesComparison(){
     renderSalesComparison();
   }catch(err){
     __salesComparisonCache=[];
-    body.innerHTML='<tr><td colspan="11" class="empty">Gagal memuat Sales Pembanding: '+escapeHtml(err.message||'Kesalahan backend')+'</td></tr>';
+    body.innerHTML='<tr><td colspan="19" class="empty">Gagal memuat Sales Pembanding: '+escapeHtml(err.message||'Kesalahan backend')+'</td></tr>';
     toast('Sales Pembanding: '+(err.message||err));
   }
 }
@@ -1959,8 +1959,10 @@ function renderSalesComparison(){
     const statusStyle=/TURUN|DOWN/.test(status)?'color:#c62828;font-weight:800':(/NAIK|UP/.test(status)?'color:#16803d;font-weight:800':(/FLUKTUATIF/.test(status)?'color:#8a5a16;font-weight:800':'font-weight:700'));
     const growthStyle=growth!=='' && growth!==null && Number(growth)<0?'color:#c62828;font-weight:800':(growth!=='' && growth!==null && Number(growth)>0?'color:#16803d;font-weight:800':'font-weight:700');
     const total=store==='GRAND TOTAL'?' style="font-weight:800;background:#d9eaf7"':'';
-    return `<tr${total}><td><b>${escapeHtml(store)}</b></td><td>${comparisonMoney(x[1])}</td><td>${comparisonMoney(x[2])}</td><td>${comparisonPercent(x[3])}</td><td>${comparisonMoney(x[4])}</td><td>${comparisonMoney(x[5])}</td><td>${comparisonPercent(x[6])}</td><td>${comparisonMoney(x[7])}</td><td style="${growthStyle}">${comparisonPercent(growth)}</td><td style="${statusStyle}">${escapeHtml(status)}</td><td>${escapeHtml(x[10]||'-')}</td></tr>`;
-  }).join(''):'<tr><td colspan="11" class="empty">Tidak ada data Sales Pembanding untuk pilihan periode dan store tersebut.</td></tr>';
+    const tcGrowthStyle=x[16]!=='' && x[16]!==null && Number(x[16])<0?'color:#c62828;font-weight:800':(x[16]!=='' && x[16]!==null && Number(x[16])>0?'color:#16803d;font-weight:800':'font-weight:700');
+    const acGrowthStyle=x[18]!=='' && x[18]!==null && Number(x[18])<0?'color:#c62828;font-weight:800':(x[18]!=='' && x[18]!==null && Number(x[18])>0?'color:#16803d;font-weight:800':'font-weight:700');
+    return `<tr${total}><td><b>${escapeHtml(store)}</b></td><td>${comparisonMoney(x[1])}</td><td>${comparisonMoney(x[2])}</td><td>${comparisonPercent(x[3])}</td><td>${comparisonMoney(x[4])}</td><td>${comparisonMoney(x[5])}</td><td>${comparisonPercent(x[6])}</td><td>${comparisonMoney(x[7])}</td><td style="${growthStyle}">${comparisonPercent(growth)}</td><td style="${statusStyle}">${escapeHtml(status)}</td><td>${escapeHtml(x[10]||'-')}</td><td>${Number(x[11]||0).toLocaleString('id-ID')}</td><td>${comparisonMoney(x[12])}</td><td>${Number(x[13]||0).toLocaleString('id-ID')}</td><td>${comparisonMoney(x[14])}</td><td>${Number(x[15]||0).toLocaleString('id-ID')}</td><td style="${tcGrowthStyle}">${comparisonPercent(x[16])}</td><td>${comparisonMoney(x[17])}</td><td style="${acGrowthStyle}">${comparisonPercent(x[18])}</td></tr>`;
+  }).join(''):'<tr><td colspan="19" class="empty">Tidak ada data Sales Pembanding untuk pilihan periode dan store tersebut.</td></tr>';
 }
 
 async function loadWasteHistory(){if(!state.user)return;try{$('wasteHistoryBody').innerHTML='<tr><td colspan="6" class="empty">Memuat history Waste...</td></tr>';const r=await apiGet('wasteData',{store:'ALL',role:'PUBLIC',userStore:'',limit:5000});const rows=Array.isArray(r.allRows)?r.allRows:(Array.isArray(r.data)?r.data:[]);$('wasteHistoryBody').innerHTML=rows.length?rows.slice().sort((a,b)=>String(b.periodeAkhir||'').localeCompare(String(a.periodeAkhir||''))).map(x=>`<tr><td>${escapeHtml(x.periodeMulai||'-')} s/d ${escapeHtml(x.periodeAkhir||'-')}</td><td>${escapeHtml(x.kode||'-')}</td><td>${escapeHtml(x.namaBarang||'-')}</td><td>${escapeHtml(x.satuan||'-')}</td><td><b>${Number(x.totalWaste||0).toLocaleString('id-ID',{maximumFractionDigits:2})}</b></td><td>${escapeHtml(x.storeName||'-')}</td></tr>`).join(''):'<tr><td colspan="6" class="empty">Belum ada history Waste.</td></tr>';__filterHistoryRows('waste');}catch(err){$('wasteHistoryBody').innerHTML='<tr><td colspan="6" class="empty">Gagal memuat history Waste.</td></tr>';toast('History Waste: '+err.message)}}
