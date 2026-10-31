@@ -687,7 +687,7 @@ button.btn:not(:disabled):hover{filter:saturate(1.12);box-shadow:0 7px 15px rgba
           <div class="field"><label>BULAN KEDUA</label><input id="salesComparisonMonthB" type="month"></div>
           <div class="field" style="display:flex;align-items:end"><button class="btn btn-primary full" onclick="loadSalesComparison()">🔎 Compare Sales</button></div>
         </div>
-        <div class="table-wrap"><table style="min-width:2400px"><thead><tr><th>STORE</th><th>SALES NETT BULAN 1</th><th>TARGET NETT BULAN 1</th><th>PENCAPAIAN TARGET BULAN 1 %</th><th>SALES NETT BULAN 2</th><th>TARGET NETT BULAN 2</th><th>PENCAPAIAN TARGET BULAN 2 %</th><th>SELISIH SALES NETT</th><th>GROWTH SALES NETT %</th><th>STATUS GROWTH</th><th>KETERANGAN</th><th>TC BULAN 1</th><th>AVERAGE CHECK BULAN 1</th><th>TC BULAN 2</th><th>AVERAGE CHECK BULAN 2</th><th>SELISIH TC</th><th>GROWTH TC %</th><th>SELISIH AVERAGE CHECK</th><th>GROWTH AVERAGE CHECK %</th></tr></thead><tbody id="salesComparisonBody"><tr><td colspan="19" class="empty">Pilih dua bulan, lalu klik Compare Sales.</td></tr></tbody></table></div>
+        <div class="table-wrap"><table style="min-width:2400px"><thead><tr><th>STORE</th><th id="salesCompHeadSalesA">SALES NETT BULAN 1</th><th id="salesCompHeadTargetA">TARGET NETT BULAN 1</th><th id="salesCompHeadAchA">PENCAPAIAN TARGET BULAN 1 %</th><th id="salesCompHeadSalesB">SALES NETT BULAN 2</th><th id="salesCompHeadTargetB">TARGET NETT BULAN 2</th><th id="salesCompHeadAchB">PENCAPAIAN TARGET BULAN 2 %</th><th>SELISIH SALES NETT</th><th>GROWTH SALES NETT %</th><th>STATUS GROWTH</th><th>KETERANGAN</th><th id="salesCompHeadTcA">TC BULAN 1</th><th id="salesCompHeadAcA">AVERAGE CHECK BULAN 1</th><th id="salesCompHeadTcB">TC BULAN 2</th><th id="salesCompHeadAcB">AVERAGE CHECK BULAN 2</th><th>SELISIH TC</th><th>GROWTH TC %</th><th>SELISIH AVERAGE CHECK</th><th>GROWTH AVERAGE CHECK %</th></tr></thead><tbody id="salesComparisonBody"><tr><td colspan="19" class="empty">Pilih dua bulan, lalu klik Compare Sales.</td></tr></tbody></table></div>
       </div>
     </section>
 
@@ -1903,6 +1903,26 @@ function initializeSalesComparisonFilters(){
   const previous=previousDate.getFullYear()+'-'+String(previousDate.getMonth()+1).padStart(2,'0');
   if(!a.value)a.value=previous;
   if(!b.value)b.value=current;
+  if(!a.dataset.headerBound){a.addEventListener('change',updateSalesComparisonHeaders);a.dataset.headerBound='1';}
+  if(!b.dataset.headerBound){b.addEventListener('change',updateSalesComparisonHeaders);b.dataset.headerBound='1';}
+  updateSalesComparisonHeaders();
+}
+function updateSalesComparisonHeaders(){
+  const monthA=comparisonMonthText($('salesComparisonMonthA')?.value||'BULAN 1');
+  const monthB=comparisonMonthText($('salesComparisonMonthB')?.value||'BULAN 2');
+  const labels={
+    salesCompHeadSalesA:'SALES NETT '+monthA,
+    salesCompHeadTargetA:'TARGET NETT '+monthA,
+    salesCompHeadAchA:'PENCAPAIAN TARGET '+monthA+' %',
+    salesCompHeadSalesB:'SALES NETT '+monthB,
+    salesCompHeadTargetB:'TARGET NETT '+monthB,
+    salesCompHeadAchB:'PENCAPAIAN TARGET '+monthB+' %',
+    salesCompHeadTcA:'TC '+monthA,
+    salesCompHeadAcA:'AVERAGE CHECK '+monthA,
+    salesCompHeadTcB:'TC '+monthB,
+    salesCompHeadAcB:'AVERAGE CHECK '+monthB
+  };
+  Object.entries(labels).forEach(([id,label])=>{const el=$(id);if(el)el.textContent=label;});
 }
 function comparisonMonthText(value){
   if(!/^\d{4}-\d{2}$/.test(String(value||'')))return value||'-';
