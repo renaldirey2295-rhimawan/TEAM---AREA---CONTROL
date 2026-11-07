@@ -391,6 +391,13 @@ button.btn:not(:disabled):hover{filter:saturate(1.12);box-shadow:0 7px 15px rgba
 @media(prefers-reduced-motion:reduce){#nav button,button.btn,#salesHistoryBody tr td{transition:none!important}}
 </style>
 
+<style>
+/* V19 SALES CORRECTION + DATE RANGE SEARCH */
+.sales-edit-search{background:#f7faff;border:1px solid #e1eaf5;border-radius:14px;padding:12px}
+#salesHistoryBody tr:has(.badge-open) td{background:#fff2f2!important}
+#salesHistoryBody .badge{margin-top:3px}
+@media(max-width:600px){.sales-edit-search{grid-template-columns:1fr;padding:10px}}
+</style>
 </head>
 <body>
 
@@ -677,7 +684,15 @@ button.btn:not(:disabled):hover{filter:saturate(1.12);box-shadow:0 7px 15px rgba
       </div>
     </section>
 
-      <div class="card" style="margin-top:16px"><div class="card-head"><div><h3>📋 History Sales</h3><div class="small">Seluruh history input Sales langsung dari SALES DATABASE. Data tetap terpisah per Store.</div></div><button class="btn btn-light" onclick="loadSalesHistory()">↻ Refresh</button></div><div class="table-wrap"><table style="min-width:1400px"><thead><tr><th>STORE</th><th>TANGGAL</th><th>DINE IN SALES</th><th>DINE IN TC</th><th>DELIVERY SALES</th><th>DELIVERY TC</th><th>TAKE AWAY SALES</th><th>TAKE AWAY TC</th><th>CONNECT / BO SALES</th><th>CONNECT / BO TC</th><th>TIPS</th><th>TOTAL SALES</th><th>TOTAL TC</th><th>KETERANGAN</th><th>INPUT BY</th></tr></thead><tbody id="salesHistoryBody"></tbody></table></div></div>
+      <div class="card" id="salesHistoryCard" style="margin-top:16px"><div class="card-head"><div><h3>📋 History Sales</h3><div class="small">Cari data berdasarkan rentang tanggal dan Store. Gunakan Edit untuk mengoreksi record tanpa membuat input baru.</div></div><button class="btn btn-light" onclick="loadSalesHistory()">↻ Refresh</button></div>
+        <div class="form-grid sales-edit-search" style="margin:12px 0 16px">
+          <div class="field"><label>TANGGAL AWAL</label><input id="salesHistoryFrom" type="date"></div>
+          <div class="field"><label>TANGGAL AKHIR</label><input id="salesHistoryTo" type="date"></div>
+          <div class="field"><label>STORE</label><select id="salesHistoryStore"><option value="ALL">SEMUA STORE</option><option value="CITYWALK">CITYWALK</option><option value="CITRA TOWER">CITRA TOWER</option><option value="MENTENG">MENTENG</option></select></div>
+          <div class="field" style="display:flex;align-items:end;gap:8px"><button class="btn btn-primary full" onclick="searchSalesHistory()">🔎 Cari Data Sales</button><button class="btn btn-light" onclick="clearSalesHistorySearch()">Reset</button></div>
+        </div>
+        <div id="salesEditModeNotice" class="store-only-note hidden" style="margin-bottom:12px;background:#fff5e6;border-color:#f0d5a8;color:#79531b"></div>
+        <div class="table-wrap"><table style="min-width:1500px"><thead><tr><th>STORE</th><th>TANGGAL</th><th>DINE IN SALES</th><th>DINE IN TC</th><th>DELIVERY SALES</th><th>DELIVERY TC</th><th>TAKE AWAY SALES</th><th>TAKE AWAY TC</th><th>CONNECT / BO SALES</th><th>CONNECT / BO TC</th><th>TIPS</th><th>TOTAL SALES</th><th>TOTAL TC</th><th>KETERANGAN</th><th>INPUT BY</th><th>AKSI</th></tr></thead><tbody id="salesHistoryBody"></tbody></table></div></div>
 
       <div class="card" id="salesComparisonCard" style="margin-top:16px">
         <div class="card-head"><div><h3>📊 Sales Pembanding</h3><div class="small">Bandingkan SALES NETT dan TARGET dari dua bulan pilihan. Bulan yang sudah selesai memakai data penuh; bulan berjalan memakai MTD.</div><div class="small" id="salesComparisonPeriod" style="margin-top:5px;font-weight:600"></div></div></div>
@@ -1891,7 +1906,68 @@ async function loadDirectDatabaseHistory(moduleName){
   }).reverse().slice(0,5000);
 }
 
-async function loadSalesHistory(){if(!state.user)return;try{$('salesHistoryBody').innerHTML='<tr><td colspan="15" class="empty">Memuat history Sales...</td></tr>';const rows=await loadDirectDatabaseHistory('sales');$('salesHistoryBody').innerHTML=rows.length?rows.map(x=>`<tr><td><b>${escapeHtml(x.store||'-')}</b></td><td>${escapeHtml(formatDateWIB(x.tanggal))}</td><td>${formatRupiah(x.dineIn)}</td><td>${Number(x.tcDineIn||0).toLocaleString('id-ID')}</td><td>${formatRupiah(x.delivery)}</td><td>${Number(x.tcDelivery||0).toLocaleString('id-ID')}</td><td>${formatRupiah(x.takeAway)}</td><td>${Number(x.tcTakeAway||0).toLocaleString('id-ID')}</td><td>${formatRupiah(x.connectBO)}</td><td>${Number(x.tcConnectBO||0).toLocaleString('id-ID')}</td><td>${formatRupiah(x.tips)}</td><td><b>${formatRupiah(x.totalSales)}</b></td><td><b>${Number(x.totalTc||0).toLocaleString('id-ID')}</b></td><td>${escapeHtml(x.keterangan||'-')}</td><td>${escapeHtml(x.inputBy||'-')}</td></tr>`).join(''):'<tr><td colspan="15" class="empty">Belum ada history Sales.</td></tr>';__filterHistoryRows('sales');}catch(err){$('salesHistoryBody').innerHTML='<tr><td colspan="15" class="empty">Gagal memuat history Sales.</td></tr>';toast('History Sales: '+err.message)}}
+let __salesHistoryRows=[];
+let __salesEditRecordId='';
+
+function salesDateToISO(value){
+  if(!value)return '';
+  if(value instanceof Date && !isNaN(value))return value.getFullYear()+'-'+String(value.getMonth()+1).padStart(2,'0')+'-'+String(value.getDate()).padStart(2,'0');
+  const s=String(value).trim();
+  if(/^\d{4}-\d{2}-\d{2}/.test(s))return s.slice(0,10);
+  const m=s.match(/^(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{4})$/);
+  if(m)return m[3]+'-'+String(m[2]).padStart(2,'0')+'-'+String(m[1]).padStart(2,'0');
+  const d=new Date(s);return isNaN(d)?'':d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+
+async function loadSalesHistory(){
+  if(!state.user)return;
+  try{
+    $('salesHistoryBody').innerHTML='<tr><td colspan="16" class="empty">Memuat history Sales...</td></tr>';
+    __salesHistoryRows=await loadDirectDatabaseHistory('sales');
+    renderSalesHistory();
+  }catch(err){$('salesHistoryBody').innerHTML='<tr><td colspan="16" class="empty">Gagal memuat history Sales.</td></tr>';toast('History Sales: '+err.message)}
+}
+
+function searchSalesHistory(){
+  const from=$('salesHistoryFrom').value,to=$('salesHistoryTo').value;
+  if(from&&to&&from>to){toast('Tanggal awal tidak boleh melewati tanggal akhir.');return;}
+  renderSalesHistory();
+}
+function clearSalesHistorySearch(){
+  $('salesHistoryFrom').value='';$('salesHistoryTo').value='';$('salesHistoryStore').value='ALL';renderSalesHistory();
+}
+function renderSalesHistory(){
+  const from=$('salesHistoryFrom')?.value||'',to=$('salesHistoryTo')?.value||'',store=$('salesHistoryStore')?.value||'ALL';
+  const rows=__salesHistoryRows.filter(x=>{
+    const d=salesDateToISO(x.tanggal),s=canonicalStore(x.store||'');
+    return (!from||d>=from)&&(!to||d<=to)&&(store==='ALL'||s===store);
+  });
+  const counts={};rows.forEach(x=>{const k=canonicalStore(x.store)+'|'+salesDateToISO(x.tanggal);counts[k]=(counts[k]||0)+1;});
+  $('salesHistoryBody').innerHTML=rows.length?rows.map(x=>{
+    const id=String(x.id||'');const key=canonicalStore(x.store)+'|'+salesDateToISO(x.tanggal);const duplicate=counts[key]>1;
+    return `<tr${duplicate?' style="background:#fff0f0"':''}><td><b>${escapeHtml(x.store||'-')}</b>${duplicate?' <span class="badge badge-open">DOUBLE</span>':''}</td><td>${escapeHtml(formatDateWIB(x.tanggal))}</td><td>${formatRupiah(x.dineIn)}</td><td>${Number(x.tcDineIn||0).toLocaleString('id-ID')}</td><td>${formatRupiah(x.delivery)}</td><td>${Number(x.tcDelivery||0).toLocaleString('id-ID')}</td><td>${formatRupiah(x.takeAway)}</td><td>${Number(x.tcTakeAway||0).toLocaleString('id-ID')}</td><td>${formatRupiah(x.connectBO)}</td><td>${Number(x.tcConnectBO||0).toLocaleString('id-ID')}</td><td>${formatRupiah(x.tips)}</td><td><b>${formatRupiah(x.totalSales)}</b></td><td><b>${Number(x.totalTc||0).toLocaleString('id-ID')}</b></td><td>${escapeHtml(x.keterangan||'-')}</td><td>${escapeHtml(x.inputBy||'-')}</td><td><button class="btn btn-primary" onclick="editSalesRecord('${escapeHtml(id)}')" ${id?'':'disabled'}>✎ Edit</button></td></tr>`;
+  }).join(''):'<tr><td colspan="16" class="empty">Tidak ada data Sales pada filter tersebut.</td></tr>';
+  __filterHistoryRows('sales');
+}
+
+function editSalesRecord(id){
+  const x=__salesHistoryRows.find(r=>String(r.id||'')===String(id));
+  if(!x){toast('Record Sales tidak ditemukan. Refresh history terlebih dahulu.');return;}
+  __salesEditRecordId=String(x.id);
+  $('salesDate').value=salesDateToISO(x.tanggal);
+  $('salesStore').value=canonicalStore(x.store||'');
+  $('salesDineIn').value=Number(x.dineIn||0);$('tcDineIn').value=Number(x.tcDineIn||0);
+  $('salesDelivery').value=Number(x.delivery||0);$('tcDelivery').value=Number(x.tcDelivery||0);
+  $('salesTakeAway').value=Number(x.takeAway||0);$('tcTakeAway').value=Number(x.tcTakeAway||0);
+  $('salesConnect').value=Number(x.connectBO||0);$('tcConnect').value=Number(x.tcConnectBO||0);
+  $('salesTips').value=Number(x.tips||0);$('salesNote').value=x.keterangan||'';
+  updateSalesTotals();
+  const btn=document.querySelector('#page-sales button[onclick="saveSales()"]');if(btn)btn.textContent='Simpan Koreksi Sales';
+  const notice=$('salesEditModeNotice');notice.classList.remove('hidden');notice.textContent='MODE EDIT AKTIF — Record ID: '+__salesEditRecordId+'. Simpan koreksi akan memperbarui data ini, bukan menambah baris baru.';
+  $('page-sales').scrollIntoView({behavior:'smooth',block:'start'});
+  toast('Data Sales dimuat ke form koreksi.');
+}
+
 
 let __salesComparisonCache = [];
 function initializeSalesComparisonFilters(){
@@ -2147,40 +2223,25 @@ function updateSalesTotal(){
 
 async function saveSales(){
   const targetStore=selectedStore('salesStore');
-  if(!targetStore){
-    toast('Pilih Store terlebih dahulu.');
-    return;
-  }
+  if(!targetStore){toast('Pilih Store terlebih dahulu.');return;}
+  if(!$('salesDate').value){toast('Tanggal Sales wajib diisi.');return;}
   try{
-    const payload={
-      action:'saveSales',
-      tanggal:$('salesDate').value,
-      store:targetStore,
-      dineIn:num('salesDineIn'),
-      tcDineIn:num('tcDineIn'),
-      delivery:num('salesDelivery'),
-      tcDelivery:num('tcDelivery'),
-      takeAway:num('salesTakeAway'),
-      tcTakeAway:num('tcTakeAway'),
-      connectBO:num('salesConnect'),
-      tcConnect:num('tcConnect'),
-      tips:num('salesTips'),
-      keterangan:$('salesNote').value.trim(),
-      inputBy:state.user?.nama || state.user?.username || state.user?.userId || 'USER'
-    };
-
+    const payload={action:__salesEditRecordId?'updateSales':'saveSales',id:__salesEditRecordId||undefined,tanggal:$('salesDate').value,store:targetStore,
+      dineIn:num('salesDineIn'),tcDineIn:num('tcDineIn'),delivery:num('salesDelivery'),tcDelivery:num('tcDelivery'),
+      takeAway:num('salesTakeAway'),tcTakeAway:num('tcTakeAway'),connectBO:num('salesConnect'),tcConnect:num('tcConnect'),tips:num('salesTips'),
+      keterangan:$('salesNote').value.trim(),inputBy:state.user?.nama||state.user?.username||state.user?.userId||'USER'};
     showLoading(true);
     const r=await apiPost(payload);
-    toast(`Sales tersimpan. Total ${formatRupiah(r.totalSales)}`);
-    resetSales();
-    await loadSalesHistory();
-    loadDashboard();
-  }catch(err){toast(err.message)}
-  finally{showLoading(false)}
+    toast(__salesEditRecordId?'Koreksi Sales berhasil disimpan. Total '+formatRupiah(r.totalSales):'Sales tersimpan. Total '+formatRupiah(r.totalSales));
+    resetSales();await loadSalesHistory();loadDashboard();
+  }catch(err){toast(err.message)}finally{showLoading(false)}
 }
 
 function resetSales(){
   ['salesDineIn','tcDineIn','salesDelivery','tcDelivery','salesTakeAway','tcTakeAway','salesConnect','tcConnect','salesTips','salesNote'].forEach(id=>$(id).value='');
+  __salesEditRecordId='';
+  const btn=document.querySelector('#page-sales button[onclick="saveSales()"]');if(btn)btn.textContent='Simpan Sales';
+  const notice=$('salesEditModeNotice');if(notice){notice.classList.add('hidden');notice.textContent='';}
   updateSalesTotals();
 }
 
