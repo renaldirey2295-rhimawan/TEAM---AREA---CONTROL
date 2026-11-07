@@ -1913,7 +1913,11 @@ function salesDateToISO(value){
   if(!value)return '';
   if(value instanceof Date && !isNaN(value))return value.getFullYear()+'-'+String(value.getMonth()+1).padStart(2,'0')+'-'+String(value.getDate()).padStart(2,'0');
   const s=String(value).trim();
-  if(/^\d{4}-\d{2}-\d{2}/.test(s))return s.slice(0,10);
+  // Spreadsheet Date values are serialized by Apps Script as ISO UTC timestamps.
+  // Convert full timestamps to the browser's local calendar date (Asia/Jakarta for this app)
+  // instead of slicing the UTC date, which can be one day earlier.
+  if(/^\d{4}-\d{2}-\d{2}T/.test(s)){const d=new Date(s);return isNaN(d)?'':d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+  if(/^\d{4}-\d{2}-\d{2}$/.test(s))return s;
   const m=s.match(/^(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{4})$/);
   if(m)return m[3]+'-'+String(m[2]).padStart(2,'0')+'-'+String(m[1]).padStart(2,'0');
   const d=new Date(s);return isNaN(d)?'':d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
@@ -1945,9 +1949,35 @@ function renderSalesHistory(){
   const counts={};rows.forEach(x=>{const k=canonicalStore(x.store)+'|'+salesDateToISO(x.tanggal);counts[k]=(counts[k]||0)+1;});
   $('salesHistoryBody').innerHTML=rows.length?rows.map(x=>{
     const id=String(x.id||'');const key=canonicalStore(x.store)+'|'+salesDateToISO(x.tanggal);const duplicate=counts[key]>1;
-    return `<tr${duplicate?' style="background:#fff0f0"':''}><td><b>${escapeHtml(x.store||'-')}</b>${duplicate?' <span class="badge badge-open">DOUBLE</span>':''}</td><td>${escapeHtml(formatDateWIB(x.tanggal))}</td><td>${formatRupiah(x.dineIn)}</td><td>${Number(x.tcDineIn||0).toLocaleString('id-ID')}</td><td>${formatRupiah(x.delivery)}</td><td>${Number(x.tcDelivery||0).toLocaleString('id-ID')}</td><td>${formatRupiah(x.takeAway)}</td><td>${Number(x.tcTakeAway||0).toLocaleString('id-ID')}</td><td>${formatRupiah(x.connectBO)}</td><td>${Number(x.tcConnectBO||0).toLocaleString('id-ID')}</td><td>${formatRupiah(x.tips)}</td><td><b>${formatRupiah(x.totalSales)}</b></td><td><b>${Number(x.totalTc||0).toLocaleString('id-ID')}</b></td><td>${escapeHtml(x.keterangan||'-')}</td><td>${escapeHtml(x.inputBy||'-')}</td><td><button class="btn btn-primary" onclick="editSalesRecord('${escapeHtml(id)}')" ${id?'':'disabled'}>✎ Edit</button></td></tr>`;
+    return `<tr data-sales-id="${escapeAttr(id)}"${duplicate?' style="background:#fff0f0"':''}><td><b>${escapeHtml(x.store||'-')}</b>${duplicate?' <span class="badge badge-open">DOUBLE</span>':''}</td><td>${escapeHtml(formatDateWIB(x.tanggal))}</td><td>${formatRupiah(x.dineIn)}</td><td>${Number(x.tcDineIn||0).toLocaleString('id-ID')}</td><td>${formatRupiah(x.delivery)}</td><td>${Number(x.tcDelivery||0).toLocaleString('id-ID')}</td><td>${formatRupiah(x.takeAway)}</td><td>${Number(x.tcTakeAway||0).toLocaleString('id-ID')}</td><td>${formatRupiah(x.connectBO)}</td><td>${Number(x.tcConnectBO||0).toLocaleString('id-ID')}</td><td>${formatRupiah(x.tips)}</td><td><b>${formatRupiah(x.totalSales)}</b></td><td><b>${Number(x.totalTc||0).toLocaleString('id-ID')}</b></td><td>${escapeHtml(x.keterangan||'-')}</td><td>${escapeHtml(x.inputBy||'-')}</td><td><div class="actions"><button class="btn btn-primary" onclick="toggleInlineSalesEdit(this)" ${id?'':'disabled'}>✎ Edit</button><button class="btn btn-danger" onclick="deleteSalesRecord('${escapeAttr(id)}')" ${id?'':'disabled'}>🗑 Delete</button></div></td></tr>`;
   }).join(''):'<tr><td colspan="16" class="empty">Tidak ada data Sales pada filter tersebut.</td></tr>';
   __filterHistoryRows('sales');
+}
+
+function toggleInlineSalesEdit(button){
+  const tr=button.closest('tr'); if(!tr)return;
+  if(tr.dataset.editing==='1')return;
+  const id=tr.dataset.salesId; const record=__salesHistoryRows.find(x=>String(x.id||'')===String(id)); if(!record)return;
+  const fields=['dineIn','tcDineIn','delivery','tcDelivery','takeAway','tcTakeAway','connectBO','tcConnectBO','tips'];
+  const cells=tr.querySelectorAll('td');
+  const cellIndexes={dineIn:2,tcDineIn:3,delivery:4,tcDelivery:5,takeAway:6,tcTakeAway:7,connectBO:8,tcConnectBO:9,tips:10};
+  fields.forEach(key=>{const td=cells[cellIndexes[key]];td.dataset.original=td.innerHTML;td.innerHTML=`<input class="sales-inline-input" data-field="${key}" type="number" min="0" step="1" value="${Number(record[key]||0)}" style="width:130px;min-width:90px;padding:8px;border:1px solid #8ba6c5;border-radius:7px">`;});
+  const noteCell=cells[13];noteCell.dataset.original=noteCell.innerHTML;noteCell.innerHTML=`<input class="sales-inline-input" data-field="keterangan" type="text" value="${escapeAttr(record.keterangan||'')}" style="width:180px;padding:8px;border:1px solid #8ba6c5;border-radius:7px">`;
+  const action=cells[15];action.dataset.original=action.innerHTML;action.innerHTML='<div class="actions"><button class="btn btn-green" onclick="saveInlineSales(this)">✓ Simpan</button><button class="btn btn-light" onclick="cancelInlineSales(this)">Batal</button></div>';
+  tr.dataset.editing='1';const first=tr.querySelector('[data-field="dineIn"]');if(first){first.focus();first.select();}
+}
+function cancelInlineSales(button){const tr=button.closest('tr');if(!tr)return;tr.querySelectorAll('td').forEach(td=>{if(td.dataset.original!==undefined){td.innerHTML=td.dataset.original;delete td.dataset.original;}});delete tr.dataset.editing;}
+async function saveInlineSales(button){
+  const tr=button.closest('tr');if(!tr)return;const id=tr.dataset.salesId;
+  const old=__salesHistoryRows.find(x=>String(x.id||'')===String(id));if(!old){toast('Record tidak ditemukan. Refresh history.');return;}
+  const val=k=>{const el=tr.querySelector(`[data-field="${k}"]`);return el?el.value:old[k]||0;};
+  const payload={action:'updateSales',id,tanggal:salesDateToISO(old.tanggal),store:old.store,dineIn:Number(val('dineIn')||0),tcDineIn:Number(val('tcDineIn')||0),delivery:Number(val('delivery')||0),tcDelivery:Number(val('tcDelivery')||0),takeAway:Number(val('takeAway')||0),tcTakeAway:Number(val('tcTakeAway')||0),connectBO:Number(val('connectBO')||0),tcConnect:Number(val('tcConnectBO')||0),tips:Number(val('tips')||0),keterangan:val('keterangan'),inputBy:state.user?.nama||state.user?.username||'USER'};
+  try{showLoading(true);const r=await apiPost(payload);toast('Koreksi langsung berhasil disimpan. Total '+formatRupiah(r.totalSales));await loadSalesHistory();loadDashboard();}catch(e){toast(e.message);}finally{showLoading(false);}
+}
+async function deleteSalesRecord(id){
+  const record=__salesHistoryRows.find(x=>String(x.id||'')===String(id));if(!record)return toast('Record Sales tidak ditemukan.');
+  if(!confirm('Hapus permanen data Sales '+(record.store||'')+' tanggal '+formatDateWIB(record.tanggal)+'? Data akan dihapus dari database backend.'))return;
+  try{showLoading(true);await apiPost({action:'deleteSales',id:String(id),deletedBy:state.user?.nama||state.user?.username||'USER'});toast('Data Sales berhasil dihapus dari database.');await loadSalesHistory();loadDashboard();}catch(e){toast(e.message);}finally{showLoading(false);}
 }
 
 function editSalesRecord(id){
