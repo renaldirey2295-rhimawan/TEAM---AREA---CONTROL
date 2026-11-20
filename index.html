@@ -397,6 +397,10 @@ button.btn:not(:disabled):hover{filter:saturate(1.12);box-shadow:0 7px 15px rgba
 #salesHistoryBody tr:has(.badge-open) td{background:#fff2f2!important}
 #salesHistoryBody .badge{margin-top:3px}
 @media(max-width:600px){.sales-edit-search{grid-template-columns:1fr;padding:10px}}
+.waste-history-search{background:#f7faff;border:1px solid #e1eaf5;border-radius:14px;padding:12px}
+.waste-history-search .field{margin-bottom:0}
+.waste-history-search .actions{align-items:end}
+@media(max-width:600px){.waste-history-search{grid-template-columns:1fr;padding:10px}.waste-history-search .field.full-row{grid-column:auto}.waste-history-search button{flex:1}}
 </style>
 </head>
 <body>
@@ -796,7 +800,21 @@ button.btn:not(:disabled):hover{filter:saturate(1.12);box-shadow:0 7px 15px rgba
         </div>
       </div>
 
-      <div class="card" style="margin-top:16px"><div class="card-head"><div><h3>📋 History Waste</h3><div class="small">Seluruh history Waste semua Store dari Waste Control.</div></div><button class="btn btn-light" onclick="loadWasteHistory()">↻ Refresh</button></div><div class="table-wrap"><table style="min-width:1000px"><thead><tr><th>PERIODE</th><th>KODE</th><th>NAMA BARANG</th><th>SATUAN</th><th>TOTAL WASTE</th><th>STORE</th></tr></thead><tbody id="wasteHistoryBody"></tbody></table></div></div>
+      <div class="card" style="margin-top:16px">
+        <div class="card-head">
+          <div><h3>📋 History Waste</h3><div class="small">Cari seluruh history Waste berdasarkan rentang tanggal dan Store.</div></div>
+          <button class="btn btn-light" onclick="loadWasteHistory()">↻ Refresh</button>
+        </div>
+        <div class="form-grid waste-history-search" style="margin:12px 0 16px">
+          <div class="field"><label>TANGGAL AWAL</label><input id="wasteHistoryFrom" type="date"></div>
+          <div class="field"><label>TANGGAL AKHIR</label><input id="wasteHistoryTo" type="date"></div>
+          <div class="field full-row" style="display:flex;align-items:end;gap:8px">
+            <button class="btn btn-primary" onclick="searchWasteHistory()">🔎 Cari History Waste</button>
+            <button class="btn btn-light" onclick="clearWasteHistorySearch()">Reset Tanggal</button>
+          </div>
+        </div>
+        <div class="table-wrap"><table style="min-width:1000px"><thead><tr><th>PERIODE</th><th>KODE</th><th>NAMA BARANG</th><th>SATUAN</th><th>TOTAL WASTE</th><th>STORE</th></tr></thead><tbody id="wasteHistoryBody"></tbody></table></div>
+      </div>
 
       <div class="card" style="margin-top:16px">
         <div class="card-head">
@@ -2187,6 +2205,18 @@ function exportMaintenanceWhatsApp(rowIndex){
   window.open(url,'_blank','noopener,noreferrer');
 }
 
+function searchWasteHistory(){
+  const from=$('wasteHistoryFrom')?.value||'';
+  const to=$('wasteHistoryTo')?.value||'';
+  if(from&&to&&from>to){toast('Tanggal awal tidak boleh melewati tanggal akhir.');return;}
+  __filterHistoryRows('waste');
+}
+function clearWasteHistorySearch(){
+  if($('wasteHistoryFrom'))$('wasteHistoryFrom').value='';
+  if($('wasteHistoryTo'))$('wasteHistoryTo').value='';
+  __filterHistoryRows('waste');
+}
+
 async function loadMaintenanceHistory(){if(!state.user)return;try{$('maintenanceHistoryBody').innerHTML='<tr><td colspan="11" class="empty">Memuat history Maintenance...</td></tr>';const rows=await loadDirectDatabaseHistory('maintenance');window.__maintenanceHistoryRows=rows;$('maintenanceHistoryBody').innerHTML=rows.length?rows.map((x,i)=>`<tr><td>${escapeHtml(formatDateWIB(x.tanggalInput||'-'))}</td><td><b>${escapeHtml(x.noSC||'-')}</b></td><td>${escapeHtml(x.store||'-')}</td><td>${escapeHtml(x.kategori||'-')}</td><td>${escapeHtml(x.itemAsset||'-')}</td><td>${escapeHtml(x.jenisKerusakan||'-')}</td><td>${escapeHtml(x.prioritas||'-')}</td><td>${statusBadge(x.status)}</td><td>${escapeHtml(x.teknisiVendor||'-')}</td><td>${escapeHtml(x.tanggalSelesai||'-')}</td><td><div class="actions"><button class="btn btn-peach" onclick="exportMaintenanceWhatsApp(${i})">💬 Export WA</button>${String(x.status||'').toUpperCase()==='COMPLETED'?'<span class="badge badge-done">SELESAI</span>':`<button class="btn btn-green" onclick="openCompletionModal('maintenance','${escapeAttr(x.noSC||'')}')">✓ Konfirmasi Selesai</button>`}</div></td></tr>`).join(''):'<tr><td colspan="11" class="empty">Belum ada history Maintenance.</td></tr>';__filterHistoryRows('maintenance');}catch(err){$('maintenanceHistoryBody').innerHTML='<tr><td colspan="11" class="empty">Gagal memuat history Maintenance.</td></tr>';toast('History Maintenance Semua Store: '+err.message)}}
 async function loadKPIHistory(){if(!state.user)return;try{$('kpiHistoryBody').innerHTML='<tr><td colspan="8" class="empty">Memuat history KPI...</td></tr>';const rows=await loadDirectDatabaseHistory('kpi');$('kpiHistoryBody').innerHTML=rows.length?rows.map(x=>`<tr><td>${escapeHtml(x.timestamp||'-')}</td><td>${escapeHtml(x.store||'-')}</td><td>${escapeHtml(x.bulan||'-')}</td><td>${escapeHtml(x.tahun||'-')}</td><td>${escapeHtml(x.tanggalUpload||'-')}</td><td>${escapeHtml(x.keterangan||'-')}</td><td>${x.driveUrl?`<a class="btn btn-light" target="_blank" href="${escapeAttr(x.driveUrl)}">Lihat KPI</a>`:escapeHtml(x.fileName||'-')}</td><td>${escapeHtml(x.uploadBy||'-')}</td></tr>`).join(''):'<tr><td colspan="8" class="empty">Belum ada history KPI.</td></tr>';__filterHistoryRows('kpi');}catch(err){$('kpiHistoryBody').innerHTML='<tr><td colspan="8" class="empty">Gagal memuat history KPI.</td></tr>';toast('History KPI Semua Store: '+err.message)}}
 
@@ -3568,7 +3598,20 @@ function __filterHistoryRows(module){
     const first=(tr.cells[0]?.textContent||'').trim().toUpperCase();
     const store=canonicalStore((tr.cells[storeIndex]?.textContent||'').trim());
     const isEmpty=/BELUM ADA HISTORY|MEMUAT HISTORY|GAGAL MEMUAT/.test(first);
-    tr.hidden=!!(wanted&&wanted!=='ALL'&&!isEmpty&&store!==wanted);
+    let hideStore=!!(wanted&&wanted!=='ALL'&&!isEmpty&&store!==wanted);
+    let hideDate=false;
+    if(module==='waste'&&!isEmpty){
+      const from=__el('wasteHistoryFrom')?.value||'';
+      const to=__el('wasteHistoryTo')?.value||'';
+      const period=(tr.cells[0]?.textContent||'').trim();
+      const parts=period.split(/\s+s\/d\s+/i);
+      const periodStart=parts[0]||'';
+      const periodEnd=parts[1]||periodStart;
+      // Periode Waste ditampilkan sebagai tanggal mulai s/d tanggal akhir.
+      // Tampilkan jika periode beririsan dengan rentang tanggal yang dipilih.
+      hideDate=!!((from&&periodEnd<from)||(to&&periodStart>to));
+    }
+    tr.hidden=hideStore||hideDate;
   });
 }
 function __setModuleView(module,view){
