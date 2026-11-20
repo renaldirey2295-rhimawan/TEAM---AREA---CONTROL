@@ -2205,10 +2205,35 @@ function exportMaintenanceWhatsApp(rowIndex){
   window.open(url,'_blank','noopener,noreferrer');
 }
 
+function __wasteDateToISO(value){
+  const s=String(value||'').trim();
+  if(!s) return '';
+  // Format ISO: YYYY-MM-DD (juga menerima timestamp setelah tanggal)
+  let m=s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+  if(m) return m[1]+'-'+String(m[2]).padStart(2,'0')+'-'+String(m[3]).padStart(2,'0');
+  // Format Indonesia: DD/MM/YYYY atau DD-MM-YYYY
+  m=s.match(/^(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{4})$/);
+  if(m) return m[3]+'-'+String(m[2]).padStart(2,'0')+'-'+String(m[1]).padStart(2,'0');
+  const d=new Date(s);
+  if(!isNaN(d.getTime())) return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  return '';
+}
+function __wastePeriodRange(periodText){
+  const parts=String(periodText||'').trim().split(/\s+s\s*\/\s*d\s*/i);
+  const start=__wasteDateToISO(parts[0]||'');
+  const end=__wasteDateToISO(parts[1]||parts[0]||'');
+  return {start,end};
+}
 function searchWasteHistory(){
   const from=$('wasteHistoryFrom')?.value||'';
   const to=$('wasteHistoryTo')?.value||'';
   if(from&&to&&from>to){toast('Tanggal awal tidak boleh melewati tanggal akhir.');return;}
+  // Pastikan tabel sudah terisi dari sumber data, lalu terapkan filter tanggal.
+  const body=$('wasteHistoryBody');
+  if(!body||!body.querySelector('tr')){
+    loadWasteHistory().then(()=>__filterHistoryRows('waste'));
+    return;
+  }
   __filterHistoryRows('waste');
 }
 function clearWasteHistorySearch(){
@@ -3601,15 +3626,15 @@ function __filterHistoryRows(module){
     let hideStore=!!(wanted&&wanted!=='ALL'&&!isEmpty&&store!==wanted);
     let hideDate=false;
     if(module==='waste'&&!isEmpty){
-      const from=__el('wasteHistoryFrom')?.value||'';
-      const to=__el('wasteHistoryTo')?.value||'';
-      const period=(tr.cells[0]?.textContent||'').trim();
-      const parts=period.split(/\s+s\/d\s+/i);
-      const periodStart=parts[0]||'';
-      const periodEnd=parts[1]||periodStart;
-      // Periode Waste ditampilkan sebagai tanggal mulai s/d tanggal akhir.
-      // Tampilkan jika periode beririsan dengan rentang tanggal yang dipilih.
-      hideDate=!!((from&&periodEnd<from)||(to&&periodStart>to));
+      const from=__wasteDateToISO(__el('wasteHistoryFrom')?.value||'');
+      const to=__wasteDateToISO(__el('wasteHistoryTo')?.value||'');
+      const range=__wastePeriodRange(tr.cells[0]?.textContent||'');
+      // Periode ditampilkan jika rentangnya beririsan dengan tanggal pencarian.
+      // Jika format tanggal pada sebuah baris tidak dikenali, jangan sembunyikan
+      // baris tersebut secara keliru; biarkan terlihat untuk pemeriksaan.
+      if(range.start&&range.end){
+        hideDate=!!((from&&range.end<from)||(to&&range.start>to));
+      }
     }
     tr.hidden=hideStore||hideDate;
   });
