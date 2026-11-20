@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
   <!-- TEAM AREA CONTROL V14: MOBILE TABLE UI FIX ONLY. FUNCTIONAL CODE FROZEN. -->
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>TEAM AREA CONTROL</title>
+<title>SYSTEM AREA CONTROL</title>
 <style>
 :root{
   --bg:#f5f7fb;
@@ -304,17 +304,18 @@ body{
 </style>
 
 <style>
-/* V16: scenic photographic background rotates every 3 hours; cards stay readable. */
+/* V16: scenic photographic background rotates every 1 hour; cards stay readable. */
 :root{--scenic-overlay:rgba(246,249,255,.70)}
-html{min-height:100%;background:#eaf0f7}
+html{min-height:100%;background:transparent!important}
 body{background:transparent!important;position:relative;isolation:isolate;min-height:100vh}
 body::before{
-  content:"";position:fixed;inset:0;z-index:-2;pointer-events:none;
-  background-image:linear-gradient(135deg,rgba(248,250,255,.68),rgba(250,248,255,.57)),var(--scenic-image);
+  content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background-color:#dce6ef;
+  background-image:linear-gradient(135deg,rgba(248,250,255,.24),rgba(250,248,255,.18)),var(--scenic-image);
   background-size:cover;background-position:center;background-repeat:no-repeat;
   transform:scale(1.015);transition:background-image .8s ease;
 }
-body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:rgba(247,249,253,.12)}
+body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:rgba(247,249,253,.04)}
 #appView{background:transparent!important}
 .topbar{background:rgba(255,255,255,.82)!important;backdrop-filter:blur(14px)}
 .page{background:transparent}
@@ -354,6 +355,49 @@ body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;bac
 @media(max-width:650px){.module-menu{grid-template-columns:1fr;gap:10px}.module-menu-card{padding:14px}.module-menu-card .module-menu-icon{width:42px;height:42px;flex-basis:42px}.module-backbar{align-items:stretch}.module-backbar .btn{width:100%}.module-history-filter{align-items:stretch}.module-history-filter select{width:100%;min-width:0}.page-section.module-transition-in{animation-duration:.12s}}
 
 </style>
+
+<style>
+/* V18.3 VISUAL ONLY: colorful sales rows and all menu/action buttons */
+#salesHistoryBody tr:nth-child(odd) td{background:#f0f7ff}
+#salesHistoryBody tr:nth-child(even) td{background:#ffffff}
+#salesHistoryBody tr:hover td{background:#dceeff;transition:background .15s ease}
+#salesHistoryBody td:first-child{font-weight:800;color:#315d91;background:#e4efff}
+#salesHistoryBody td:nth-child(12),#salesHistoryBody td:nth-child(13){font-weight:800;color:#246847}
+#salesHistoryBody tr:nth-child(odd) td:first-child{background:#dceafb}
+#salesHistoryBody tr:hover td:first-child{background:#c8e0ff}
+/* Main menu buttons each retain their own color identity */
+#nav button{border:1px solid transparent!important;font-weight:800!important;box-shadow:0 4px 12px rgba(40,60,90,.12);transition:transform .18s ease,box-shadow .18s ease,filter .18s ease}
+#nav button:nth-child(1){background:#e4efff!important;color:#315d91!important;border-color:#cbdfff!important}
+#nav button:nth-child(2){background:#dff5e8!important;color:#246847!important;border-color:#c1e8d1!important}
+#nav button:nth-child(3){background:#fff0d8!important;color:#8a5a16!important;border-color:#f4ddb1!important}
+#nav button:nth-child(4){background:#fbe3dc!important;color:#914d3d!important;border-color:#f0c9bd!important}
+#nav button:nth-child(5){background:#eee5ff!important;color:#6745a0!important;border-color:#d9cafa!important}
+#nav button:nth-child(6){background:#dff5f6!important;color:#216d75!important;border-color:#bfe7e9!important}
+#nav button:nth-child(7){background:#ffe5f0!important;color:#91466b!important;border-color:#f5c9dd!important}
+#nav button:nth-child(8){background:#ffe8df!important;color:#a64e2c!important;border-color:#f5c9b7!important}
+#nav button:hover,.module-menu-card:hover{filter:saturate(1.12);transform:translateY(-2px);box-shadow:0 8px 18px rgba(40,60,90,.16)}
+#nav button.active{outline:2px solid rgba(72,103,145,.25);outline-offset:1px;filter:saturate(1.15);box-shadow:0 6px 15px rgba(40,60,90,.16)}
+/* Buttons across all modules */
+button.btn-primary{background:#dceafb!important;color:#315675!important;border:1px solid #c6dbef!important}
+button.btn-green{background:#dff5e8!important;color:#246847!important;border:1px solid #c1e8d1!important}
+button.btn-purple{background:#eee5ff!important;color:#6745a0!important;border:1px solid #d9cafa!important}
+button.btn-orange{background:#fff0d8!important;color:#8a5a16!important;border:1px solid #f4ddb1!important}
+button.btn-peach{background:#fbe3dc!important;color:#914d3d!important;border:1px solid #f0c9bd!important}
+button.btn-danger{background:#f9dddd!important;color:#873d3d!important;border:1px solid #efc5c5!important}
+button.btn-light{background:#edf3fb!important;color:#425a75!important;border:1px solid #d7e3f1!important}
+button.btn:not(:disabled){box-shadow:0 3px 9px rgba(45,65,90,.09)}
+button.btn:not(:disabled):hover{filter:saturate(1.12);box-shadow:0 7px 15px rgba(45,65,90,.15)}
+.module-menu-card{border:1px solid rgba(255,255,255,.9)!important}
+@media(prefers-reduced-motion:reduce){#nav button,button.btn,#salesHistoryBody tr td{transition:none!important}}
+</style>
+
+<style>
+/* V19 SALES CORRECTION + DATE RANGE SEARCH */
+.sales-edit-search{background:#f7faff;border:1px solid #e1eaf5;border-radius:14px;padding:12px}
+#salesHistoryBody tr:has(.badge-open) td{background:#fff2f2!important}
+#salesHistoryBody .badge{margin-top:3px}
+@media(max-width:600px){.sales-edit-search{grid-template-columns:1fr;padding:10px}}
+</style>
 </head>
 <body>
 
@@ -363,10 +407,24 @@ body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;bac
 
 <div id="toast" class="toast hidden"></div>
 
+<div id="completionModal" class="hidden" style="position:fixed;inset:0;z-index:120;background:rgba(25,40,60,.45);padding:18px;display:none;align-items:center;justify-content:center">
+  <div class="card" style="width:min(420px,100%);background:#fff!important">
+    <h3 id="completionModalTitle">Konfirmasi Selesai</h3>
+    <p id="completionModalDesc" class="small">Pilih tanggal penyelesaian.</p>
+    <div class="field"><label>TANGGAL PENYELESAIAN *</label><input id="completionDateInput" type="date" required></div>
+    <div class="actions">
+      <button class="btn btn-green" onclick="submitCompletionConfirmation()">✓ Simpan Konfirmasi</button>
+      <button class="btn btn-light" onclick="closeCompletionModal()">Batal</button>
+    </div>
+  </div>
+</div>
+
+
+
 <div id="loginView" class="login-wrap hidden">
   <div class="login-card">
     <div class="logo">🧭</div>
-    <h2>TEAM AREA CONTROL</h2>
+    <h2>SYSTEM AREA CONTROL</h2>
     <p>Store Operation Portal</p>
     <div class="store-only-note">
       Sistem ini tidak menggunakan username dan password.
@@ -380,25 +438,43 @@ body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;bac
     <div class="brand">
       <div class="logo">🧭</div>
       <div>
-        <h1>TEAM AREA CONTROL</h1>
+        <h1>SYSTEM AREA CONTROL</h1>
         <small>STORE OPERATION SYSTEM</small>
       </div>
     </div>
 
     <div class="userbox">
-      <div id="userPill" class="userpill">PUBLIC STORE PORTAL</div>
+      <div id="userPill" class="userpill">PORTAL STORE</div>
     </div>
   </header>
 
   <main class="page">
-    <nav class="nav" id="nav">
-      <button data-page="dashboard" onclick="showPage('dashboard')">🏠 Dashboard</button>
-      <button data-page="sales" onclick="showPage('sales')">💰 Sales</button>
-      <button data-page="waste" onclick="showPage('waste')">♻️ Waste</button>
-      <button data-page="maintenance" onclick="showPage('maintenance')">🔧 Maintenance</button>
-      <button data-page="kpi" onclick="showPage('kpi')">📊 KPI Store</button>
-      <button data-page="walkthrough" onclick="showPage('walkthrough')">📝 Walkthrough</button>
-      <button data-page="smallware" onclick="showPage('smallware')">🍴 Smallware</button>
+    <nav class="nav" id="nav" aria-label="Menu utama">
+      <div class="nav-group">
+        <div class="nav-group-title">UTAMA</div>
+        <button data-page="dashboard" onclick="showPage('dashboard')"><span class="nav-icon">⌂</span><span>Dashboard</span></button>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-title">DATA</div>
+        <button data-page="sales" onclick="showPage('sales')"><span class="nav-icon">▤</span><span>Sales</span></button>
+        <button data-page="waste" onclick="showPage('waste')"><span class="nav-icon">♻</span><span>Waste</span></button>
+        <button data-page="maintenance" onclick="showPage('maintenance')"><span class="nav-icon">⚒</span><span>Maintenance</span></button>
+        <button data-page="smallware" onclick="showPage('smallware')"><span class="nav-icon">▣</span><span>Smallware</span></button>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-title">REPORT</div>
+        <button data-page="kpi" onclick="showPage('kpi')"><span class="nav-icon">▥</span><span>KPI Store</span></button>
+        <button data-page="walkthrough" onclick="showPage('walkthrough')"><span class="nav-icon">☷</span><span>Walkthrough</span></button>
+        <button data-page="soldout" onclick="showPage('soldout')"><span class="nav-icon">⊘</span><span>Rekap Sold Out</span></button>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-title">ADMIN</div>
+        <button data-page="admin" onclick="showPage('admin')"><span class="nav-icon">🛡</span><span>Admin Approval</span></button>
+      </div>
+      <div class="nav-group nav-utility">
+        <div class="nav-group-title">UTILITY</div>
+        <div class="nav-utility-note">Menu operasional terhubung ke database yang sama.</div>
+      </div>
     </nav>
 
     <div class="store-only-note">
@@ -608,7 +684,26 @@ body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;bac
       </div>
     </section>
 
-      <div class="card" style="margin-top:16px"><div class="card-head"><div><h3>📋 History Sales</h3><div class="small">Seluruh history input Sales langsung dari SALES DATABASE. Data tetap terpisah per Store.</div></div><button class="btn btn-light" onclick="loadSalesHistory()">↻ Refresh</button></div><div class="table-wrap"><table style="min-width:1400px"><thead><tr><th>STORE</th><th>TANGGAL</th><th>DINE IN SALES</th><th>DINE IN TC</th><th>DELIVERY SALES</th><th>DELIVERY TC</th><th>TAKE AWAY SALES</th><th>TAKE AWAY TC</th><th>CONNECT / BO SALES</th><th>CONNECT / BO TC</th><th>TIPS</th><th>TOTAL SALES</th><th>TOTAL TC</th><th>KETERANGAN</th><th>INPUT BY</th></tr></thead><tbody id="salesHistoryBody"></tbody></table></div></div>
+      <div class="card" id="salesHistoryCard" style="margin-top:16px"><div class="card-head"><div><h3>📋 History Sales</h3><div class="small">Cari data berdasarkan rentang tanggal dan Store. Gunakan Edit untuk mengoreksi record tanpa membuat input baru.</div></div><button class="btn btn-light" onclick="loadSalesHistory()">↻ Refresh</button></div>
+        <div class="form-grid sales-edit-search" style="margin:12px 0 16px">
+          <div class="field"><label>TANGGAL AWAL</label><input id="salesHistoryFrom" type="date"></div>
+          <div class="field"><label>TANGGAL AKHIR</label><input id="salesHistoryTo" type="date"></div>
+          <div class="field"><label>STORE</label><select id="salesHistoryStore"><option value="ALL">SEMUA STORE</option><option value="CITYWALK">CITYWALK</option><option value="CITRA TOWER">CITRA TOWER</option><option value="MENTENG">MENTENG</option></select></div>
+          <div class="field" style="display:flex;align-items:end;gap:8px"><button class="btn btn-primary full" onclick="searchSalesHistory()">🔎 Cari Data Sales</button><button class="btn btn-light" onclick="clearSalesHistorySearch()">Reset</button></div>
+        </div>
+        <div id="salesEditModeNotice" class="store-only-note hidden" style="margin-bottom:12px;background:#fff5e6;border-color:#f0d5a8;color:#79531b"></div>
+        <div class="table-wrap"><table style="min-width:1500px"><thead><tr><th>STORE</th><th>TANGGAL</th><th>DINE IN SALES</th><th>DINE IN TC</th><th>DELIVERY SALES</th><th>DELIVERY TC</th><th>TAKE AWAY SALES</th><th>TAKE AWAY TC</th><th>CONNECT / BO SALES</th><th>CONNECT / BO TC</th><th>TIPS</th><th>TOTAL SALES</th><th>TOTAL TC</th><th>KETERANGAN</th><th>INPUT BY</th><th>AKSI</th></tr></thead><tbody id="salesHistoryBody"></tbody></table></div></div>
+
+      <div class="card" id="salesComparisonCard" style="margin-top:16px">
+        <div class="card-head"><div><h3>📊 Sales Pembanding</h3><div class="small">Bandingkan SALES NETT dan TARGET dari dua bulan pilihan. Bulan yang sudah selesai memakai data penuh; bulan berjalan memakai MTD.</div><div class="small" id="salesComparisonPeriod" style="margin-top:5px;font-weight:600"></div></div></div>
+        <div class="form-grid" style="margin:12px 0 16px">
+          <div class="field"><label>STORE</label><select id="salesComparisonStore"><option value="ALL">SEMUA STORE</option><option value="CITYWALK">CITYWALK</option><option value="CITRA TOWER">CITRA TOWER</option><option value="MENTENG">MENTENG</option></select></div>
+          <div class="field"><label>BULAN PERTAMA</label><input id="salesComparisonMonthA" type="month"></div>
+          <div class="field"><label>BULAN KEDUA</label><input id="salesComparisonMonthB" type="month"></div>
+          <div class="field" style="display:flex;align-items:end"><button class="btn btn-primary full" onclick="loadSalesComparison()">🔎 Compare Sales</button></div>
+        </div>
+        <div class="table-wrap"><table style="min-width:2400px"><thead><tr><th>STORE</th><th id="salesCompHeadSalesA">SALES NETT BULAN 1</th><th id="salesCompHeadTargetA">TARGET NETT BULAN 1</th><th id="salesCompHeadAchA">PENCAPAIAN TARGET BULAN 1 %</th><th id="salesCompHeadSalesB">SALES NETT BULAN 2</th><th id="salesCompHeadTargetB">TARGET NETT BULAN 2</th><th id="salesCompHeadAchB">PENCAPAIAN TARGET BULAN 2 %</th><th>SELISIH SALES NETT</th><th>GROWTH SALES NETT %</th><th>STATUS GROWTH</th><th>KETERANGAN</th><th id="salesCompHeadTcA">TC BULAN 1</th><th id="salesCompHeadAcA">AVERAGE CHECK BULAN 1</th><th id="salesCompHeadTcB">TC BULAN 2</th><th id="salesCompHeadAcB">AVERAGE CHECK BULAN 2</th><th>SELISIH TC</th><th>GROWTH TC %</th><th>SELISIH AVERAGE CHECK</th><th>GROWTH AVERAGE CHECK %</th></tr></thead><tbody id="salesComparisonBody"><tr><td colspan="19" class="empty">Pilih dua bulan, lalu klik Compare Sales.</td></tr></tbody></table></div>
+      </div>
     </section>
 
     <section id="page-waste" class="page-section hidden">
@@ -806,7 +901,7 @@ body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;bac
         </div>
         <div id="maintenanceResult" style="margin-top:14px"></div>
       </div>
-      <div class="card" style="margin-top:16px"><div class="card-head"><div><h3>📋 History Maintenance Semua Store</h3><div class="small">Seluruh ticket Maintenance semua Store.</div></div><button class="btn btn-light" onclick="loadMaintenanceHistory()">↻ Refresh</button></div><div class="table-wrap"><table style="min-width:1200px"><thead><tr><th>TGL INPUT</th><th>NO SC</th><th>STORE</th><th>KATEGORI</th><th>ASSET</th><th>KERUSAKAN</th><th>PRIORITAS</th><th>STATUS</th><th>TEKNISI/VENDOR</th><th>TGL SELESAI</th></tr></thead><tbody id="maintenanceHistoryBody"></tbody></table></div></div>
+      <div class="card" style="margin-top:16px"><div class="card-head"><div><h3>📋 History Maintenance Semua Store</h3><div class="small">Seluruh ticket Maintenance semua Store.</div></div><button class="btn btn-light" onclick="loadMaintenanceHistory()">↻ Refresh</button></div><div class="table-wrap"><table style="min-width:1200px"><thead><tr><th>TGL INPUT</th><th>NO SC</th><th>STORE</th><th>KATEGORI</th><th>ASSET</th><th>KERUSAKAN</th><th>PRIORITAS</th><th>STATUS</th><th>TEKNISI/VENDOR</th><th>TGL SELESAI</th><th>EXPORT WA</th></tr></thead><tbody id="maintenanceHistoryBody"></tbody></table></div></div>
     </section>
 
     <section id="page-kpi" class="page-section hidden">
@@ -846,8 +941,14 @@ body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;bac
           <div class="field full-row">
             <label>FOTO KPI *</label>
             <div class="filebox">
-              <input id="kpiPhoto" type="file" accept="image/*" onchange="previewFile(this,'kpiPreview')">
+              <div class="actions" style="margin-bottom:8px">
+                <button type="button" class="btn btn-light" onclick="document.getElementById('kpiPhotoGallery').click()">🖼️ Pilih dari Galeri</button>
+                <button type="button" class="btn btn-light" onclick="document.getElementById('kpiPhotoCamera').click()">📷 Kamera</button>
+              </div>
+              <input id="kpiPhotoGallery" type="file" accept="image/*" onchange="handleImageChoice(this,'kpiPhotoCamera','kpiPreview')" style="display:none">
+              <input id="kpiPhotoCamera" type="file" accept="image/*" capture="environment" onchange="handleImageChoice(this,'kpiPhotoGallery','kpiPreview')" style="display:none">
               <div id="kpiPreview" class="preview"></div>
+              <div class="small">Pilih screenshot/foto KPI dari galeri atau ambil foto menggunakan kamera.</div>
             </div>
           </div>
         </div>
@@ -900,6 +1001,31 @@ body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;bac
       </div>
 
       <div id="walkthroughDetail" class="card hidden" style="margin-top:16px"></div>
+    </section>
+
+    <section id="page-soldout" class="page-section hidden">
+      <div class="hero">
+        <h2>🚫 Rekap Sold Out</h2>
+        <p>Summary Sold Out per material untuk kontrol tanggal kejadian dan total hari dalam periode pencarian.</p>
+      </div>
+      <div class="card" style="margin-bottom:16px">
+        <div class="form-grid">
+          <div class="field"><label>FILTER STORE</label><select id="soStore"><option value="ALL">SEMUA STORE</option><option value="CITYWALK">CITYWALK</option><option value="CITRA TOWER">CITRA TOWER</option><option value="MENTENG">MENTENG</option></select></div>
+          <div class="field"><label>DARI TANGGAL</label><input id="soFrom" type="date"></div>
+          <div class="field"><label>SAMPAI TANGGAL</label><input id="soTo" type="date"></div>
+          <div class="field" style="display:flex;align-items:end"><button class="btn btn-primary" onclick="loadSoldOutSummary()">🔎 Tampilkan Rekap</button></div>
+        </div>
+      </div>
+      <div class="stats" style="margin-bottom:16px">
+        <div class="stat"><div class="icon">📦</div><div class="label">TOTAL ITEM</div><div id="soTotalItems" class="value">0</div></div>
+        <div class="stat"><div class="icon">🏬</div><div class="label">STORE-ITEM</div><div id="soStoreItems" class="value">0</div></div>
+        <div class="stat"><div class="icon">📅</div><div class="label">TOTAL HARI SO</div><div id="soDays" class="value">0</div></div>
+        <div class="stat"><div class="icon">🚨</div><div class="label">CRITICAL</div><div id="soCritical" class="value">0</div></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><div><h3>📋 Summary Sold Out per Material</h3><div class="small">Sumber: RECAP SOLD OUT DETAIL · Material dihitung satu kali per tanggal, meskipun terkait beberapa menu.</div></div><button class="btn btn-light" onclick="loadSoldOutSummary()">↻ Refresh</button></div>
+        <div class="table-wrap"><table style="min-width:1050px"><thead><tr><th>STORE</th><th>NAMA MATERIAL</th><th>TANGGAL SOLD OUT</th><th>JUMLAH HARI SOLD OUT</th><th>KATEGORI</th><th>PENYEBAB SOLD OUT</th><th>PRIORITAS</th></tr></thead><tbody id="soldOutBody"><tr><td colspan="7" class="empty">Klik Tampilkan Rekap untuk memuat data.</td></tr></tbody></table></div>
+      </div>
     </section>
 
     <section id="page-smallware" class="page-section hidden">
@@ -981,8 +1107,14 @@ body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;bac
           <div class="field full-row">
             <label>FOTO KERUSAKAN <span id="swPhotoMark" style="visibility:hidden">*</span></label>
             <div class="filebox">
-              <input id="swPhoto" type="file" accept="image/*" onchange="previewFile(this,'swPhotoPreview')">
+              <div class="actions" style="margin-bottom:8px">
+                <button type="button" class="btn btn-light" onclick="document.getElementById('swPhotoGallery').click()">🖼️ Pilih dari Galeri</button>
+                <button type="button" class="btn btn-light" onclick="document.getElementById('swPhotoCamera').click()">📷 Kamera</button>
+              </div>
+              <input id="swPhotoGallery" type="file" accept="image/*" onchange="handleImageChoice(this,'swPhotoCamera','swPhotoPreview')" style="display:none">
+              <input id="swPhotoCamera" type="file" accept="image/*" capture="environment" onchange="handleImageChoice(this,'swPhotoGallery','swPhotoPreview')" style="display:none">
               <div id="swPhotoPreview" class="preview"></div>
+              <div class="small">Pilih foto yang sudah ada atau ambil foto langsung dari kamera perangkat.</div>
             </div>
             <div class="small" id="swPhotoHelp">Wajib untuk Replacement - Rusak / Pecah.</div>
           </div>
@@ -1043,6 +1175,58 @@ body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;bac
       <div id="swDetail" class="card hidden" style="margin-top:16px"></div>
     </section>
 
+    <section id="page-admin" class="page-section hidden">
+      <div class="hero">
+        <h2>🛡️ ADMIN — Pusat Approval</h2>
+        <p>Kelola request yang membutuhkan persetujuan dari satu menu. Setiap modul tetap menulis ke database aslinya.</p>
+      </div>
+      <div id="adminLocked" class="card">
+        <h3>Verifikasi Admin / AM</h3>
+        <p class="small">Gunakan akun AM/Admin yang terdaftar pada MASTER USER. Menu approval tidak terbuka sebelum verifikasi berhasil.</p>
+        <div class="form-grid">
+          <div class="field"><label>USERNAME</label><input id="adminUsername" autocomplete="username" placeholder="Username AM/Admin"></div>
+          <div class="field"><label>PASSWORD</label><input id="adminPassword" type="password" autocomplete="current-password" placeholder="Password"></div>
+        </div>
+        <div class="actions"><button class="btn btn-primary" onclick="verifyAdminPortal()">Verifikasi & Buka Admin</button></div>
+      </div>
+      <div id="adminUnlocked" class="hidden">
+        <div class="card" style="margin-bottom:16px">
+          <div class="card-head">
+            <div><h3 id="adminWelcome">Pusat Approval</h3><div class="small">Akun terverifikasi. Pilih modul untuk melihat request.</div></div>
+            <div class="actions"><button class="btn btn-light" onclick="loadAdminRequests()">↻ Refresh</button><button class="btn btn-danger" onclick="lockAdminPortal()">Keluar Admin</button></div>
+          </div>
+          <div class="form-grid">
+            <div class="field"><label>MODUL REQUEST</label>
+              <select id="adminModule" onchange="loadAdminRequests()">
+                <option value="smallware">Smallware</option>
+                <option value="maintenance">Maintenance (monitoring)</option>
+              </select>
+            </div>
+            <div class="field"><label>FILTER STATUS</label>
+              <select id="adminStatus" onchange="renderAdminRequests()">
+                <option value="ALL">Semua Status</option>
+                <option value="PENDING">PENDING</option>
+                <option value="APPROVED">APPROVED</option>
+                <option value="ORDERED">ORDERED</option>
+                <option value="RECEIVED">RECEIVED</option>
+                <option value="COMPLETED">COMPLETED</option>
+                <option value="REJECTED">REJECTED</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="stats" id="adminStats">
+          <div class="stat"><div class="label">TOTAL REQUEST</div><div id="adminTotal" class="value">0</div></div>
+          <div class="stat"><div class="label">MENUNGGU APPROVAL</div><div id="adminPending" class="value">0</div></div>
+          <div class="stat"><div class="label">PROSES BERJALAN</div><div id="adminProgress" class="value">0</div></div>
+          <div class="stat"><div class="label">SELESAI</div><div id="adminCompleted" class="value">0</div></div>
+        </div>
+        <div class="card">
+          <div class="card-head"><div><h3 id="adminListTitle">Daftar Request</h3><div id="adminListInfo" class="small">Data dimuat dari database modul asal.</div></div></div>
+          <div id="adminRequestList"><div class="empty">Tekan Refresh untuk memuat request.</div></div>
+        </div>
+      </div>
+    </section>
   </main>
 </div>
 
@@ -1060,7 +1244,8 @@ const CONFIG = {
 
 const state = {
   user: null,
-  dashboard: null
+  dashboard: null,
+  adminToken: ''
 };
 
 const $ = id => document.getElementById(id);
@@ -1164,6 +1349,8 @@ function isAM(){
 }
 
 const WT_AM_API_URL = 'https://script.google.com/macros/s/AKfycbynW54Eknu6qCi77Z-tRZdF26Pa3xfpylqbtd1fmFAUcvK-pxPq4fP2I57CkM7l5jhuKg/exec';
+// SALES PEMBANDING memakai Web App khusus SALES CONTROL V3; API modul lain tetap memakai WT_AM_API_URL.
+const SALES_CONTROL_API_URL = 'https://script.google.com/macros/s/AKfycbxHHONwMxABIadjAv7Xugckj8cbpPOc8Y119Skjt5v_0Wgin_Z6vARooLhqsfUoZ63J/exec';
 
 function buildApiUrl(action, params={}){
   const url = new URL(WT_AM_API_URL);
@@ -1518,7 +1705,7 @@ function renderRecentMaintenance(rows){
           <tr>
             <th>No SC</th>
             <th>Store</th>
-            <th>Asset</th>
+            <th>Nama Barang</th>
             <th>Status</th>
           </tr>
         </thead>
@@ -1691,7 +1878,7 @@ function historyHeaderKey(header){
     'CONNECT / BO':'connectBO','CONNECT / BO SALES':'connectBO','CONNECT BO SALES':'connectBO','SALES CONNECT / BO':'connectBO','TC CONNECT / BO':'tcConnectBO','CONNECT / BO TC':'tcConnectBO',
     'TIPS':'tips','TOTAL SALES':'totalSales','TOTAL TC':'totalTc','KETERANGAN':'keterangan','INPUT BY':'inputBy',
     'NO SC':'noSC','NOMOR SC':'noSC','TANGGAL INPUT':'tanggalInput','TGL INPUT':'tanggalInput','TANGGAL KEJADIAN':'tanggalKejadian','TGL KEJADIAN':'tanggalKejadian',
-    'KATEGORI':'kategori','ITEM / ASSET':'itemAsset','ASSET':'itemAsset','JENIS KERUSAKAN':'jenisKerusakan','KERUSAKAN':'jenisKerusakan',
+    'KATEGORI':'kategori','ITEM / NAMA BARANG':'itemAsset','ASSET':'itemAsset','JENIS KERUSAKAN':'jenisKerusakan','KERUSAKAN':'jenisKerusakan',
     'PRIORITAS':'prioritas','FOTO BEFORE':'fotoBefore','STATUS':'status','TEKNISI / VENDOR':'teknisiVendor',
     'TANGGAL PROGRESS':'tanggalProgress','FOTO PROGRESS':'fotoProgress','TINDAKAN':'tindakan',
     'TANGGAL SELESAI':'tanggalSelesai','FOTO AFTER':'fotoAfter','KETERANGAN SELESAI':'keteranganSelesai',
@@ -1719,10 +1906,321 @@ async function loadDirectDatabaseHistory(moduleName){
   }).reverse().slice(0,5000);
 }
 
-async function loadSalesHistory(){if(!state.user)return;try{$('salesHistoryBody').innerHTML='<tr><td colspan="15" class="empty">Memuat history Sales...</td></tr>';const rows=await loadDirectDatabaseHistory('sales');$('salesHistoryBody').innerHTML=rows.length?rows.map(x=>`<tr><td><b>${escapeHtml(x.store||'-')}</b></td><td>${escapeHtml(formatDateWIB(x.tanggal))}</td><td>${formatRupiah(x.dineIn)}</td><td>${Number(x.tcDineIn||0).toLocaleString('id-ID')}</td><td>${formatRupiah(x.delivery)}</td><td>${Number(x.tcDelivery||0).toLocaleString('id-ID')}</td><td>${formatRupiah(x.takeAway)}</td><td>${Number(x.tcTakeAway||0).toLocaleString('id-ID')}</td><td>${formatRupiah(x.connectBO)}</td><td>${Number(x.tcConnectBO||0).toLocaleString('id-ID')}</td><td>${formatRupiah(x.tips)}</td><td><b>${formatRupiah(x.totalSales)}</b></td><td><b>${Number(x.totalTc||0).toLocaleString('id-ID')}</b></td><td>${escapeHtml(x.keterangan||'-')}</td><td>${escapeHtml(x.inputBy||'-')}</td></tr>`).join(''):'<tr><td colspan="15" class="empty">Belum ada history Sales.</td></tr>';__filterHistoryRows('sales');}catch(err){$('salesHistoryBody').innerHTML='<tr><td colspan="15" class="empty">Gagal memuat history Sales.</td></tr>';toast('History Sales: '+err.message)}}
+let __salesHistoryRows=[];
+let __salesEditRecordId='';
+
+function salesDateToISO(value){
+  if(!value)return '';
+  if(value instanceof Date && !isNaN(value))return value.getFullYear()+'-'+String(value.getMonth()+1).padStart(2,'0')+'-'+String(value.getDate()).padStart(2,'0');
+  const s=String(value).trim();
+  // Spreadsheet Date values are serialized by Apps Script as ISO UTC timestamps.
+  // Convert full timestamps to the browser's local calendar date (Asia/Jakarta for this app)
+  // instead of slicing the UTC date, which can be one day earlier.
+  if(/^\d{4}-\d{2}-\d{2}T/.test(s)){const d=new Date(s);return isNaN(d)?'':d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+  if(/^\d{4}-\d{2}-\d{2}$/.test(s))return s;
+  const m=s.match(/^(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{4})$/);
+  if(m)return m[3]+'-'+String(m[2]).padStart(2,'0')+'-'+String(m[1]).padStart(2,'0');
+  const d=new Date(s);return isNaN(d)?'':d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+
+async function loadSalesHistory(){
+  if(!state.user)return;
+  try{
+    $('salesHistoryBody').innerHTML='<tr><td colspan="16" class="empty">Memuat history Sales...</td></tr>';
+    __salesHistoryRows=await loadDirectDatabaseHistory('sales');
+    renderSalesHistory();
+  }catch(err){$('salesHistoryBody').innerHTML='<tr><td colspan="16" class="empty">Gagal memuat history Sales.</td></tr>';toast('History Sales: '+err.message)}
+}
+
+function searchSalesHistory(){
+  const from=$('salesHistoryFrom').value,to=$('salesHistoryTo').value;
+  if(from&&to&&from>to){toast('Tanggal awal tidak boleh melewati tanggal akhir.');return;}
+  renderSalesHistory();
+}
+function clearSalesHistorySearch(){
+  $('salesHistoryFrom').value='';$('salesHistoryTo').value='';$('salesHistoryStore').value='ALL';renderSalesHistory();
+}
+function renderSalesHistory(){
+  const from=$('salesHistoryFrom')?.value||'',to=$('salesHistoryTo')?.value||'',store=$('salesHistoryStore')?.value||'ALL';
+  const rows=__salesHistoryRows.filter(x=>{
+    const d=salesDateToISO(x.tanggal),s=canonicalStore(x.store||'');
+    return (!from||d>=from)&&(!to||d<=to)&&(store==='ALL'||s===store);
+  });
+  const counts={};rows.forEach(x=>{const k=canonicalStore(x.store)+'|'+salesDateToISO(x.tanggal);counts[k]=(counts[k]||0)+1;});
+  $('salesHistoryBody').innerHTML=rows.length?rows.map(x=>{
+    const id=String(x.id||'');const key=canonicalStore(x.store)+'|'+salesDateToISO(x.tanggal);const duplicate=counts[key]>1;
+    return `<tr data-sales-id="${escapeAttr(id)}"${duplicate?' style="background:#fff0f0"':''}><td><b>${escapeHtml(x.store||'-')}</b>${duplicate?' <span class="badge badge-open">DOUBLE</span>':''}</td><td>${escapeHtml(formatDateWIB(x.tanggal))}</td><td>${formatRupiah(x.dineIn)}</td><td>${Number(x.tcDineIn||0).toLocaleString('id-ID')}</td><td>${formatRupiah(x.delivery)}</td><td>${Number(x.tcDelivery||0).toLocaleString('id-ID')}</td><td>${formatRupiah(x.takeAway)}</td><td>${Number(x.tcTakeAway||0).toLocaleString('id-ID')}</td><td>${formatRupiah(x.connectBO)}</td><td>${Number(x.tcConnectBO||0).toLocaleString('id-ID')}</td><td>${formatRupiah(x.tips)}</td><td><b>${formatRupiah(x.totalSales)}</b></td><td><b>${Number(x.totalTc||0).toLocaleString('id-ID')}</b></td><td>${escapeHtml(x.keterangan||'-')}</td><td>${escapeHtml(x.inputBy||'-')}</td><td><div class="actions"><button class="btn btn-primary" onclick="toggleInlineSalesEdit(this)" ${id?'':'disabled'}>✎ Edit</button><button class="btn btn-danger" onclick="deleteSalesRecord('${escapeAttr(id)}')" ${id?'':'disabled'}>🗑 Delete</button></div></td></tr>`;
+  }).join(''):'<tr><td colspan="16" class="empty">Tidak ada data Sales pada filter tersebut.</td></tr>';
+  __filterHistoryRows('sales');
+}
+
+function toggleInlineSalesEdit(button){
+  const tr=button.closest('tr'); if(!tr)return;
+  if(tr.dataset.editing==='1')return;
+  const id=tr.dataset.salesId; const record=__salesHistoryRows.find(x=>String(x.id||'')===String(id)); if(!record)return;
+  const fields=['dineIn','tcDineIn','delivery','tcDelivery','takeAway','tcTakeAway','connectBO','tcConnectBO','tips'];
+  const cells=tr.querySelectorAll('td');
+  const cellIndexes={dineIn:2,tcDineIn:3,delivery:4,tcDelivery:5,takeAway:6,tcTakeAway:7,connectBO:8,tcConnectBO:9,tips:10};
+  fields.forEach(key=>{const td=cells[cellIndexes[key]];td.dataset.original=td.innerHTML;td.innerHTML=`<input class="sales-inline-input" data-field="${key}" type="number" min="0" step="1" value="${Number(record[key]||0)}" style="width:130px;min-width:90px;padding:8px;border:1px solid #8ba6c5;border-radius:7px">`;});
+  const noteCell=cells[13];noteCell.dataset.original=noteCell.innerHTML;noteCell.innerHTML=`<input class="sales-inline-input" data-field="keterangan" type="text" value="${escapeAttr(record.keterangan||'')}" style="width:180px;padding:8px;border:1px solid #8ba6c5;border-radius:7px">`;
+  const action=cells[15];action.dataset.original=action.innerHTML;action.innerHTML='<div class="actions"><button class="btn btn-green" onclick="saveInlineSales(this)">✓ Simpan</button><button class="btn btn-light" onclick="cancelInlineSales(this)">Batal</button></div>';
+  tr.dataset.editing='1';const first=tr.querySelector('[data-field="dineIn"]');if(first){first.focus();first.select();}
+}
+function cancelInlineSales(button){const tr=button.closest('tr');if(!tr)return;tr.querySelectorAll('td').forEach(td=>{if(td.dataset.original!==undefined){td.innerHTML=td.dataset.original;delete td.dataset.original;}});delete tr.dataset.editing;}
+async function saveInlineSales(button){
+  const tr=button.closest('tr');if(!tr)return;const id=tr.dataset.salesId;
+  const old=__salesHistoryRows.find(x=>String(x.id||'')===String(id));if(!old){toast('Record tidak ditemukan. Refresh history.');return;}
+  const val=k=>{const el=tr.querySelector(`[data-field="${k}"]`);return el?el.value:old[k]||0;};
+  const payload={action:'updateSales',id,tanggal:salesDateToISO(old.tanggal),store:old.store,dineIn:Number(val('dineIn')||0),tcDineIn:Number(val('tcDineIn')||0),delivery:Number(val('delivery')||0),tcDelivery:Number(val('tcDelivery')||0),takeAway:Number(val('takeAway')||0),tcTakeAway:Number(val('tcTakeAway')||0),connectBO:Number(val('connectBO')||0),tcConnect:Number(val('tcConnectBO')||0),tips:Number(val('tips')||0),keterangan:val('keterangan'),inputBy:state.user?.nama||state.user?.username||'USER'};
+  try{showLoading(true);const r=await apiPost(payload);toast('Koreksi langsung berhasil disimpan. Total '+formatRupiah(r.totalSales));await loadSalesHistory();loadDashboard();}catch(e){toast(e.message);}finally{showLoading(false);}
+}
+async function deleteSalesRecord(id){
+  const record=__salesHistoryRows.find(x=>String(x.id||'')===String(id));if(!record)return toast('Record Sales tidak ditemukan.');
+  if(!confirm('Hapus permanen data Sales '+(record.store||'')+' tanggal '+formatDateWIB(record.tanggal)+'? Data akan dihapus dari database backend.'))return;
+  try{showLoading(true);await apiPost({action:'deleteSales',id:String(id),deletedBy:state.user?.nama||state.user?.username||'USER'});toast('Data Sales berhasil dihapus dari database.');await loadSalesHistory();loadDashboard();}catch(e){toast(e.message);}finally{showLoading(false);}
+}
+
+function editSalesRecord(id){
+  const x=__salesHistoryRows.find(r=>String(r.id||'')===String(id));
+  if(!x){toast('Record Sales tidak ditemukan. Refresh history terlebih dahulu.');return;}
+  __salesEditRecordId=String(x.id);
+  $('salesDate').value=salesDateToISO(x.tanggal);
+  $('salesStore').value=canonicalStore(x.store||'');
+  $('salesDineIn').value=Number(x.dineIn||0);$('tcDineIn').value=Number(x.tcDineIn||0);
+  $('salesDelivery').value=Number(x.delivery||0);$('tcDelivery').value=Number(x.tcDelivery||0);
+  $('salesTakeAway').value=Number(x.takeAway||0);$('tcTakeAway').value=Number(x.tcTakeAway||0);
+  $('salesConnect').value=Number(x.connectBO||0);$('tcConnect').value=Number(x.tcConnectBO||0);
+  $('salesTips').value=Number(x.tips||0);$('salesNote').value=x.keterangan||'';
+  updateSalesTotals();
+  const btn=document.querySelector('#page-sales button[onclick="saveSales()"]');if(btn)btn.textContent='Simpan Koreksi Sales';
+  const notice=$('salesEditModeNotice');notice.classList.remove('hidden');notice.textContent='MODE EDIT AKTIF — Record ID: '+__salesEditRecordId+'. Simpan koreksi akan memperbarui data ini, bukan menambah baris baru.';
+  $('page-sales').scrollIntoView({behavior:'smooth',block:'start'});
+  toast('Data Sales dimuat ke form koreksi.');
+}
+
+
+let __salesComparisonCache = [];
+function initializeSalesComparisonFilters(){
+  const a=$('salesComparisonMonthA'), b=$('salesComparisonMonthB');
+  if(!a || !b) return;
+  const now=new Date();
+  const current=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
+  const previousDate=new Date(now.getFullYear(),now.getMonth()-1,1);
+  const previous=previousDate.getFullYear()+'-'+String(previousDate.getMonth()+1).padStart(2,'0');
+  if(!a.value)a.value=previous;
+  if(!b.value)b.value=current;
+  if(!a.dataset.headerBound){a.addEventListener('change',updateSalesComparisonHeaders);a.dataset.headerBound='1';}
+  if(!b.dataset.headerBound){b.addEventListener('change',updateSalesComparisonHeaders);b.dataset.headerBound='1';}
+  updateSalesComparisonHeaders();
+}
+function updateSalesComparisonHeaders(){
+  const monthA=comparisonMonthText($('salesComparisonMonthA')?.value||'BULAN 1');
+  const monthB=comparisonMonthText($('salesComparisonMonthB')?.value||'BULAN 2');
+  const labels={
+    salesCompHeadSalesA:'SALES NETT '+monthA,
+    salesCompHeadTargetA:'TARGET NETT '+monthA,
+    salesCompHeadAchA:'PENCAPAIAN TARGET '+monthA+' %',
+    salesCompHeadSalesB:'SALES NETT '+monthB,
+    salesCompHeadTargetB:'TARGET NETT '+monthB,
+    salesCompHeadAchB:'PENCAPAIAN TARGET '+monthB+' %',
+    salesCompHeadTcA:'TC '+monthA,
+    salesCompHeadAcA:'AVERAGE CHECK '+monthA,
+    salesCompHeadTcB:'TC '+monthB,
+    salesCompHeadAcB:'AVERAGE CHECK '+monthB
+  };
+  Object.entries(labels).forEach(([id,label])=>{const el=$(id);if(el)el.textContent=label;});
+}
+function comparisonMonthText(value){
+  if(!/^\d{4}-\d{2}$/.test(String(value||'')))return value||'-';
+  const [y,m]=value.split('-').map(Number);
+  return new Date(y,m-1,1).toLocaleDateString('id-ID',{month:'long',year:'numeric'}).toUpperCase();
+}
+function comparisonMoney(value){
+  if(value===null || value===undefined || value==='')return '-';
+  return formatRupiah(Number(value)||0);
+}
+function comparisonPercent(value){
+  if(value===null || value===undefined || value==='')return '-';
+  return (Number(value)*100).toLocaleString('id-ID',{minimumFractionDigits:1,maximumFractionDigits:1})+'%';
+}
+async function loadSalesComparison(){
+  const body=$('salesComparisonBody');
+  if(!body)return;
+  initializeSalesComparisonFilters();
+  const monthA=$('salesComparisonMonthA').value;
+  const monthB=$('salesComparisonMonthB').value;
+  const store=$('salesComparisonStore')?.value||'ALL';
+  if(!monthA || !monthB){toast('Pilih kedua bulan terlebih dahulu.');return;}
+  if(monthA===monthB){toast('Bulan pertama dan kedua harus berbeda.');return;}
+  body.innerHTML='<tr><td colspan="19" class="empty">Memuat perbandingan '+escapeHtml(comparisonMonthText(monthA))+' vs '+escapeHtml(comparisonMonthText(monthB))+'...</td></tr>';
+  try{
+    const url=new URL(SALES_CONTROL_API_URL);
+    url.searchParams.set('action','salesComparison');
+    url.searchParams.set('monthA',monthA);
+    url.searchParams.set('monthB',monthB);
+    url.searchParams.set('store',store);
+    const response=await fetch(url.toString(),{method:'GET',mode:'cors',cache:'no-store'});
+    const raw=await response.text();
+    let result;
+    try{result=JSON.parse(raw);}catch(e){throw new Error('Respons API SALES CONTROL bukan JSON. Periksa deployment Web App.');}
+    if(!response.ok || result.success===false)throw new Error(result.error||result.message||'Permintaan perbandingan gagal.');
+    __salesComparisonCache=Array.isArray(result.rows)?result.rows:[];
+    const period=$('salesComparisonPeriod');
+    if(period)period.textContent=(result.periodALabel||comparisonMonthText(monthA))+' ('+(result.periodAType||'bulan penuh')+') vs '+(result.periodBLabel||comparisonMonthText(monthB))+' ('+(result.periodBType||'bulan penuh')+') · '+(store==='ALL'?'SEMUA STORE':store);
+    renderSalesComparison();
+  }catch(err){
+    __salesComparisonCache=[];
+    body.innerHTML='<tr><td colspan="19" class="empty">Gagal memuat Sales Pembanding: '+escapeHtml(err.message||'Kesalahan backend')+'</td></tr>';
+    toast('Sales Pembanding: '+(err.message||err));
+  }
+}
+function renderSalesComparison(){
+  const body=$('salesComparisonBody');if(!body)return;
+  const rows=__salesComparisonCache;
+  body.innerHTML=rows.length?rows.map(row=>{
+    const x=Array.isArray(row)?row:[];
+    const store=String(x[0]||'-');
+    const status=String(x[9]||'BELUM ADA DATA').toUpperCase();
+    const growth=x[8];
+    const statusStyle=/TURUN|DOWN/.test(status)?'color:#c62828;font-weight:800':(/NAIK|UP/.test(status)?'color:#16803d;font-weight:800':(/FLUKTUATIF/.test(status)?'color:#8a5a16;font-weight:800':'font-weight:700'));
+    const growthStyle=growth!=='' && growth!==null && Number(growth)<0?'color:#c62828;font-weight:800':(growth!=='' && growth!==null && Number(growth)>0?'color:#16803d;font-weight:800':'font-weight:700');
+    const total=store==='GRAND TOTAL'?' style="font-weight:800;background:#d9eaf7"':'';
+    const tcGrowthStyle=x[16]!=='' && x[16]!==null && Number(x[16])<0?'color:#c62828;font-weight:800':(x[16]!=='' && x[16]!==null && Number(x[16])>0?'color:#16803d;font-weight:800':'font-weight:700');
+    const acGrowthStyle=x[18]!=='' && x[18]!==null && Number(x[18])<0?'color:#c62828;font-weight:800':(x[18]!=='' && x[18]!==null && Number(x[18])>0?'color:#16803d;font-weight:800':'font-weight:700');
+    return `<tr${total}><td><b>${escapeHtml(store)}</b></td><td>${comparisonMoney(x[1])}</td><td>${comparisonMoney(x[2])}</td><td>${comparisonPercent(x[3])}</td><td>${comparisonMoney(x[4])}</td><td>${comparisonMoney(x[5])}</td><td>${comparisonPercent(x[6])}</td><td>${comparisonMoney(x[7])}</td><td style="${growthStyle}">${comparisonPercent(growth)}</td><td style="${statusStyle}">${escapeHtml(status)}</td><td>${escapeHtml(x[10]||'-')}</td><td>${Number(x[11]||0).toLocaleString('id-ID')}</td><td>${comparisonMoney(x[12])}</td><td>${Number(x[13]||0).toLocaleString('id-ID')}</td><td>${comparisonMoney(x[14])}</td><td>${Number(x[15]||0).toLocaleString('id-ID')}</td><td style="${tcGrowthStyle}">${comparisonPercent(x[16])}</td><td>${comparisonMoney(x[17])}</td><td style="${acGrowthStyle}">${comparisonPercent(x[18])}</td></tr>`;
+  }).join(''):'<tr><td colspan="19" class="empty">Tidak ada data Sales Pembanding untuk pilihan periode dan store tersebut.</td></tr>';
+}
+
 async function loadWasteHistory(){if(!state.user)return;try{$('wasteHistoryBody').innerHTML='<tr><td colspan="6" class="empty">Memuat history Waste...</td></tr>';const r=await apiGet('wasteData',{store:'ALL',role:'PUBLIC',userStore:'',limit:5000});const rows=Array.isArray(r.allRows)?r.allRows:(Array.isArray(r.data)?r.data:[]);$('wasteHistoryBody').innerHTML=rows.length?rows.slice().sort((a,b)=>String(b.periodeAkhir||'').localeCompare(String(a.periodeAkhir||''))).map(x=>`<tr><td>${escapeHtml(x.periodeMulai||'-')} s/d ${escapeHtml(x.periodeAkhir||'-')}</td><td>${escapeHtml(x.kode||'-')}</td><td>${escapeHtml(x.namaBarang||'-')}</td><td>${escapeHtml(x.satuan||'-')}</td><td><b>${Number(x.totalWaste||0).toLocaleString('id-ID',{maximumFractionDigits:2})}</b></td><td>${escapeHtml(x.storeName||'-')}</td></tr>`).join(''):'<tr><td colspan="6" class="empty">Belum ada history Waste.</td></tr>';__filterHistoryRows('waste');}catch(err){$('wasteHistoryBody').innerHTML='<tr><td colspan="6" class="empty">Gagal memuat history Waste.</td></tr>';toast('History Waste: '+err.message)}}
-async function loadMaintenanceHistory(){if(!state.user)return;try{$('maintenanceHistoryBody').innerHTML='<tr><td colspan="10" class="empty">Memuat history Maintenance...</td></tr>';const rows=await loadDirectDatabaseHistory('maintenance');$('maintenanceHistoryBody').innerHTML=rows.length?rows.map(x=>`<tr><td>${escapeHtml(x.tanggalInput||'-')}</td><td><b>${escapeHtml(x.noSC||'-')}</b></td><td>${escapeHtml(x.store||'-')}</td><td>${escapeHtml(x.kategori||'-')}</td><td>${escapeHtml(x.itemAsset||'-')}</td><td>${escapeHtml(x.jenisKerusakan||'-')}</td><td>${escapeHtml(x.prioritas||'-')}</td><td>${statusBadge(x.status)}</td><td>${escapeHtml(x.teknisiVendor||'-')}</td><td>${escapeHtml(x.tanggalSelesai||'-')}</td></tr>`).join(''):'<tr><td colspan="10" class="empty">Belum ada history Maintenance.</td></tr>';__filterHistoryRows('maintenance');}catch(err){$('maintenanceHistoryBody').innerHTML='<tr><td colspan="10" class="empty">Gagal memuat history Maintenance.</td></tr>';toast('History Maintenance Semua Store: '+err.message)}}
+let completionContext = null;
+
+function openCompletionModal(type, id){
+  completionContext = {type, id};
+  const isMaintenance = type === 'maintenance';
+  $('completionModalTitle').textContent = isMaintenance ? 'Konfirmasi Ticket Maintenance Selesai' : 'Konfirmasi Smallware Selesai';
+  $('completionModalDesc').textContent = isMaintenance
+    ? `Masukkan tanggal penyelesaian untuk No SC ${id}.`
+    : `Masukkan tanggal penyelesaian untuk Request Smallware ${id}.`;
+  $('completionDateInput').value = todayISO();
+  const modal = $('completionModal');
+  modal.classList.remove('hidden');
+  modal.style.display = 'flex';
+}
+
+function closeCompletionModal(){
+  const modal = $('completionModal');
+  modal.classList.add('hidden');
+  modal.style.display = 'none';
+  completionContext = null;
+}
+
+async function submitCompletionConfirmation(){
+  if(!completionContext) return;
+  const tanggalSelesai = $('completionDateInput').value;
+  if(!tanggalSelesai){
+    toast('Tanggal penyelesaian wajib dipilih.');
+    return;
+  }
+  const ctx = {...completionContext};
+  try{
+    showLoading(true);
+    if(ctx.type === 'maintenance'){
+      await apiPost({
+        action:'confirmMaintenanceComplete',
+        noSC:ctx.id,
+        status:'COMPLETED',
+        tanggalSelesai,
+        updateBy:state.user?.nama || state.user?.username || 'PUBLIC'
+      });
+    }else{
+      await apiPost({
+        action:'updateSmallwareStatus',
+        idRequest:ctx.id,
+        role:state.user?.role || 'STORE',
+        adminToken:state.adminToken || '',
+        userStore:storeApiOfUser(),
+        status:'COMPLETED',
+        completedDate:tanggalSelesai,
+        tanggalSelesai,
+        updateBy:state.user?.nama || state.user?.username || 'PUBLIC'
+      });
+    }
+    closeCompletionModal();
+    toast('Konfirmasi selesai berhasil dikirim.');
+    if(ctx.type === 'maintenance'){
+      await loadMaintenanceHistory();
+      if($('searchSC')?.value.trim()) await searchMaintenance();
+      loadDashboard();
+    }else{
+      $('swDetail').classList.add('hidden');
+      await loadSmallware();
+      await loadSmallwareFrequency();
+    }
+  }catch(err){
+    toast('Gagal menyimpan konfirmasi: '+(err.message||err));
+  }finally{
+    showLoading(false);
+  }
+}
+
+function exportMaintenanceWhatsApp(rowIndex){
+  const rows=window.__maintenanceHistoryRows||[];
+  const x=rows[rowIndex];
+  if(!x){toast('Data Maintenance tidak ditemukan. Silakan refresh history.');return;}
+  const store=String(x.store||x.storeName||'').trim();
+  const damage=String(x.jenisKerusakan||x.keterangan||'-').trim();
+  const date=formatDateWIB(x.tanggalInput||'');
+  const detail=String(x.keterangan||'-').trim();
+  const message=[
+    'Selamat Siang Team Maintenance dan PRJ,',
+    'Berikut SC ('+store+') dibantu follow up nya :',
+    '',
+    '1. Store : '+store,
+    'Kerusakan : '+damage,
+    'No SC : '+String(x.noSC||'-').trim(),
+    'Tgl input SC : '+date,
+    'Keterangan : '+detail,
+    '',
+    'Terima kasih'
+  ].join('\n');
+  const url='https://wa.me/?text='+encodeURIComponent(message);
+  window.open(url,'_blank','noopener,noreferrer');
+}
+
+async function loadMaintenanceHistory(){if(!state.user)return;try{$('maintenanceHistoryBody').innerHTML='<tr><td colspan="11" class="empty">Memuat history Maintenance...</td></tr>';const rows=await loadDirectDatabaseHistory('maintenance');window.__maintenanceHistoryRows=rows;$('maintenanceHistoryBody').innerHTML=rows.length?rows.map((x,i)=>`<tr><td>${escapeHtml(formatDateWIB(x.tanggalInput||'-'))}</td><td><b>${escapeHtml(x.noSC||'-')}</b></td><td>${escapeHtml(x.store||'-')}</td><td>${escapeHtml(x.kategori||'-')}</td><td>${escapeHtml(x.itemAsset||'-')}</td><td>${escapeHtml(x.jenisKerusakan||'-')}</td><td>${escapeHtml(x.prioritas||'-')}</td><td>${statusBadge(x.status)}</td><td>${escapeHtml(x.teknisiVendor||'-')}</td><td>${escapeHtml(x.tanggalSelesai||'-')}</td><td><div class="actions"><button class="btn btn-peach" onclick="exportMaintenanceWhatsApp(${i})">💬 Export WA</button>${String(x.status||'').toUpperCase()==='COMPLETED'?'<span class="badge badge-done">SELESAI</span>':`<button class="btn btn-green" onclick="openCompletionModal('maintenance','${escapeAttr(x.noSC||'')}')">✓ Konfirmasi Selesai</button>`}</div></td></tr>`).join(''):'<tr><td colspan="11" class="empty">Belum ada history Maintenance.</td></tr>';__filterHistoryRows('maintenance');}catch(err){$('maintenanceHistoryBody').innerHTML='<tr><td colspan="11" class="empty">Gagal memuat history Maintenance.</td></tr>';toast('History Maintenance Semua Store: '+err.message)}}
 async function loadKPIHistory(){if(!state.user)return;try{$('kpiHistoryBody').innerHTML='<tr><td colspan="8" class="empty">Memuat history KPI...</td></tr>';const rows=await loadDirectDatabaseHistory('kpi');$('kpiHistoryBody').innerHTML=rows.length?rows.map(x=>`<tr><td>${escapeHtml(x.timestamp||'-')}</td><td>${escapeHtml(x.store||'-')}</td><td>${escapeHtml(x.bulan||'-')}</td><td>${escapeHtml(x.tahun||'-')}</td><td>${escapeHtml(x.tanggalUpload||'-')}</td><td>${escapeHtml(x.keterangan||'-')}</td><td>${x.driveUrl?`<a class="btn btn-light" target="_blank" href="${escapeAttr(x.driveUrl)}">Lihat KPI</a>`:escapeHtml(x.fileName||'-')}</td><td>${escapeHtml(x.uploadBy||'-')}</td></tr>`).join(''):'<tr><td colspan="8" class="empty">Belum ada history KPI.</td></tr>';__filterHistoryRows('kpi');}catch(err){$('kpiHistoryBody').innerHTML='<tr><td colspan="8" class="empty">Gagal memuat history KPI.</td></tr>';toast('History KPI Semua Store: '+err.message)}}
+
+async function loadSoldOutSummary(){
+  const body=document.getElementById('soldOutBody');
+  if(!body)return;
+  body.innerHTML='<tr><td colspan="7" class="empty">Memuat summary Sold Out...</td></tr>';
+  try{
+    const r=await apiGet('soldoutSummary',{
+      store:document.getElementById('soStore')?.value||'ALL',
+      from:document.getElementById('soFrom')?.value||'',
+      to:document.getElementById('soTo')?.value||'',
+      limit:5000
+    });
+    const summary=r.summary||{};
+    document.getElementById('soTotalItems').textContent=Number(summary.totalItems||0).toLocaleString('id-ID');
+    document.getElementById('soStoreItems').textContent=Number(summary.totalStoreItems||0).toLocaleString('id-ID');
+    document.getElementById('soDays').textContent=Number(summary.totalSoldOutDays||0).toLocaleString('id-ID');
+    document.getElementById('soCritical').textContent=Number(summary.critical||0).toLocaleString('id-ID');
+    const rows=Array.isArray(r.data)?r.data:[];
+    if(!rows.length){body.innerHTML='<tr><td colspan="7" class="empty">Tidak ada data Sold Out untuk filter ini.</td></tr>';return;}
+    body.innerHTML=rows.map(x=>{
+      const priority=String(x.priority||'NORMAL').toUpperCase();
+      const colors={CRITICAL:'badge-danger',HIGH:'badge-warning',MONITOR:'badge-progress',NORMAL:'badge-success'};
+      const badge=colors[priority]||'badge-progress';
+      const dates=Array.isArray(x.tanggalSoldOut)?x.tanggalSoldOut:[];
+      const datesText=dates.map(d=>formatDateWIB(d)).join(', ');
+      return `<tr><td><b>${escapeHtml(x.store||'-')}</b></td><td>${escapeHtml(x.namaMaterial||'-')}</td><td style="white-space:normal;min-width:190px">${escapeHtml(datesText||'-')}</td><td style="text-align:center;font-weight:700">${Number(x.jumlahHariSoldOut||0).toLocaleString('id-ID')} hari</td><td>${escapeHtml(x.kategori||'-')}</td><td style="white-space:normal;min-width:220px;max-width:380px">${escapeHtml(x.penyebabSoldOut||'Belum diisi oleh store')}</td><td><span class="badge ${badge}">${escapeHtml(priority)}</span></td></tr>`;
+    }).join('');
+  }catch(err){
+    body.innerHTML=`<tr><td colspan="7" class="empty">Gagal memuat Sold Out: ${escapeHtml(err.message||String(err))}</td></tr>`;
+    toast('Rekap Sold Out: '+(err.message||err));
+  }
+}
 
 /* SALES */
 [
@@ -1755,40 +2253,25 @@ function updateSalesTotal(){
 
 async function saveSales(){
   const targetStore=selectedStore('salesStore');
-  if(!targetStore){
-    toast('Pilih Store terlebih dahulu.');
-    return;
-  }
+  if(!targetStore){toast('Pilih Store terlebih dahulu.');return;}
+  if(!$('salesDate').value){toast('Tanggal Sales wajib diisi.');return;}
   try{
-    const payload={
-      action:'saveSales',
-      tanggal:$('salesDate').value,
-      store:targetStore,
-      dineIn:num('salesDineIn'),
-      tcDineIn:num('tcDineIn'),
-      delivery:num('salesDelivery'),
-      tcDelivery:num('tcDelivery'),
-      takeAway:num('salesTakeAway'),
-      tcTakeAway:num('tcTakeAway'),
-      connectBO:num('salesConnect'),
-      tcConnect:num('tcConnect'),
-      tips:num('salesTips'),
-      keterangan:$('salesNote').value.trim(),
-      inputBy:'PUBLIC USER'
-    };
-
+    const payload={action:__salesEditRecordId?'updateSales':'saveSales',id:__salesEditRecordId||undefined,tanggal:$('salesDate').value,store:targetStore,
+      dineIn:num('salesDineIn'),tcDineIn:num('tcDineIn'),delivery:num('salesDelivery'),tcDelivery:num('tcDelivery'),
+      takeAway:num('salesTakeAway'),tcTakeAway:num('tcTakeAway'),connectBO:num('salesConnect'),tcConnect:num('tcConnect'),tips:num('salesTips'),
+      keterangan:$('salesNote').value.trim(),inputBy:state.user?.nama||state.user?.username||state.user?.userId||'USER'};
     showLoading(true);
     const r=await apiPost(payload);
-    toast(`Sales tersimpan. Total ${formatRupiah(r.totalSales)}`);
-    resetSales();
-    await loadSalesHistory();
-    loadDashboard();
-  }catch(err){toast(err.message)}
-  finally{showLoading(false)}
+    toast(__salesEditRecordId?'Koreksi Sales berhasil disimpan. Total '+formatRupiah(r.totalSales):'Sales tersimpan. Total '+formatRupiah(r.totalSales));
+    resetSales();await loadSalesHistory();loadDashboard();
+  }catch(err){toast(err.message)}finally{showLoading(false)}
 }
 
 function resetSales(){
   ['salesDineIn','tcDineIn','salesDelivery','tcDelivery','salesTakeAway','tcTakeAway','salesConnect','tcConnect','salesTips','salesNote'].forEach(id=>$(id).value='');
+  __salesEditRecordId='';
+  const btn=document.querySelector('#page-sales button[onclick="saveSales()"]');if(btn)btn.textContent='Simpan Sales';
+  const notice=$('salesEditModeNotice');if(notice){notice.classList.add('hidden');notice.textContent='';}
   updateSalesTotals();
 }
 
@@ -1958,7 +2441,7 @@ async function saveKPI(){
     return;
   }
 
-  const file=$('kpiPhoto').files[0];
+  const file=$('kpiPhotoGallery').files[0] || $('kpiPhotoCamera').files[0];
   if(!file){
     toast('Foto KPI wajib dipilih.');
     return;
@@ -1980,7 +2463,8 @@ async function saveKPI(){
 
     const r=await apiPost(payload);
     toast('KPI berhasil diupload ke Google Drive.');
-    $('kpiPhoto').value='';
+    $('kpiPhotoGallery').value='';
+    $('kpiPhotoCamera').value='';
     $('kpiPreview').innerHTML='';
     $('kpiNote').value='';
     await loadKPIHistory();
@@ -1992,6 +2476,12 @@ async function saveKPI(){
 /* UTILS */
 function num(id){
   return Number($(id).value||0)||0;
+}
+
+function handleImageChoice(input, otherInputId, targetId){
+  const other = $(otherInputId);
+  if(other) other.value = '';
+  previewFile(input, targetId);
 }
 
 function previewFile(input,targetId){
@@ -2158,8 +2648,15 @@ async function viewWalkthroughDetail(id){
       throw new Error('Detail temuan tidak ditemukan.');
     }
 
+    // Detail card berada di panel Follow-up yang tersembunyi saat halaman History aktif.
+    // Pindahkan tampilan ke panel Follow-up sebelum merender detail agar temuan dan foto terlihat.
+    __setupModulePanels();
+    __setModuleView('walkthrough','followup');
     renderWalkthroughDetail(r.data);
-    $('walkthroughDetail').scrollIntoView({behavior:'smooth',block:'start'});
+    $('walkthroughDetail').classList.remove('hidden');
+    requestAnimationFrame(function(){
+      $('walkthroughDetail').scrollIntoView({behavior:'smooth',block:'start'});
+    });
   }catch(err){
     toast(err.message);
   }finally{
@@ -2672,7 +3169,7 @@ function openSmallwareDetail(index){
         </div>
       </div>` : ''}
 
-    ${am ? renderSmallwareAdminActions(row) : ''}
+    ${renderSmallwareAdminActions(row)}
   `;
 
   $('swDetail').scrollIntoView({behavior:'smooth',block:'start'});
@@ -2680,23 +3177,32 @@ function openSmallwareDetail(index){
 
 function renderSmallwareAdminActions(row){
   const s = String(row.status||'').toUpperCase();
+  const am = isAM();
 
   let html = `
-    <div class="section-title">⚙️ Approval / Processing</div>
+    <div class="section-title">${am ? '⚙️ Approval / Processing' : '📦 Konfirmasi Barang'}</div>
     <div class="actions">
   `;
 
-  if(s==='PENDING'){
+  if(s==='PENDING' && am){
     html += `
       <button class="btn btn-green" onclick="approveSmallwareUI('${escapeAttr(row.idRequest)}')">✓ APPROVE</button>
       <button class="btn btn-danger" onclick="rejectSmallwareUI('${escapeAttr(row.idRequest)}')">✕ REJECT</button>`;
   }
 
-  if(['APPROVED','ORDERED','RECEIVED'].includes(s)){
-    const next = s==='APPROVED' ? 'ORDERED' : s==='ORDERED' ? 'RECEIVED' : 'COMPLETED';
+  if(s==='APPROVED' && am){
     html += `
-      <button class="btn btn-primary" onclick="updateSmallwareStatusUI('${escapeAttr(row.idRequest)}','${next}')">
-        Ubah → ${next}
+      <button class="btn btn-primary" onclick="updateSmallwareStatusUI('${escapeAttr(row.idRequest)}','ORDERED')">
+        Tandai Sudah Dipesan
+      </button>`;
+  }
+
+  // Konfirmasi selesai boleh dilakukan dari akun Store, Admin/AM, maupun portal publik.
+  // Backend tetap memvalidasi bahwa status saat ini ORDERED dan tanggal selesai diisi.
+  if(s==='ORDERED'){
+    html += `
+      <button class="btn btn-green" onclick="openCompletionModal('smallware','${escapeAttr(row.idRequest)}')">
+        ✓ Konfirmasi Selesai
       </button>`;
   }
 
@@ -2714,7 +3220,8 @@ async function saveSmallwareRequestUI(){
   const name = $('swName').value.trim();
   const qty = Number($('swQty').value||0);
   const type = $('swType').value;
-  const file = $('swPhoto').files[0];
+  const targetStore = selectedStore('swStore') || storeApiOfUser();
+  const file = $('swPhotoGallery').files[0] || $('swPhotoCamera').files[0];
 
   if(!name){
     toast('Nama Smallware wajib diisi.');
@@ -2838,6 +3345,7 @@ async function updateSmallwareStatusUI(id,status){
       action:'updateSmallwareStatus',
       idRequest:id,
       role:state.user.role,
+      userStore:(selectedStore('swStore') || storeApiOfUser()),
       status,
       updateBy:state.user.nama || state.user.username || ''
     });
@@ -2857,7 +3365,8 @@ function resetSmallwareForm(){
   $('swName').value='';
   $('swQty').value='';
   $('swType').value='';
-  $('swPhoto').value='';
+  $('swPhotoGallery').value='';
+  $('swPhotoCamera').value='';
   $('swPhotoPreview').innerHTML='';
   $('swNote').value='';
   toggleSmallwarePhoto();
@@ -2915,7 +3424,7 @@ document.addEventListener('DOMContentLoaded', function(){
 });
 
 
-/* V16 scenic wallpaper: one landscape per 3-hour block, consistent for all visitors in that block. */
+/* V16 scenic wallpaper: one landscape per hour, consistent for all visitors in that hour. */
 (function initScenicBackground(){
   const scenicPhotos = [
     'https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=2200&q=85',
@@ -2924,8 +3433,8 @@ document.addEventListener('DOMContentLoaded', function(){
     'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=2200&q=85'
   ];
   const applyScenic = () => {
-    const threeHourBlock = Math.floor(Date.now() / (3 * 60 * 60 * 1000));
-    const url = scenicPhotos[threeHourBlock % scenicPhotos.length];
+    const oneHourBlock = Math.floor(Date.now() / (60 * 60 * 1000));
+    const url = scenicPhotos[oneHourBlock % scenicPhotos.length];
     document.documentElement.style.setProperty('--scenic-image', `url("${url}")`);
   };
   applyScenic();
@@ -2943,7 +3452,8 @@ const __moduleViewState = { module:'dashboard', view:'menu' };
 const __moduleSpecs = {
   sales:{title:'💰 Sales',subtitle:'Pilih input sales atau lihat history berdasarkan store.',items:[
     {key:'input',icon:'➕',title:'Input Sales',desc:'Input laporan sales harian.',tone:'green'},
-    {key:'history',icon:'📋',title:'History Sales',desc:'Riwayat transaksi dan filter store.',tone:'blue'}]},
+    {key:'history',icon:'📋',title:'History Sales',desc:'Riwayat transaksi dan filter store.',tone:'blue'},
+    {key:'comparison',icon:'📊',title:'Sales Pembanding',desc:'Lihat sales gross dan nett dari sheet pembanding.',tone:'purple'}]},
   waste:{title:'♻️ Waste',subtitle:'Pilih dashboard Waste atau buka riwayat seluruh store.',items:[
     {key:'dashboard',icon:'📊',title:'Dashboard Waste',desc:'Ringkasan, top waste, dan periode terbaru.',tone:'orange'},
     {key:'history',icon:'📋',title:'History Waste',desc:'Riwayat Waste semua store.',tone:'blue'}]},
@@ -2957,6 +3467,7 @@ const __moduleSpecs = {
   walkthrough:{title:'📝 Walkthrough',subtitle:'Buka temuan dan tindak lanjut walkthrough.',items:[
     {key:'history',icon:'📋',title:'History Temuan',desc:'Cari dan lihat temuan berdasarkan store.',tone:'cyan'},
     {key:'followup',icon:'✅',title:'Detail / Follow Up Temuan',desc:'Pilih temuan untuk melihat detail dan tindak lanjut.',tone:'green'}]},
+  soldout:{title:'🚫 Rekap Sold Out',subtitle:'Lihat rekap item Sold Out berdasarkan store dan periode.',items:[{key:'history',icon:'📋',title:'Rekap Sold Out',desc:'Ringkasan dan prioritas item Sold Out.',tone:'orange'}]},
   smallware:{title:'🍴 Smallware',subtitle:'Pilih request baru, history request, atau frequency.',items:[
     {key:'request',icon:'➕',title:'Request Baru',desc:'Buat permintaan Smallware.',tone:'green'},
     {key:'history',icon:'📋',title:'History Request',desc:'Lihat status seluruh request.',tone:'blue'},
@@ -2989,7 +3500,7 @@ function __setupModulePanels(){
   const salesSection=__el('page-sales');const salesHistory=__findCardByChild('salesHistoryBody');
   if(salesSection&&salesHistory&&!salesSection.contains(salesHistory))salesSection.appendChild(salesHistory);
   const configs={
-    sales:{panels:{input:()=>[__findCardByChild('salesDineIn')],history:()=>[__findCardByChild('salesHistoryBody')] }},
+    sales:{panels:{input:()=>[__findCardByChild('salesDineIn')],history:()=>[__findCardByChild('salesHistoryBody')],comparison:()=>[__el('salesComparisonCard')] }},
     waste:{panels:{dashboard:()=>[],history:()=>[__findCardByChild('wasteHistoryBody')]}},
     maintenance:{panels:{input:()=>[__findCardByChild('mtNoSC')],search:()=>[__findCardByChild('searchSC')],history:()=>[__findCardByChild('maintenanceHistoryBody')]}},
     kpi:{panels:{input:()=>[__findCardByChild('kpiStore')],history:()=>[__findCardByChild('kpiHistoryBody')]}},
@@ -3032,7 +3543,7 @@ function __setupModulePanels(){
       }
     }
     // History store filters are client-side and never alter source data.
-    if(module==='sales')__addHistoryFilter('sales',__findCardByChild('salesHistoryBody'));
+    if(module==='sales'){__addHistoryFilter('sales',__findCardByChild('salesHistoryBody'));}
     if(module==='waste')__addHistoryFilter('waste',__findCardByChild('wasteHistoryBody'));
     if(module==='maintenance')__addHistoryFilter('maintenance',__findCardByChild('maintenanceHistoryBody'));
     if(module==='kpi')__addHistoryFilter('kpi',__findCardByChild('kpiHistoryBody'));
@@ -3045,18 +3556,7 @@ function __addHistoryFilter(module,card){
   const box=document.createElement('div');box.className='module-history-filter';
   const label=document.createElement('label');label.textContent='FILTER STORE';label.htmlFor=module+'HistoryStoreFilter';
   const select=document.createElement('select');select.id=module+'HistoryStoreFilter';select.innerHTML='<option value="ALL">SEMUA STORE</option><option value="CITYWALK">CITYWALK</option><option value="CITRA TOWER">CITRA TOWER</option><option value="MENTENG">MENTENG</option>';
-  select.addEventListener('change',()=>__filterHistoryRows(module));box.append(label,select);
-
-  // Filter rentang tanggal khusus History Waste.
-  if(module==='waste'){
-    const dateLabel=document.createElement('label');dateLabel.textContent='RENTANG TANGGAL';
-    const start=document.createElement('input');start.type='date';start.id='wasteHistoryDateStart';start.setAttribute('aria-label','Tanggal mulai');start.style.width='auto';start.style.minWidth='150px';
-    const end=document.createElement('input');end.type='date';end.id='wasteHistoryDateEnd';end.setAttribute('aria-label','Tanggal akhir');end.style.width='auto';end.style.minWidth='150px';
-    const search=document.createElement('button');search.type='button';search.className='btn btn-primary';search.textContent='Cari';search.addEventListener('click',__applyWasteHistoryDateFilter);
-    const reset=document.createElement('button');reset.type='button';reset.className='btn btn-light';reset.textContent='Reset';reset.addEventListener('click',()=>{start.value='';end.value='';__applyWasteHistoryDateFilter();});
-    box.append(dateLabel,start,end,search,reset);
-  }
-  const tableWrap=card.querySelector('.table-wrap');if(tableWrap)card.insertBefore(box,tableWrap);else card.appendChild(box);
+  select.addEventListener('change',()=>__filterHistoryRows(module));box.append(label,select);const tableWrap=card.querySelector('.table-wrap');if(tableWrap)card.insertBefore(box,tableWrap);else card.appendChild(box);
 }
 function __filterHistoryRows(module){
   const select=__el(module+'HistoryStoreFilter');
@@ -3069,33 +3569,6 @@ function __filterHistoryRows(module){
     const store=canonicalStore((tr.cells[storeIndex]?.textContent||'').trim());
     const isEmpty=/BELUM ADA HISTORY|MEMUAT HISTORY|GAGAL MEMUAT/.test(first);
     tr.hidden=!!(wanted&&wanted!=='ALL'&&!isEmpty&&store!==wanted);
-  });
-  if(module==='waste')__applyWasteHistoryDateFilter();
-}
-function __applyWasteHistoryDateFilter(){
-  const body=__el('wasteHistoryBody');
-  if(!body)return;
-  const startValue=__el('wasteHistoryDateStart')?.value||'';
-  const endValue=__el('wasteHistoryDateEnd')?.value||'';
-  if(startValue&&endValue&&startValue>endValue){
-    toast('Tanggal mulai tidak boleh melewati tanggal akhir.');
-    return;
-  }
-  const start=startValue?new Date(startValue+'T00:00:00'):null;
-  const end=endValue?new Date(endValue+'T23:59:59'):null;
-  Array.from(body.querySelectorAll('tr')).forEach(tr=>{
-    const first=(tr.cells[0]?.textContent||'').trim().toUpperCase();
-    const isEmpty=/BELUM ADA HISTORY|MEMUAT HISTORY|GAGAL MEMUAT/.test(first);
-    if(isEmpty){tr.hidden=false;return;}
-    // Kolom PERIODE berformat YYYY-MM-DD s/d YYYY-MM-DD.
-    const period=(tr.cells[0]?.textContent||'').trim();
-    const parts=period.split(/\s+s\/d\s+/i);
-    if(parts.length!==2){tr.hidden=!!(start||end);return;}
-    const rowStart=new Date(parts[0]+'T00:00:00');
-    const rowEnd=new Date(parts[1]+'T23:59:59');
-    if(isNaN(rowStart.getTime())||isNaN(rowEnd.getTime())){tr.hidden=!!(start||end);return;}
-    const overlaps=(!start||rowEnd>=start)&&(!end||rowStart<=end);
-    tr.hidden=!overlaps;
   });
 }
 function __setModuleView(module,view){
@@ -3132,6 +3605,7 @@ async function openModuleView(module,view){
       if(module==='sales'){
         if(view==='input'&&__el('salesDate'))__el('salesDate').value=todayISO();
         if(view==='history')await loadSalesHistory();
+        if(view==='comparison')await loadSalesComparison();
       }else if(module==='waste'){
         if(view==='dashboard'){initWastePage();await loadWasteDashboard();}
         if(view==='history')await loadWasteHistory();
@@ -3144,6 +3618,8 @@ async function openModuleView(module,view){
       }else if(module==='walkthrough'){
         if(view==='history')await initWalkthrough();
         if(view==='followup')await initWalkthrough();
+      }else if(module==='soldout'){
+        if(view==='history')await loadSoldOutSummary();
       }else if(module==='smallware'){
         if(typeof initSmallware==='function')await initSmallware();
         if(typeof showSmallwareTab==='function')showSmallwareTab(view);
@@ -3157,6 +3633,14 @@ async function openModuleView(module,view){
 }
 function showPage(page){
   __setupModulePanels();
+  if(page==='admin'){
+    document.querySelectorAll('.page-section').forEach(x=>x.classList.add('hidden'));
+    const admin=__el('page-admin');if(admin)admin.classList.remove('hidden');
+    document.querySelectorAll('#nav button').forEach(btn=>btn.classList.toggle('active',btn.dataset.page==='admin'));
+    __moduleViewState.module='admin';__moduleViewState.view='dashboard';
+    if(isAM() && typeof loadAdminRequests==='function') loadAdminRequests();
+    return;
+  }
   if(page==='dashboard'){
     document.querySelectorAll('.page-section').forEach(x=>x.classList.add('hidden'));
     const dash=__el('page-dashboard');if(dash)dash.classList.remove('hidden');
@@ -3172,6 +3656,367 @@ function showPage(page){
   const target=__el('page-'+page);if(target)target.classList.remove('hidden');
 }
 
+
+// ADMIN HUB V1: verifikasi memakai akun AM/Admin yang sudah ada.
+// Data Smallware tetap dibaca/ditulis ke SMALLWARE DATABASE melalui API modul aslinya.
+let adminRequestsCache = [];
+let adminMaintenanceCache = [];
+
+async function verifyAdminPortal(){
+  const username = ($('adminUsername')?.value || '').trim();
+  const password = $('adminPassword')?.value || '';
+  if(!username || !password){ toast('Username dan password wajib diisi.'); return; }
+  try{
+    showLoading(true);
+    const result = await apiPost({action:'login', username, password});
+    const user = result && result.user;
+    const role = String(user?.role || '').trim().toUpperCase();
+    if(!result.success || !user){ throw new Error(result.message || 'Verifikasi gagal.'); }
+    if(!['AM','AREA MANAGER','ADMIN','SUPER ADMIN','SUPERADMIN'].includes(role)){
+      throw new Error('Akun ini bukan role AM/Admin. Menu Admin tidak dibuka.');
+    }
+    state.user = {
+      username:user.username, nama:user.nama || user.username,
+      role:role, store:user.store || 'ALL', userId:user.userId || ''
+    };
+    state.adminToken = result.adminToken || '';
+    $('adminLocked').classList.add('hidden');
+    $('adminUnlocked').classList.remove('hidden');
+    $('adminWelcome').textContent = 'Admin aktif: ' + (state.user.nama || state.user.username);
+    $('userPill').textContent = 'ADMIN • ' + (state.user.nama || state.user.username);
+    $('adminPassword').value = '';
+    toast('Verifikasi Admin berhasil.');
+    await loadAdminRequests();
+  }catch(err){
+    toast(err.message || 'Verifikasi Admin gagal.');
+  }finally{ showLoading(false); }
+}
+
+function lockAdminPortal(){
+  state.user = {username:'PUBLIC',nama:'PUBLIC USER',role:'STORE',store:'ALL'};
+  state.adminToken = '';
+  $('adminUnlocked').classList.add('hidden');
+  $('adminLocked').classList.remove('hidden');
+  $('userPill').textContent = 'PUBLIC STORE PORTAL';
+  $('adminPassword').value = '';
+  toast('Menu Admin dikunci kembali.');
+}
+
+async function loadAdminRequests(){
+  if(!isAM()){ $('adminLocked')?.classList.remove('hidden'); $('adminUnlocked')?.classList.add('hidden'); return; }
+  const module = $('adminModule')?.value || 'smallware';
+  try{
+    showLoading(true);
+    if(module === 'smallware'){
+      const res = await apiGet('smallware',{store:'',limit:500,role:state.user.role});
+      adminRequestsCache = res.data || [];
+      $('adminListTitle').textContent = 'Request Smallware';
+      $('adminListInfo').textContent = 'Sumber: SMALLWARE DATABASE. Approval dan perubahan status disimpan kembali ke database ini.';
+    }else{
+      // Maintenance belum mempunyai tahap approval tersendiri pada struktur database saat ini.
+      const res = await apiGet('recentMaintenance',{store:'',limit:500});
+      adminMaintenanceCache = res.data || [];
+      adminRequestsCache = adminMaintenanceCache;
+      $('adminListTitle').textContent = 'Monitoring Maintenance';
+      $('adminListInfo').textContent = 'Maintenance ditampilkan untuk monitoring. Status approval khusus belum tersedia pada skema modul ini.';
+    }
+    renderAdminRequests();
+  }catch(err){
+    $('adminRequestList').innerHTML = `<div class="empty">Gagal memuat request: ${escapeHtml(err.message || err)}</div>`;
+    toast(err.message || 'Gagal memuat request.');
+  }finally{ showLoading(false); }
+}
+
+function renderAdminRequests(){
+  const module = $('adminModule')?.value || 'smallware';
+  const filter = $('adminStatus')?.value || 'ALL';
+  const rows = adminRequestsCache || [];
+  const statusOf = r => String(r.status || '').trim().toUpperCase();
+  $('adminTotal').textContent = rows.length;
+  $('adminPending').textContent = rows.filter(r=>statusOf(r)==='PENDING').length;
+  $('adminProgress').textContent = rows.filter(r=>['APPROVED','ORDERED','RECEIVED','ON PROGRESS','WAITING PART','OPEN'].includes(statusOf(r))).length;
+  $('adminCompleted').textContent = rows.filter(r=>['COMPLETED','CLOSED'].includes(statusOf(r))).length;
+  const filtered = rows.filter(r=>filter==='ALL' || statusOf(r)===filter);
+  if(!filtered.length){ $('adminRequestList').innerHTML='<div class="empty">Tidak ada request untuk filter ini.</div>'; return; }
+  if(module==='maintenance'){
+    $('adminRequestList').innerHTML = `<div class="table-wrap"><table><thead><tr><th>No SC / ID</th><th>Tanggal</th><th>Store</th><th>Item / Asset</th><th>Prioritas</th><th>Status</th><th>Keterangan</th></tr></thead><tbody>${filtered.map(r=>`<tr><td>${escapeHtml(r.noSC||r.id||'-')}</td><td>${escapeHtml(formatDateWIB(r.tanggalInput||r.tanggalKejadian||''))}</td><td>${escapeHtml(r.store||'-')}</td><td>${escapeHtml(r.itemAsset||r.item||'-')}</td><td>${escapeHtml(r.prioritas||'-')}</td><td>${escapeHtml(statusOf(r)||'-')}</td><td>${escapeHtml(r.keterangan||'-')}</td></tr>`).join('')}</tbody></table></div>`;
+    return;
+  }
+  $('adminRequestList').innerHTML = filtered.map((r,idx)=>{
+    const status = statusOf(r) || 'PENDING';
+    const id = String(r.idRequest||r.id||'');
+    const canApprove = status==='PENDING';
+    const canOrder = status==='APPROVED';
+    const canComplete = status==='ORDERED'; // Admin/AM dapat mengonfirmasi melalui menu Admin Approval.
+    const photo = r.fotoKerusakan ? `<a class="photo-link" href="${escapeAttr(r.fotoKerusakan)}" target="_blank" rel="noopener">Lihat Foto</a>` : 'Tidak ada foto';
+    return `<div class="walk-card">
+      <div class="walk-card-head"><div><strong>${escapeHtml(r.namaSmallware||'Smallware request')}</strong><div class="small">${escapeHtml(id)} • ${escapeHtml(r.store||'-')} • ${escapeHtml(r.jenisRequest||'-')}</div></div><span class="badge ${status==='PENDING'?'badge-open':(['COMPLETED','REJECTED'].includes(status)?'badge-done':'badge-progress')}">${escapeHtml(status)}</span></div>
+      <div class="walk-meta">
+        <div class="walk-meta-item"><div class="label">TANGGAL REQUEST</div><strong>${escapeHtml(formatDateWIB(r.tanggalRequest||r.timestamp||''))}</strong></div>
+        <div class="walk-meta-item"><div class="label">QTY</div><strong>${escapeHtml(r.qtyRequest||0)}</strong></div>
+        <div class="walk-meta-item"><div class="label">AREA</div><strong>${escapeHtml(r.area||'-')}</strong></div>
+        <div class="walk-meta-item"><div class="label">FOTO</div><strong>${photo}</strong></div>
+      </div>
+      <div class="walk-finding"><b>Keterangan:</b> ${escapeHtml(r.keterangan||'-')}<br><b>Catatan approval:</b> ${escapeHtml(r.approvalNote||'-')}<br><b>Approval oleh:</b> ${escapeHtml(r.approvalBy||'-')}</div>
+      <div class="actions">
+        <button class="btn btn-light" onclick="toggleAdminRequestDetail('${escapeAttr(id)}')">Lihat Detail</button>
+        ${canApprove?`<button class="btn btn-green" onclick="adminApproveSmallware('${escapeAttr(id)}')">✓ APPROVE</button><button class="btn btn-danger" onclick="adminRejectSmallware('${escapeAttr(id)}')">✕ REJECT</button>`:''}
+        ${canOrder?`<button class="btn btn-primary" onclick="adminSetSmallwareStatus('${escapeAttr(id)}','ORDERED')">Tandai Sudah Dipesan</button>`:''}
+        ${canComplete?`<button class="btn btn-green" onclick="openCompletionModal('smallware','${escapeAttr(id)}')">Konfirmasi Selesai</button>`:''}
+      </div>
+      <div id="admin-detail-${escapeAttr(id)}" class="hidden walk-finding"><b>Detail request</b><br>ID: ${escapeHtml(id)}<br>Smallware ID: ${escapeHtml(r.smallwareId||'-')}<br>Input oleh: ${escapeHtml(r.inputBy||'-')}<br>Tanggal proses: ${escapeHtml(formatDateWIB(r.processingDate||''))}<br>Tanggal selesai: ${escapeHtml(formatDateWIB(r.completedDate||''))}<br>${r.fotoKerusakan?`<img src="${escapeAttr(r.fotoKerusakan)}" alt="Foto smallware" style="max-width:220px;max-height:180px;border-radius:12px;margin-top:8px">`:''}</div>
+    </div>`;
+  }).join('');
+}
+
+function toggleAdminRequestDetail(id){
+  const el = $('admin-detail-'+id);
+  if(el) el.classList.toggle('hidden');
+}
+
+async function adminApproveSmallware(id){
+  const note = prompt('Catatan approval (opsional):','');
+  if(note===null) return;
+  await adminSmallwareAction({action:'approveSmallwareRequest',idRequest:id,role:state.user.role,adminToken:state.adminToken,approvalBy:state.user.nama||state.user.username,approvalNote:note},'Request berhasil APPROVED.');
+}
+async function adminRejectSmallware(id){
+  const note = prompt('Alasan REJECT wajib diisi:','');
+  if(note===null) return;
+  if(!note.trim()){toast('Alasan reject wajib diisi.');return;}
+  await adminSmallwareAction({action:'rejectSmallwareRequest',idRequest:id,role:state.user.role,adminToken:state.adminToken,approvalBy:state.user.nama||state.user.username,approvalNote:note},'Request berhasil REJECTED.');
+}
+async function adminSetSmallwareStatus(id,status){
+  if(!confirm('Ubah status request menjadi '+status+'?')) return;
+  await adminSmallwareAction({action:'updateSmallwareStatus',idRequest:id,role:state.user.role,adminToken:state.adminToken,status,updateBy:state.user.nama||state.user.username},'Status berubah menjadi '+status+'.');
+}
+async function adminSmallwareAction(payload,successMessage){
+  if(!isAM()){toast('Verifikasi Admin diperlukan.');return;}
+  try{
+    showLoading(true);
+    await apiPost(payload);
+    toast(successMessage);
+    await loadAdminRequests();
+    if(typeof loadSmallware==='function') await loadSmallware();
+    if(typeof loadSmallwareFrequency==='function') await loadSmallwareFrequency();
+  }catch(err){toast(err.message||'Aksi Admin gagal.');}
+  finally{showLoading(false);}
+}
+
 </script>
+
+
+<!-- V18.5 VISUAL-ONLY THEME OVERRIDE: preserves existing JavaScript and workflows -->
+<style id="v185-soft-color-theme">
+:root{
+  --bg:#edf3f9;
+  --card:#f7f9fc;
+  --line:#d5e0ec;
+  --text:#26364b;
+  --muted:#60738b;
+  --shadow:0 8px 24px rgba(47,70,100,.09);
+}
+body{background-color:#edf3f9;color:#26364b}
+/* Soft, bright surfaces instead of stark white */
+.card,.panel,.section-card,.content-card,.stat-card,.kpi-card,.history-card,
+header,.topbar,.page-header,.hero,.module-header,.dashboard-header,
+.modal-content,.dialog,.form-card,.walk-card,.module-menu-card,
+#page-dashboard .card,#page-dashboard .panel,
+.page-section .card,.page-section .panel{
+  background-color:#f5f8fc;
+  border-color:#d5e0ec;
+  box-shadow:0 6px 18px rgba(55,78,108,.07);
+}
+/* Soft color variation for common dashboard/form panels */
+#page-dashboard .card:nth-of-type(4n+1),
+.page-section .card:nth-of-type(4n+1){background-color:#f0f6ff}
+#page-dashboard .card:nth-of-type(4n+2),
+.page-section .card:nth-of-type(4n+2){background-color:#eff9f4}
+#page-dashboard .card:nth-of-type(4n+3),
+.page-section .card:nth-of-type(4n+3){background-color:#fff7ed}
+#page-dashboard .card:nth-of-type(4n),
+.page-section .card:nth-of-type(4n){background-color:#f7f2ff}
+/* Readable form controls with a gentle tint */
+input:not([type="file"]),select,textarea{
+  background-color:#f8faff;
+  color:#2c3b50;
+  border-color:#d3dfed;
+}
+input:not([type="file"]):focus,select:focus,textarea:focus{
+  background-color:#fff;
+  border-color:#8fb5e8;
+  box-shadow:0 0 0 3px rgba(116,164,224,.16);
+}
+/* Table surfaces: subtle blue tint, alternating rows, clearer typography */
+table{border-color:#d4e0ed}
+thead th,table thead th{
+  background:#e4edf8!important;
+  color:#304a69!important;
+  font-weight:700!important;
+  border-color:#d1deec!important;
+}
+tbody td,table tbody td{
+  background-color:#f7f9fd;
+  color:#33445b;
+  font-weight:500;
+  border-color:#dce5ef;
+}
+tbody tr:nth-child(even) td,table tbody tr:nth-child(even) td{
+  background-color:#edf4fb!important;
+}
+tbody tr:hover td,table tbody tr:hover td{
+  background-color:#e1efff!important;
+}
+/* Existing history row accents remain gentle, not stark white */
+#salesHistoryBody tr:nth-child(odd) td{background:#f7f9fd!important}
+#salesHistoryBody tr:nth-child(even) td{background:#edf4fb!important}
+#salesHistoryBody tr:hover td{background:#e1efff!important}
+/* Buttons retain their existing module colors; neutral buttons become soft blue */
+button,.btn{
+  transition:filter .16s ease,transform .16s ease,box-shadow .16s ease;
+}
+.btn:not(.btn-peach):not(.btn-orange):not(.btn-danger):not(.btn-success),
+button.btn-light{
+  background-color:#eaf1fa;
+  color:#304b6b;
+  border-color:#d0deed;
+}
+button:hover,.btn:hover{filter:brightness(.98);box-shadow:0 4px 12px rgba(47,70,100,.10)}
+/* Soft notice and empty-state backgrounds */
+.empty,.empty-state,.notice,.info-box{background-color:#eef4fb;color:#52677f;border-color:#d7e3f0}
+/* Keep text contrast clear on light backgrounds */
+.card h1,.card h2,.card h3,.panel h1,.panel h2,.panel h3,
+.page-section h1,.page-section h2,.page-section h3{color:#293a50}
+</style>
+
+
+
+<!-- V19: SARIRASA-INSPIRED LAYOUT ONLY. Existing API, data flow, and module logic preserved. -->
+<style id="v19-sarirasa-layout">
+:root{--brand-maroon:#633b43;--brand-maroon-dark:#4b2b32;--brand-black:#171717;--workspace:#dedede;--nav-text:#f8ecee;--nav-muted:#e4cfd3}
+html,body{min-height:100%;background:var(--workspace)!important;color:#202020}
+body::before,body::after{display:none!important}
+#appView{min-height:100vh;background:var(--workspace)!important}
+.topbar{position:fixed;left:0;right:0;top:0;height:44px;min-height:44px;padding:0 14px!important;z-index:80;background:var(--brand-black)!important;color:#f7f7f7;border:0!important;border-bottom:1px solid #303030!important;border-radius:0!important;box-shadow:none!important;backdrop-filter:none!important}
+.brand{gap:9px}.brand .logo{width:28px;height:28px;flex:0 0 28px;border-radius:5px;background:transparent!important;color:#fff;box-shadow:none!important;font-size:20px}.brand h1{font-size:16px!important;font-weight:500;letter-spacing:.1px;color:#f4d600!important}.brand small{display:none!important}.userbox{gap:8px}.userpill{background:transparent!important;border:0!important;color:#f4d600!important;border-radius:0!important;padding:5px 8px!important;font-size:12px!important}
+.page{max-width:none!important;width:auto;margin:0 10px 10px 222px!important;padding:62px 22px 22px!important;min-height:100vh;background:var(--workspace)!important;overflow-x:hidden;border-radius:0!important}
+#nav{position:fixed;z-index:70;left:0;top:44px;bottom:0;width:210px;display:flex!important;flex-direction:column;align-items:stretch;gap:0!important;overflow-y:auto!important;overflow-x:hidden!important;padding:12px 9px 22px!important;background:var(--brand-maroon)!important;border:0!important;border-radius:0!important;box-shadow:none!important;scrollbar-width:thin}
+.nav-group{display:flex;flex-direction:column;gap:2px;margin:0 0 17px;padding:0;min-width:0}
+.nav-group-title{padding:11px 12px 7px;color:#e7cdd1;font-size:10px;font-weight:800;letter-spacing:1.3px;text-transform:uppercase}
+#nav button{display:flex!important;align-items:center;gap:11px;width:100%;min-width:0;white-space:normal!important;text-align:left;border:0!important;border-radius:5px!important;background:transparent!important;color:var(--nav-text)!important;padding:10px 12px!important;margin:0!important;font-size:13px!important;font-weight:500!important;box-shadow:none!important;outline:0!important;transform:none!important}
+#nav button .nav-icon{display:inline-grid;place-items:center;flex:0 0 23px;width:23px;height:23px;font-size:19px;line-height:1;color:#fff}
+#nav button:hover{background:rgba(255,255,255,.12)!important;color:#fff!important;box-shadow:none!important;filter:none!important}
+#nav button.active{background:#f0e6e7!important;color:#4b2b32!important;font-weight:700!important;box-shadow:inset 3px 0 #f4d600!important;outline:0!important;filter:none!important}
+#nav button.active .nav-icon{color:#4b2b32!important}
+.nav-utility-note{margin:0 12px;color:#e7cdd1;font-size:11px;line-height:1.5}
+.store-only-note{border-radius:3px!important;background:#f1eeee!important;border:1px solid #d2c8ca!important;color:#5a4347!important;box-shadow:none!important}
+.hero{border-radius:3px!important;background:#e9e9e9!important;border:0!important;box-shadow:none!important;padding:4px 14px 18px!important;margin:0 0 18px!important}
+.hero h2{font-size:24px!important;font-weight:500;color:#161616!important}.hero p{color:#5d5d5d!important}
+.card,.stat,.panel,.walk-card,.module-menu-card,#page-dashboard .card,#page-dashboard .panel,.page-section .card,.page-section .panel{border-radius:4px!important;box-shadow:none!important;border:1px solid #d0d0d0!important}
+.card h3,.page-section h3{color:#272727}
+#page-dashboard .card:nth-of-type(n),.page-section .card:nth-of-type(n){background:#e8e8e8!important}
+input:not([type="file"]),select,textarea{border-radius:3px!important;background:#fff!important;border:1px solid #c9c9c9!important;color:#222!important;box-shadow:none!important}
+.btn,button.btn,.module-menu-card{border-radius:4px!important}
+.table-wrap{border-radius:3px!important;border-color:#ccc!important}th,thead th,table thead th{background:#d0d0d0!important;color:#262626!important}
+#loading{z-index:150;background:rgba(220,220,220,.72)!important}
+#toast{border-radius:4px!important}
+@media(max-width:760px){
+ .topbar{height:48px;min-height:48px;padding:0 9px!important}.brand h1{font-size:13px!important}.userpill{font-size:10px!important;padding:4px!important;max-width:42vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+ #nav{top:48px;bottom:0;width:58px;padding:8px 5px 16px!important;overflow-x:hidden}
+ .nav-group{margin-bottom:12px}.nav-group-title{font-size:0;padding:8px 0 5px;text-align:center}.nav-group-title:after{content:"•";font-size:12px;color:#d5b7bd}
+ #nav button{justify-content:center;padding:10px 2px!important;gap:0;font-size:0!important;min-height:42px}
+ #nav button .nav-icon{flex-basis:26px;width:26px;font-size:21px}
+ .nav-utility-note{display:none}
+ .page{margin:0 0 0 58px!important;padding:60px 10px 16px!important;width:auto;max-width:calc(100% - 58px)!important}
+ .hero{padding:8px 10px 14px!important}.hero h2{font-size:20px!important}
+ .store-only-note{font-size:11px;padding:8px!important}
+}
+@media(max-width:420px){.brand .logo{display:none}.brand h1{font-size:12px!important}.page{padding-left:7px!important;padding-right:7px!important}}
+</style>
+
+<style>
+
+
+/* FINAL SCENIC VISIBILITY FIX
+   Keep the image layer above the document canvas and behind all app content.
+   Make the workspace translucent so the photo can actually be seen. */
+html, body { background: transparent !important; }
+body { position: relative !important; isolation: isolate !important; }
+body::before {
+  z-index: 0 !important;
+  background-color: #dce6ef !important;
+  background-image:
+    linear-gradient(135deg, rgba(248,250,255,.20), rgba(250,248,255,.14)),
+    var(--scenic-image, url("https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=2200&q=85")) !important;
+  background-size: cover !important;
+  background-position: center center !important;
+  background-repeat: no-repeat !important;
+}
+body::after { z-index: 0 !important; background: rgba(247,249,253,.02) !important; }
+#appView { position: relative !important; z-index: 1 !important; background: transparent !important; }
+#appView .page { background: rgba(225,225,225,.40) !important; }
+#appView .hero { background: rgba(235,235,235,.70) !important; }
+#appView .card,
+#appView .stat,
+#appView .panel,
+#appView .walk-card,
+#appView .module-menu-card,
+#appView .page-section .card {
+  background-color: rgba(255,255,255,.80) !important;
+}
+#nav, .topbar { z-index: 80 !important; }
+#loading, #toast, #completionModal { z-index: 150 !important; }
+
+</style>
+<style>
+
+/* V18 HARD OVERRIDE: earlier theme CSS disabled body pseudo backgrounds.
+   Re-enable the scenic image and make the workspace translucent. */
+:root {
+  --scenic-image: url("https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=2200&q=85");
+}
+html, body {
+  background: transparent !important;
+  background-color: transparent !important;
+}
+body {
+  position: relative !important;
+  isolation: isolate !important;
+  min-height: 100vh !important;
+}
+body::before {
+  display: block !important;
+  content: "" !important;
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: -1 !important;
+  pointer-events: none !important;
+  background-color: #dce6ef !important;
+  background-image:
+    linear-gradient(rgba(255,255,255,.10), rgba(255,255,255,.10)),
+    var(--scenic-image) !important;
+  background-size: cover !important;
+  background-position: center center !important;
+  background-repeat: no-repeat !important;
+  transform: none !important;
+}
+body::after {
+  display: none !important;
+  content: none !important;
+}
+#appView, #appView.app {
+  position: relative !important;
+  z-index: 1 !important;
+  min-height: 100vh !important;
+  background: transparent !important;
+  background-color: transparent !important;
+}
+.page {
+  background: rgba(225,225,225,.24) !important;
+}
+.workspace, .main-content, .content, .page-content, .view, .module-content {
+  background: transparent !important;
+}
+
+</style>
 </body>
 </html>
