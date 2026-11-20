@@ -1878,7 +1878,7 @@ function renderWasteLatest(rows){
       <td><b>${escapeHtml(x.kode||'-')}</b></td>
       <td>${escapeHtml(x.namaBarang||'-')}</td>
       <td>${escapeHtml(x.satuan||'-')}</td>
-      <td>${escapeHtml(x.storeName||'-')}</td>
+      <td>${escapeHtml(x.storeName||x.namaStore||x.namastore||'-')}</td>
       <td><b>${Number(x.totalWaste||0).toLocaleString('id-ID',{maximumFractionDigits:2})}</b></td>
     </tr>`).join('');
 }
@@ -2135,7 +2135,7 @@ function __wasteRowMatchesSearch(x){
   if(to&&start>to) return false;
   const storeSelect=$('wasteHistoryStoreFilter');
   const wanted=storeSelect?canonicalStore(storeSelect.value):'ALL';
-  if(wanted&&wanted!=='ALL'&&canonicalStore(x.storeName)!==wanted) return false;
+  if(wanted&&wanted!=='ALL'&&canonicalStore(x.storeName||x.namaStore||x.namastore)!==wanted) return false;
   return true;
 }
 function __renderWasteHistory(){
