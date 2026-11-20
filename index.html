@@ -2109,7 +2109,52 @@ function renderSalesComparison(){
   }).join(''):'<tr><td colspan="19" class="empty">Tidak ada data Sales Pembanding untuk pilihan periode dan store tersebut.</td></tr>';
 }
 
-async function loadWasteHistory(){if(!state.user)return;try{$('wasteHistoryBody').innerHTML='<tr><td colspan="6" class="empty">Memuat history Waste...</td></tr>';const r=await apiGet('wasteData',{store:'ALL',role:'PUBLIC',userStore:'',limit:5000});const rows=Array.isArray(r.allRows)?r.allRows:(Array.isArray(r.data)?r.data:[]);$('wasteHistoryBody').innerHTML=rows.length?rows.slice().sort((a,b)=>String(b.periodeAkhir||'').localeCompare(String(a.periodeAkhir||''))).map(x=>`<tr><td>${escapeHtml(x.periodeMulai||'-')} s/d ${escapeHtml(x.periodeAkhir||'-')}</td><td>${escapeHtml(x.kode||'-')}</td><td>${escapeHtml(x.namaBarang||'-')}</td><td>${escapeHtml(x.satuan||'-')}</td><td><b>${Number(x.totalWaste||0).toLocaleString('id-ID',{maximumFractionDigits:2})}</b></td><td>${escapeHtml(x.storeName||'-')}</td></tr>`).join(''):'<tr><td colspan="6" class="empty">Belum ada history Waste.</td></tr>';__filterHistoryRows('waste');}catch(err){$('wasteHistoryBody').innerHTML='<tr><td colspan="6" class="empty">Gagal memuat history Waste.</td></tr>';toast('History Waste: '+err.message)}}
+window.__wasteHistoryRows = window.__wasteHistoryRows || [];
+function __wasteParseDate(value){
+  if(value instanceof Date && !isNaN(value.getTime())) return new Date(value.getFullYear(),value.getMonth(),value.getDate());
+  if(typeof value==='number' && isFinite(value)){
+    // Google Sheets date serial (days from 1899-12-30)
+    const d=new Date(Date.UTC(1899,11,30)+Math.round(value)*86400000);
+    return new Date(d.getUTCFullYear(),d.getUTCMonth(),d.getUTCDate());
+  }
+  const s=String(value??'').trim(); if(!s) return null;
+  let m=s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+  if(m){const d=new Date(+m[1],+m[2]-1,+m[3]);return isNaN(d)?null:d;}
+  // Waste Control dates written in Indonesian format DD/MM/YYYY or DD-MM-YYYY
+  m=s.match(/^(\d{1,2})[\/. -](\d{1,2})[\/. -](\d{4})$/);
+  if(m){const d=new Date(+m[3],+m[2]-1,+m[1]);return isNaN(d)?null:d;}
+  const d=new Date(s); return isNaN(d)?null:new Date(d.getFullYear(),d.getMonth(),d.getDate());
+}
+function __wasteRowMatchesSearch(x){
+  const fromValue=$('wasteHistoryFrom')?.value||'';
+  const toValue=$('wasteHistoryTo')?.value||'';
+  const from=__wasteParseDate(fromValue), to=__wasteParseDate(toValue);
+  const start=__wasteParseDate(x.periodeMulai), end=__wasteParseDate(x.periodeAkhir||x.periodeMulai);
+  if((from||to)&&(!start||!end)) return false;
+  if(from&&end<from) return false;
+  if(to&&start>to) return false;
+  const storeSelect=$('wasteHistoryStoreFilter');
+  const wanted=storeSelect?canonicalStore(storeSelect.value):'ALL';
+  if(wanted&&wanted!=='ALL'&&canonicalStore(x.storeName)!==wanted) return false;
+  return true;
+}
+function __renderWasteHistory(){
+  const body=$('wasteHistoryBody'); if(!body)return;
+  const rows=(window.__wasteHistoryRows||[]).filter(__wasteRowMatchesSearch);
+  body.innerHTML=rows.length?rows.slice().sort((a,b)=>String(b.periodeAkhir||'').localeCompare(String(a.periodeAkhir||''))).map(x=>`<tr><td>${escapeHtml(x.periodeMulai||'-')} s/d ${escapeHtml(x.periodeAkhir||'-')}</td><td>${escapeHtml(x.kode||'-')}</td><td>${escapeHtml(x.namaBarang||'-')}</td><td>${escapeHtml(x.satuan||'-')}</td><td><b>${Number(x.totalWaste||0).toLocaleString('id-ID',{maximumFractionDigits:2})}</b></td><td>${escapeHtml(x.storeName||'-')}</td></tr>`).join(''):'<tr><td colspan="6" class="empty">Tidak ada data Waste pada rentang tanggal dan Store yang dipilih.</td></tr>';
+}
+async function loadWasteHistory(){
+  if(!state.user)return;
+  try{
+    $('wasteHistoryBody').innerHTML='<tr><td colspan="6" class="empty">Memuat history Waste...</td></tr>';
+    const r=await apiGet('wasteData',{store:'ALL',role:'PUBLIC',userStore:'',limit:5000});
+    window.__wasteHistoryRows=Array.isArray(r.allRows)?r.allRows:(Array.isArray(r.data)?r.data:[]);
+    __renderWasteHistory();
+  }catch(err){
+    $('wasteHistoryBody').innerHTML='<tr><td colspan="6" class="empty">Gagal memuat history Waste.</td></tr>';
+    toast('History Waste: '+err.message);
+  }
+}
 let completionContext = null;
 
 function openCompletionModal(type, id){
@@ -2206,40 +2251,23 @@ function exportMaintenanceWhatsApp(rowIndex){
 }
 
 function __wasteDateToISO(value){
-  const s=String(value||'').trim();
-  if(!s) return '';
-  // Format ISO: YYYY-MM-DD (juga menerima timestamp setelah tanggal)
-  let m=s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
-  if(m) return m[1]+'-'+String(m[2]).padStart(2,'0')+'-'+String(m[3]).padStart(2,'0');
-  // Format Indonesia: DD/MM/YYYY atau DD-MM-YYYY
-  m=s.match(/^(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{4})$/);
-  if(m) return m[3]+'-'+String(m[2]).padStart(2,'0')+'-'+String(m[1]).padStart(2,'0');
-  const d=new Date(s);
-  if(!isNaN(d.getTime())) return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
-  return '';
-}
-function __wastePeriodRange(periodText){
-  const parts=String(periodText||'').trim().split(/\s+s\s*\/\s*d\s*/i);
-  const start=__wasteDateToISO(parts[0]||'');
-  const end=__wasteDateToISO(parts[1]||parts[0]||'');
-  return {start,end};
+  const d=__wasteParseDate(value); if(!d)return '';
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
 }
 function searchWasteHistory(){
   const from=$('wasteHistoryFrom')?.value||'';
   const to=$('wasteHistoryTo')?.value||'';
   if(from&&to&&from>to){toast('Tanggal awal tidak boleh melewati tanggal akhir.');return;}
-  // Pastikan tabel sudah terisi dari sumber data, lalu terapkan filter tanggal.
-  const body=$('wasteHistoryBody');
-  if(!body||!body.querySelector('tr')){
-    loadWasteHistory().then(()=>__filterHistoryRows('waste'));
+  if(!Array.isArray(window.__wasteHistoryRows)||!window.__wasteHistoryRows.length){
+    loadWasteHistory();
     return;
   }
-  __filterHistoryRows('waste');
+  __renderWasteHistory();
 }
 function clearWasteHistorySearch(){
   if($('wasteHistoryFrom'))$('wasteHistoryFrom').value='';
   if($('wasteHistoryTo'))$('wasteHistoryTo').value='';
-  __filterHistoryRows('waste');
+  __renderWasteHistory();
 }
 
 async function loadMaintenanceHistory(){if(!state.user)return;try{$('maintenanceHistoryBody').innerHTML='<tr><td colspan="11" class="empty">Memuat history Maintenance...</td></tr>';const rows=await loadDirectDatabaseHistory('maintenance');window.__maintenanceHistoryRows=rows;$('maintenanceHistoryBody').innerHTML=rows.length?rows.map((x,i)=>`<tr><td>${escapeHtml(formatDateWIB(x.tanggalInput||'-'))}</td><td><b>${escapeHtml(x.noSC||'-')}</b></td><td>${escapeHtml(x.store||'-')}</td><td>${escapeHtml(x.kategori||'-')}</td><td>${escapeHtml(x.itemAsset||'-')}</td><td>${escapeHtml(x.jenisKerusakan||'-')}</td><td>${escapeHtml(x.prioritas||'-')}</td><td>${statusBadge(x.status)}</td><td>${escapeHtml(x.teknisiVendor||'-')}</td><td>${escapeHtml(x.tanggalSelesai||'-')}</td><td><div class="actions"><button class="btn btn-peach" onclick="exportMaintenanceWhatsApp(${i})">💬 Export WA</button>${String(x.status||'').toUpperCase()==='COMPLETED'?'<span class="badge badge-done">SELESAI</span>':`<button class="btn btn-green" onclick="openCompletionModal('maintenance','${escapeAttr(x.noSC||'')}')">✓ Konfirmasi Selesai</button>`}</div></td></tr>`).join(''):'<tr><td colspan="11" class="empty">Belum ada history Maintenance.</td></tr>';__filterHistoryRows('maintenance');}catch(err){$('maintenanceHistoryBody').innerHTML='<tr><td colspan="11" class="empty">Gagal memuat history Maintenance.</td></tr>';toast('History Maintenance Semua Store: '+err.message)}}
@@ -3624,19 +3652,9 @@ function __filterHistoryRows(module){
     const store=canonicalStore((tr.cells[storeIndex]?.textContent||'').trim());
     const isEmpty=/BELUM ADA HISTORY|MEMUAT HISTORY|GAGAL MEMUAT/.test(first);
     let hideStore=!!(wanted&&wanted!=='ALL'&&!isEmpty&&store!==wanted);
-    let hideDate=false;
-    if(module==='waste'&&!isEmpty){
-      const from=__wasteDateToISO(__el('wasteHistoryFrom')?.value||'');
-      const to=__wasteDateToISO(__el('wasteHistoryTo')?.value||'');
-      const range=__wastePeriodRange(tr.cells[0]?.textContent||'');
-      // Periode ditampilkan jika rentangnya beririsan dengan tanggal pencarian.
-      // Jika format tanggal pada sebuah baris tidak dikenali, jangan sembunyikan
-      // baris tersebut secara keliru; biarkan terlihat untuk pemeriksaan.
-      if(range.start&&range.end){
-        hideDate=!!((from&&range.end<from)||(to&&range.start>to));
-      }
-    }
-    tr.hidden=hideStore||hideDate;
+    // Waste dirender langsung dari cache data API oleh __renderWasteHistory().
+    // Filter DOM hanya dipakai modul history lainnya.
+    tr.hidden=hideStore;
   });
 }
 function __setModuleView(module,view){
