@@ -749,6 +749,13 @@ button.btn:not(:disabled):hover{filter:saturate(1.12);box-shadow:0 7px 15px rgba
         </div>
         <div class="form-grid">
           <div class="field">
+            <label>KATEGORI WASTE</label>
+            <select id="wtWasteCategory" onchange="onWasteCategoryChange()">
+              <option value="RM/WIP">RM/WIP</option>
+              <option value="ISP">ISP</option>
+            </select>
+          </div>
+          <div class="field">
             <label>STORE</label>
             <select id="wtWasteStore" onchange="loadWasteDashboard()"></select>
           </div>
@@ -806,6 +813,7 @@ button.btn:not(:disabled):hover{filter:saturate(1.12);box-shadow:0 7px 15px rgba
           <button class="btn btn-light" onclick="loadWasteHistory()">↻ Refresh</button>
         </div>
         <div class="form-grid waste-history-search" style="margin:12px 0 16px">
+          <div class="field"><label>KATEGORI</label><select id="wasteHistoryCategory" onchange="syncWasteCategoryFromHistory()"><option value="RM/WIP">RM/WIP</option><option value="ISP">ISP</option></select></div>
           <div class="field"><label>TANGGAL AWAL</label><input id="wasteHistoryFrom" type="date"></div>
           <div class="field"><label>TANGGAL AKHIR</label><input id="wasteHistoryTo" type="date"></div>
           <div class="field full-row" style="display:flex;align-items:end;gap:8px">
@@ -1760,6 +1768,24 @@ async function loadWasteDashboard(){
   await loadExternalWasteDashboard(false);
 }
 
+function getSelectedWasteCategory(){
+  return String(($('wtWasteCategory')?.value)||($('wasteHistoryCategory')?.value)||'RM/WIP').toUpperCase();
+}
+
+function onWasteCategoryChange(){
+  const category=getSelectedWasteCategory();
+  if($('wasteHistoryCategory')) $('wasteHistoryCategory').value=category;
+  loadWasteDashboard();
+  loadWasteHistory();
+}
+
+function syncWasteCategoryFromHistory(){
+  const category=String($('wasteHistoryCategory')?.value||'RM/WIP').toUpperCase();
+  if($('wtWasteCategory')) $('wtWasteCategory').value=category;
+  loadWasteDashboard();
+  loadWasteHistory();
+}
+
 function initWastePage(){
   const select = $('wtWasteStore');
   if(!select) return;
@@ -1771,6 +1797,8 @@ function initWastePage(){
     <option value="MENTENG">MENTENG</option>`;
 
   select.value = select.value || 'ALL';
+  if($('wtWasteCategory')) $('wtWasteCategory').value='RM/WIP';
+  if($('wasteHistoryCategory')) $('wasteHistoryCategory').value='RM/WIP';
   loadWasteDashboard();
 }
 
@@ -1781,7 +1809,8 @@ async function loadExternalWasteDashboard(updateMainDashboard=false){
     const result = await apiGet('wasteDashboard',{
       store,
       role:'PUBLIC',
-      userStore:''
+      userStore:'',
+      category:getSelectedWasteCategory()
     });
 
     if(!result || !result.success) throw new Error(result?.message||'Waste gagal dimuat.');
@@ -2148,7 +2177,8 @@ function __renderWasteHistory(){
   const to=$('wasteHistoryTo')?.value||'';
   const storeSelect=$('wasteHistoryStoreFilter');
   const storeLabel=storeSelect&&storeSelect.value&&storeSelect.value!=='ALL'?storeSelect.options[storeSelect.selectedIndex]?.text||storeSelect.value:'Semua Store';
-  const rangeLabel=from||to?`Rentang: ${from||'awal data'} s/d ${to||'akhir data'} · ${storeLabel} · ${rows.length} baris. Periode bulanan ditampilkan jika beririsan dengan rentang tanggal.`:`Semua tanggal · ${storeLabel} · ${rows.length} baris.`;
+  const category=getSelectedWasteCategory();
+  const rangeLabel=from||to?`${category} · Rentang: ${from||'awal data'} s/d ${to||'akhir data'} · ${storeLabel} · ${rows.length} baris. Periode ditampilkan jika beririsan dengan rentang tanggal.`:`${category} · Semua tanggal · ${storeLabel} · ${rows.length} baris.`;
   const info=$('wasteHistoryRangeInfo'); if(info)info.textContent=rangeLabel;
   body.innerHTML=rows.length?rows.slice().sort((a,b)=>String(b.periodeAkhir||'').localeCompare(String(a.periodeAkhir||''))).map(x=>{
     const storeName=x.namaStore||x.storeName||x.namastore||x.namaToko||x.store||'-';
@@ -2159,7 +2189,7 @@ async function loadWasteHistory(){
   if(!state.user)return;
   try{
     $('wasteHistoryBody').innerHTML='<tr><td colspan="6" class="empty">Memuat history Waste...</td></tr>';
-    const r=await apiGet('wasteData',{store:'ALL',role:'PUBLIC',userStore:'',limit:5000});
+    const r=await apiGet('wasteData',{store:'ALL',role:'PUBLIC',userStore:'',limit:5000,category:getSelectedWasteCategory()});
     window.__wasteHistoryRows=Array.isArray(r.allRows)?r.allRows:(Array.isArray(r.data)?r.data:[]);
     __renderWasteHistory();
   }catch(err){
