@@ -1213,6 +1213,18 @@ button.btn:not(:disabled):hover{filter:saturate(1.12);box-shadow:0 7px 15px rgba
         <div class="stat"><div class="icon">👤</div><div class="label">AREA MANAGER AKTIF</div><div id="amMapTotalManager" class="value">0</div></div>
         <div class="stat"><div class="icon">📝</div><div class="label">RIWAYAT MAPPING</div><div id="amMapTotalHistory" class="value">0</div></div>
       </div>
+      <div class="card" style="margin-bottom:16px;border:1px solid var(--line)">
+        <div class="card-head"><div><h3>➕ Tambah Store Baru</h3><div class="small">Daftarkan store baru ke master. Store ID dibuat otomatis dan langsung dipetakan ke Area Manager.</div></div><span class="badge">MASTER STORE</span></div>
+        <div class="form-grid">
+          <div class="field"><label>NAMA STORE *</label><input id="amNewStoreName" maxlength="80" placeholder="Contoh: AEON SENTUL" autocomplete="off"></div>
+          <div class="field"><label>AREA MANAGER *</label><select id="amNewStoreManager"><option value="">Memuat Area Manager...</option></select></div>
+          <div class="field"><label>TANGGAL MULAI TANGGUNG JAWAB *</label><input id="amNewStoreEffectiveDate" type="date"></div>
+          <div class="field"><label>DITAMBAHKAN OLEH</label><input id="amNewStoreChangedBy" value="RENALDI HIMAWAN" readonly></div>
+          <div class="field full"><label>KETERANGAN</label><input id="amNewStoreNotes" placeholder="Catatan penambahan store (opsional)"></div>
+        </div>
+        <div class="actions"><button class="btn btn-primary" onclick="addNewStoreFromMapping()">➕ Simpan Store Baru</button></div>
+        <div class="small" style="margin-top:8px">Store ID dibuat otomatis. Nama store yang sudah terdaftar tidak dapat didaftarkan dua kali.</div>
+      </div>
       <div class="card" style="margin-bottom:16px">
         <div class="card-head"><div><h3>🔁 Ubah Mapping Area Manager</h3><div class="small">Pilih Store dan Area Manager baru. Store ID tidak akan berubah.</div></div><button class="btn btn-light" onclick="loadAreaMappingPage()">↻ Refresh</button></div>
         <div class="form-grid">
@@ -3978,7 +3990,7 @@ async function adminSmallwareAction(payload,successMessage){
 
 
 /* =========================================================
-   V8.5.1 - AREA MANAGER MAPPING UI
+   V8.6 - AREA MANAGER MAPPING & ADD STORE UI
 ========================================================= */
 function amMapEscape(value){
   return String(value==null?'':value).replace(/[&<>"']/g,function(ch){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch];});
@@ -4003,6 +4015,9 @@ async function loadAreaMappingPage(){
     $('amMapStore').innerHTML='<option value="">Pilih Store</option>'+storeOptions;
     $('amMapHistoryStore').innerHTML='<option value="">Semua Store</option>'+storeRows.map(x=>`<option value="${amMapEscape(x.id)}">${amMapEscape(x.store)}</option>`).join('');
     $('amMapManager').innerHTML='<option value="">Pilih Area Manager</option>'+managerRows.map(x=>`<option value="${amMapEscape(x.name)}">${amMapEscape(x.name)}</option>`).join('');
+    $('amNewStoreManager').innerHTML='<option value="">Pilih Area Manager</option>'+managerRows.map(x=>`<option value="${amMapEscape(x.name)}">${amMapEscape(x.name)}</option>`).join('');
+    if(managerRows.length===1)$('amNewStoreManager').value=managerRows[0].name;
+    if(!$('amNewStoreEffectiveDate').value)$('amNewStoreEffectiveDate').value=todayISO();
     $('amMapHistoryManager').innerHTML='<option value="">Semua Area Manager</option>'+managerRows.map(x=>`<option value="${amMapEscape(x.name)}">${amMapEscape(x.name)}</option>`).join('');
     if(!$('amMapEffectiveDate').value)$('amMapEffectiveDate').value=todayISO();
     $('amMapCurrentTable').innerHTML=`<table style="min-width:650px"><thead><tr><th>STORE ID</th><th>STORE</th><th>STATUS</th><th>AREA MANAGER</th><th>UPDATED AT</th></tr></thead><tbody>${mapRows.map(x=>`<tr><td>${amMapEscape(x.id)}</td><td><b>${amMapEscape(x.store)}</b></td><td>${amMapEscape(x.status)}</td><td>${amMapEscape(x.areaManager||'-')}</td><td>${amMapEscape(amMapDate(x.updatedAt))}</td></tr>`).join('')||'<tr><td colspan="5" class="empty">Belum ada data mapping.</td></tr>'}</tbody></table>`;
@@ -4010,6 +4025,29 @@ async function loadAreaMappingPage(){
   }catch(err){console.error(err);toast('Gagal memuat Mapping Area: '+(err.message||err));}
   finally{showLoading(false);}
 }
+async function addNewStoreFromMapping(){
+  const payload={
+    action:'addStoreToMaster',
+    store:($('amNewStoreName').value||'').trim(),
+    areaManager:$('amNewStoreManager').value,
+    effectiveDate:$('amNewStoreEffectiveDate').value,
+    changedBy:$('amNewStoreChangedBy').value||'RENALDI HIMAWAN',
+    notes:$('amNewStoreNotes').value||''
+  };
+  if(!payload.store||!payload.areaManager||!payload.effectiveDate){toast('Nama Store, Area Manager, dan tanggal mulai wajib diisi.');return;}
+  if(!confirm('Tambahkan store '+payload.store.toUpperCase()+' ke MASTER STORE dan hubungkan ke '+payload.areaManager+'?'))return;
+  showLoading(true);
+  try{
+    const result=await apiPost(payload);
+    toast((result.message||'Store berhasil ditambahkan.')+' ID: '+(result.id||'-'));
+    $('amNewStoreName').value='';
+    $('amNewStoreNotes').value='';
+    await loadAreaMappingPage();
+    if(typeof loadDashboard==='function')await loadDashboard();
+  }catch(err){console.error(err);toast('Gagal menambahkan store: '+(err.message||err));}
+  finally{showLoading(false);}
+}
+
 async function loadAreaMappingHistory(){
   try{
     const filters={storeId:$('amMapHistoryStore')?.value||'',areaManager:$('amMapHistoryManager')?.value||''};
