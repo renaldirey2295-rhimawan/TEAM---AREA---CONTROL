@@ -602,10 +602,7 @@ button.btn:not(:disabled):hover{filter:saturate(1.12);box-shadow:0 7px 15px rgba
           <div class="field">
             <label>STORE *</label>
             <select id="salesStore" class="store-input">
-              <option value="">Pilih Store</option>
-              <option value="CITYWALK">CITYWALK</option>
-              <option value="CITRA TOWER">CITRA TOWER</option>
-              <option value="MENTENG">MENTENG</option>
+              <option value="">Memuat daftar store...</option>
             </select>
           </div>
 
@@ -693,7 +690,7 @@ button.btn:not(:disabled):hover{filter:saturate(1.12);box-shadow:0 7px 15px rgba
         <div class="form-grid sales-edit-search" style="margin:12px 0 16px">
           <div class="field"><label>TANGGAL AWAL</label><input id="salesHistoryFrom" type="date"></div>
           <div class="field"><label>TANGGAL AKHIR</label><input id="salesHistoryTo" type="date"></div>
-          <div class="field"><label>STORE</label><select id="salesHistoryStore"><option value="ALL">SEMUA STORE</option><option value="CITYWALK">CITYWALK</option><option value="CITRA TOWER">CITRA TOWER</option><option value="MENTENG">MENTENG</option></select></div>
+          <div class="field"><label>STORE</label><select id="salesHistoryStore"><option value="ALL">SEMUA STORE</option></select></div>
           <div class="field" style="display:flex;align-items:end;gap:8px"><button class="btn btn-primary full" onclick="searchSalesHistory()">🔎 Cari Data Sales</button><button class="btn btn-light" onclick="clearSalesHistorySearch()">Reset</button></div>
         </div>
         <div id="salesEditModeNotice" class="store-only-note hidden" style="margin-bottom:12px;background:#fff5e6;border-color:#f0d5a8;color:#79531b"></div>
@@ -702,7 +699,7 @@ button.btn:not(:disabled):hover{filter:saturate(1.12);box-shadow:0 7px 15px rgba
       <div class="card" id="salesComparisonCard" style="margin-top:16px">
         <div class="card-head"><div><h3>📊 Sales Pembanding</h3><div class="small">Bandingkan SALES NETT dan TARGET dari dua bulan pilihan. Bulan yang sudah selesai memakai data penuh; bulan berjalan memakai MTD.</div><div class="small" id="salesComparisonPeriod" style="margin-top:5px;font-weight:600"></div></div></div>
         <div class="form-grid" style="margin:12px 0 16px">
-          <div class="field"><label>STORE</label><select id="salesComparisonStore"><option value="ALL">SEMUA STORE</option><option value="CITYWALK">CITYWALK</option><option value="CITRA TOWER">CITRA TOWER</option><option value="MENTENG">MENTENG</option></select></div>
+          <div class="field"><label>STORE</label><select id="salesComparisonStore"><option value="ALL">SEMUA STORE</option></select></div>
           <div class="field"><label>BULAN PERTAMA</label><input id="salesComparisonMonthA" type="month"></div>
           <div class="field"><label>BULAN KEDUA</label><input id="salesComparisonMonthB" type="month"></div>
           <div class="field" style="display:flex;align-items:end"><button class="btn btn-primary full" onclick="loadSalesComparison()">🔎 Compare Sales</button></div>
@@ -1502,6 +1499,39 @@ function initAfterLogin(){
   initPublicPortal();
 }
 
+/* =====================================================
+   SALES CONTROL - DYNAMIC STORE MASTER V1
+   Mengambil daftar store aktif dari MASTER STORE melalui API stores.
+===================================================== */
+let __salesMasterStoreRows = [];
+
+async function refreshSalesStoreOptions(){
+  const ids=['salesStore','salesHistoryStore','salesComparisonStore'];
+  const previous={};
+  ids.forEach(id=>{const el=$(id);previous[id]=el?el.value:'';});
+  try{
+    const response=await apiGet('stores');
+    const rows=Array.isArray(response?.data)?response.data:[];
+    __salesMasterStoreRows=rows.filter(x=>String(x.status||'ACTIVE').toUpperCase()==='ACTIVE' && String(x.store||'').trim());
+    if(!__salesMasterStoreRows.length) throw new Error('MASTER STORE belum memiliki store aktif.');
+    const escapeOption=value=>String(value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    const options=__salesMasterStoreRows.map(x=>`<option value="${escapeOption(x.store)}">${escapeOption(x.store)}</option>`).join('');
+    const sales=$('salesStore');
+    if(sales){sales.innerHTML='<option value="">Pilih Store</option>'+options;sales.value=__salesMasterStoreRows.some(x=>x.store===previous.salesStore)?previous.salesStore:'';}
+    ['salesHistoryStore','salesComparisonStore'].forEach(id=>{
+      const el=$(id);if(!el)return;
+      el.innerHTML='<option value="ALL">SEMUA STORE</option>'+options;
+      el.value=__salesMasterStoreRows.some(x=>x.store===previous[id])?previous[id]:'ALL';
+    });
+    return __salesMasterStoreRows;
+  }catch(err){
+    console.error('Gagal memuat MASTER STORE untuk Sales:',err);
+    const sales=$('salesStore');if(sales)sales.innerHTML='<option value="">Gagal memuat store</option>';
+    toast('Daftar Store Sales gagal dimuat: '+(err.message||err));
+    throw err;
+  }
+}
+
 function initPublicPortal(){
   state.user = {
     username:'PUBLIC',
@@ -1514,6 +1544,7 @@ function initPublicPortal(){
   $('appView').classList.remove('hidden');
 
   $('userPill').textContent = 'PUBLIC STORE PORTAL';
+  refreshSalesStoreOptions().catch(()=>{});
 
   ['salesStore','mtStore','kpiStore','swStore'].forEach(function(id){
     if($(id)) $(id).value='';
@@ -3810,6 +3841,14 @@ async function openModuleView(module,view){
 }
 function showPage(page){
   __setupModulePanels();
+  if(page==='sales'){
+    document.querySelectorAll('.page-section').forEach(x=>x.classList.add('hidden'));
+    const salesPage=__el('page-sales');if(salesPage)salesPage.classList.remove('hidden');
+    document.querySelectorAll('#nav button').forEach(btn=>btn.classList.toggle('active',btn.dataset.page==='sales'));
+    __moduleViewState.module='sales';__moduleViewState.view='dashboard';
+    refreshSalesStoreOptions().catch(()=>{});
+    return;
+  }
   if(page==='area-mapping'){
     document.querySelectorAll('.page-section').forEach(x=>x.classList.add('hidden'));
     const mapping=__el('page-area-mapping');if(mapping)mapping.classList.remove('hidden');
