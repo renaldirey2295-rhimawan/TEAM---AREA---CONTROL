@@ -474,6 +474,7 @@ button.btn:not(:disabled):hover{filter:saturate(1.12);box-shadow:0 7px 15px rgba
       <div class="nav-group">
         <div class="nav-group-title">ADMIN</div>
         <button data-page="admin" onclick="showPage('admin')"><span class="nav-icon">🛡</span><span>Admin Approval</span></button>
+        <button data-page="area-mapping" onclick="showPage('area-mapping')"><span class="nav-icon">🧭</span><span>Mapping Area</span></button>
       </div>
       <div class="nav-group nav-utility">
         <div class="nav-group-title">UTILITY</div>
@@ -1200,6 +1201,42 @@ button.btn:not(:disabled):hover{filter:saturate(1.12);box-shadow:0 7px 15px rgba
       </div>
 
       <div id="swDetail" class="card hidden" style="margin-top:16px"></div>
+    </section>
+
+    <section id="page-area-mapping" class="page-section hidden">
+      <div class="hero">
+        <h2>🧭 MASTER STORE & AREA MANAGER</h2>
+        <p>Kelola penanggung jawab setiap store. Perubahan mapping otomatis dicatat ke HISTORY MAPPING AREA.</p>
+      </div>
+      <div class="stats" style="margin-bottom:16px">
+        <div class="stat"><div class="icon">🏪</div><div class="label">TOTAL STORE</div><div id="amMapTotalStore" class="value">0</div></div>
+        <div class="stat"><div class="icon">👤</div><div class="label">AREA MANAGER AKTIF</div><div id="amMapTotalManager" class="value">0</div></div>
+        <div class="stat"><div class="icon">📝</div><div class="label">RIWAYAT MAPPING</div><div id="amMapTotalHistory" class="value">0</div></div>
+      </div>
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-head"><div><h3>🔁 Ubah Mapping Area Manager</h3><div class="small">Pilih Store dan Area Manager baru. Store ID tidak akan berubah.</div></div><button class="btn btn-light" onclick="loadAreaMappingPage()">↻ Refresh</button></div>
+        <div class="form-grid">
+          <div class="field"><label>STORE *</label><select id="amMapStore"><option value="">Memuat store...</option></select></div>
+          <div class="field"><label>AREA MANAGER BARU *</label><select id="amMapManager"><option value="">Memuat Area Manager...</option></select></div>
+          <div class="field"><label>TANGGAL EFEKTIF *</label><input id="amMapEffectiveDate" type="date"></div>
+          <div class="field"><label>DIUBAH OLEH</label><input id="amMapChangedBy" value="RENALDI HIMAWAN" readonly></div>
+          <div class="field full"><label>KETERANGAN</label><input id="amMapNotes" placeholder="Alasan atau catatan perubahan mapping"></div>
+        </div>
+        <div class="actions"><button class="btn btn-primary" onclick="saveAreaMapping()">💾 Simpan Mapping</button></div>
+        <div class="small" style="margin-top:8px">Tanggal efektif tidak boleh lebih dari hari ini. Riwayat sebelumnya tetap tersimpan.</div>
+      </div>
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-head"><div><h3>🏪 Mapping Store Saat Ini</h3><div class="small">Sumber data: MASTER STORE</div></div></div>
+        <div id="amMapCurrentTable" class="table-wrap"><div class="empty">Memuat data...</div></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><div><h3>📚 History Mapping Area</h3><div class="small">Catatan seluruh penetapan dan perubahan Area Manager.</div></div></div>
+        <div class="form-grid" style="margin-bottom:12px">
+          <div class="field"><label>FILTER STORE</label><select id="amMapHistoryStore" onchange="loadAreaMappingHistory()"><option value="">Semua Store</option></select></div>
+          <div class="field"><label>FILTER AREA MANAGER</label><select id="amMapHistoryManager" onchange="loadAreaMappingHistory()"><option value="">Semua Area Manager</option></select></div>
+        </div>
+        <div id="amMapHistoryTable" class="table-wrap"><div class="empty">Memuat riwayat...</div></div>
+      </div>
     </section>
 
     <section id="page-admin" class="page-section hidden">
@@ -3761,6 +3798,14 @@ async function openModuleView(module,view){
 }
 function showPage(page){
   __setupModulePanels();
+  if(page==='area-mapping'){
+    document.querySelectorAll('.page-section').forEach(x=>x.classList.add('hidden'));
+    const mapping=__el('page-area-mapping');if(mapping)mapping.classList.remove('hidden');
+    document.querySelectorAll('#nav button').forEach(btn=>btn.classList.toggle('active',btn.dataset.page==='area-mapping'));
+    __moduleViewState.module='area-mapping';__moduleViewState.view='mapping';
+    loadAreaMappingPage();
+    return;
+  }
   if(page==='admin'){
     document.querySelectorAll('.page-section').forEach(x=>x.classList.add('hidden'));
     const admin=__el('page-admin');if(admin)admin.classList.remove('hidden');
@@ -3930,6 +3975,62 @@ async function adminSmallwareAction(payload,successMessage){
   finally{showLoading(false);}
 }
 
+
+
+/* =========================================================
+   V8.5.1 - AREA MANAGER MAPPING UI
+========================================================= */
+function amMapEscape(value){
+  return String(value==null?'':value).replace(/[&<>"']/g,function(ch){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch];});
+}
+function amMapDate(value){
+  if(!value)return '-';
+  const d=value instanceof Date?value:new Date(value);
+  if(Number.isNaN(d.getTime()))return String(value);
+  return new Intl.DateTimeFormat('id-ID',{timeZone:'Asia/Jakarta',day:'2-digit',month:'short',year:'numeric'}).format(d);
+}
+async function loadAreaMappingPage(){
+  showLoading(true);
+  try{
+    const [stores,managers,mapping,history]=await Promise.all([
+      apiGet('stores'),apiGet('masterAreaManagers'),apiGet('storeAreaMapping'),apiGet('areaMappingHistory')
+    ]);
+    const storeRows=stores.data||[], managerRows=managers.data||[], mapRows=mapping.data||[], historyRows=history.data||[];
+    $('amMapTotalStore').textContent=storeRows.length;
+    $('amMapTotalManager').textContent=managerRows.length;
+    $('amMapTotalHistory').textContent=historyRows.length;
+    const storeOptions=storeRows.map(x=>`<option value="${amMapEscape(x.id)}">${amMapEscape(x.store)} (${amMapEscape(x.id)})</option>`).join('');
+    $('amMapStore').innerHTML='<option value="">Pilih Store</option>'+storeOptions;
+    $('amMapHistoryStore').innerHTML='<option value="">Semua Store</option>'+storeRows.map(x=>`<option value="${amMapEscape(x.id)}">${amMapEscape(x.store)}</option>`).join('');
+    $('amMapManager').innerHTML='<option value="">Pilih Area Manager</option>'+managerRows.map(x=>`<option value="${amMapEscape(x.name)}">${amMapEscape(x.name)}</option>`).join('');
+    $('amMapHistoryManager').innerHTML='<option value="">Semua Area Manager</option>'+managerRows.map(x=>`<option value="${amMapEscape(x.name)}">${amMapEscape(x.name)}</option>`).join('');
+    if(!$('amMapEffectiveDate').value)$('amMapEffectiveDate').value=todayISO();
+    $('amMapCurrentTable').innerHTML=`<table style="min-width:650px"><thead><tr><th>STORE ID</th><th>STORE</th><th>STATUS</th><th>AREA MANAGER</th><th>UPDATED AT</th></tr></thead><tbody>${mapRows.map(x=>`<tr><td>${amMapEscape(x.id)}</td><td><b>${amMapEscape(x.store)}</b></td><td>${amMapEscape(x.status)}</td><td>${amMapEscape(x.areaManager||'-')}</td><td>${amMapEscape(amMapDate(x.updatedAt))}</td></tr>`).join('')||'<tr><td colspan="5" class="empty">Belum ada data mapping.</td></tr>'}</tbody></table>`;
+    await loadAreaMappingHistory();
+  }catch(err){console.error(err);toast('Gagal memuat Mapping Area: '+(err.message||err));}
+  finally{showLoading(false);}
+}
+async function loadAreaMappingHistory(){
+  try{
+    const filters={storeId:$('amMapHistoryStore')?.value||'',areaManager:$('amMapHistoryManager')?.value||''};
+    const result=await apiGet('areaMappingHistory',filters), rows=result.data||[];
+    $('amMapTotalHistory').textContent=rows.length;
+    $('amMapHistoryTable').innerHTML=`<table style="min-width:900px"><thead><tr><th>TIMESTAMP</th><th>STORE</th><th>AREA MANAGER SEBELUMNYA</th><th>AREA MANAGER BARU</th><th>TANGGAL EFEKTIF</th><th>CHANGED BY</th><th>KETERANGAN</th></tr></thead><tbody>${rows.map(x=>`<tr><td>${amMapEscape(amMapDate(x.timestamp))}</td><td><b>${amMapEscape(x.store)}</b><br><small>${amMapEscape(x.storeId)}</small></td><td>${amMapEscape(x.previousAreaManager||'-')}</td><td>${amMapEscape(x.newAreaManager||'-')}</td><td>${amMapEscape(amMapDate(x.effectiveDate))}</td><td>${amMapEscape(x.changedBy||'-')}</td><td>${amMapEscape(x.notes||'-')}</td></tr>`).join('')||'<tr><td colspan="7" class="empty">Tidak ada riwayat sesuai filter.</td></tr>'}</tbody></table>`;
+  }catch(err){console.error(err);$('amMapHistoryTable').innerHTML='<div class="empty">Gagal memuat riwayat: '+amMapEscape(err.message||err)+'</div>';}
+}
+async function saveAreaMapping(){
+  const payload={action:'updateStoreAreaMapping',storeId:$('amMapStore').value,areaManager:$('amMapManager').value,effectiveDate:$('amMapEffectiveDate').value,changedBy:$('amMapChangedBy').value||'RENALDI HIMAWAN',notes:$('amMapNotes').value||''};
+  if(!payload.storeId||!payload.areaManager||!payload.effectiveDate){toast('Store, Area Manager, dan tanggal efektif wajib diisi.');return;}
+  if(!confirm('Simpan perubahan mapping Area Manager untuk Store yang dipilih? Riwayat perubahan akan dicatat.'))return;
+  showLoading(true);
+  try{
+    const result=await apiPost(payload);
+    toast(result.message||'Mapping berhasil disimpan.');
+    $('amMapNotes').value='';
+    await loadAreaMappingPage();
+  }catch(err){console.error(err);toast('Gagal menyimpan mapping: '+(err.message||err));}
+  finally{showLoading(false);}
+}
 </script>
 
 
