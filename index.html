@@ -588,6 +588,24 @@ button.btn:not(:disabled):hover{filter:saturate(1.12);box-shadow:0 7px 15px rgba
     </section>
 
     <section id="page-sales" class="page-section hidden">
+      <div class="card" id="externalSalesControlCard" style="margin-bottom:16px;border:1px solid #b7d8c5">
+        <div class="card-head"><div><h3>📊 SALES CONTROL TERINTEGRASI</h3><div class="small">Data dibaca langsung dari spreadsheet Sales Control terpisah. Mode read-only; database sumber tidak diubah.</div></div><button class="btn btn-light" onclick="loadExternalSalesControl()">↻ Refresh</button></div>
+        <div class="form-grid" style="margin:12px 0">
+          <div class="field"><label>BULAN</label><input type="month" id="externalSalesMonth"></div>
+          <div class="field"><label>STORE</label><select id="externalSalesStore"><option value="ALL">SEMUA STORE AKTIF</option></select></div>
+          <div class="field" style="display:flex;align-items:end"><button class="btn btn-primary full" onclick="loadExternalSalesControl()">Tampilkan Data</button></div>
+        </div>
+        <div class="stats" style="margin:12px 0">
+          <div class="stat"><div class="label">SALES GROSS</div><div class="value" id="externalSalesGross">Rp 0</div></div>
+          <div class="stat"><div class="label">SALES NETT</div><div class="value" id="externalSalesNett">Rp 0</div></div>
+          <div class="stat"><div class="label">15%</div><div class="value" id="externalSalesTax">Rp 0</div></div>
+          <div class="stat"><div class="label">JUMLAH RECORD</div><div class="value" id="externalSalesCount">0</div></div>
+        </div>
+        <div id="externalSalesInfo" class="small" style="margin:8px 0;color:#64748b">Menunggu pemuatan data...</div>
+        <div class="table-wrap"><table style="min-width:850px"><thead><tr><th>TANGGAL</th><th>STORE</th><th class="number">SALES GROSS</th><th class="number">15%</th><th class="number">SALES NETT</th><th class="number">GROWTH</th></tr></thead><tbody id="externalSalesBody"><tr><td colspan="6" class="empty">Memuat data Sales Control...</td></tr></tbody></table></div>
+      </div>
+
+
       <div class="hero">
         <h2>💰 Sales Report</h2>
         <p>Input laporan sales harian store.</p>
@@ -602,7 +620,10 @@ button.btn:not(:disabled):hover{filter:saturate(1.12);box-shadow:0 7px 15px rgba
           <div class="field">
             <label>STORE *</label>
             <select id="salesStore" class="store-input">
-              <option value="">Memuat daftar store...</option>
+              <option value="">Pilih Store</option>
+              <option value="CITYWALK">CITYWALK</option>
+              <option value="CITRA TOWER">CITRA TOWER</option>
+              <option value="MENTENG">MENTENG</option>
             </select>
           </div>
 
@@ -690,7 +711,7 @@ button.btn:not(:disabled):hover{filter:saturate(1.12);box-shadow:0 7px 15px rgba
         <div class="form-grid sales-edit-search" style="margin:12px 0 16px">
           <div class="field"><label>TANGGAL AWAL</label><input id="salesHistoryFrom" type="date"></div>
           <div class="field"><label>TANGGAL AKHIR</label><input id="salesHistoryTo" type="date"></div>
-          <div class="field"><label>STORE</label><select id="salesHistoryStore"><option value="ALL">SEMUA STORE</option></select></div>
+          <div class="field"><label>STORE</label><select id="salesHistoryStore"><option value="ALL">SEMUA STORE</option><option value="CITYWALK">CITYWALK</option><option value="CITRA TOWER">CITRA TOWER</option><option value="MENTENG">MENTENG</option></select></div>
           <div class="field" style="display:flex;align-items:end;gap:8px"><button class="btn btn-primary full" onclick="searchSalesHistory()">🔎 Cari Data Sales</button><button class="btn btn-light" onclick="clearSalesHistorySearch()">Reset</button></div>
         </div>
         <div id="salesEditModeNotice" class="store-only-note hidden" style="margin-bottom:12px;background:#fff5e6;border-color:#f0d5a8;color:#79531b"></div>
@@ -699,7 +720,7 @@ button.btn:not(:disabled):hover{filter:saturate(1.12);box-shadow:0 7px 15px rgba
       <div class="card" id="salesComparisonCard" style="margin-top:16px">
         <div class="card-head"><div><h3>📊 Sales Pembanding</h3><div class="small">Bandingkan SALES NETT dan TARGET dari dua bulan pilihan. Bulan yang sudah selesai memakai data penuh; bulan berjalan memakai MTD.</div><div class="small" id="salesComparisonPeriod" style="margin-top:5px;font-weight:600"></div></div></div>
         <div class="form-grid" style="margin:12px 0 16px">
-          <div class="field"><label>STORE</label><select id="salesComparisonStore"><option value="ALL">SEMUA STORE</option></select></div>
+          <div class="field"><label>STORE</label><select id="salesComparisonStore"><option value="ALL">SEMUA STORE</option><option value="CITYWALK">CITYWALK</option><option value="CITRA TOWER">CITRA TOWER</option><option value="MENTENG">MENTENG</option></select></div>
           <div class="field"><label>BULAN PERTAMA</label><input id="salesComparisonMonthA" type="month"></div>
           <div class="field"><label>BULAN KEDUA</label><input id="salesComparisonMonthB" type="month"></div>
           <div class="field" style="display:flex;align-items:end"><button class="btn btn-primary full" onclick="loadSalesComparison()">🔎 Compare Sales</button></div>
@@ -1323,6 +1344,48 @@ const state = {
 
 const $ = id => document.getElementById(id);
 
+/* =========================================================
+   EXTERNAL SALES CONTROL CONNECTOR - READ ONLY
+========================================================= */
+async function loadExternalSalesControl(){
+  const body=$('externalSalesBody');
+  if(!body)return;
+  const month=$('externalSalesMonth')?.value||'';
+  const store=$('externalSalesStore')?.value||'ALL';
+  body.innerHTML='<tr><td colspan="6" class="empty">Memuat data dari Sales Control...</td></tr>';
+  try{
+    const result=await apiGet('externalSalesDashboard',{month:month,store:store});
+    const rows=Array.isArray(result.rows)?result.rows:[];
+    const summary=result.summary||{};
+    $('externalSalesGross').textContent=formatRupiah(Number(summary.gross)||0);
+    $('externalSalesNett').textContent=formatRupiah(Number(summary.nett)||0);
+    $('externalSalesTax').textContent=formatRupiah(Number(summary.tax)||0);
+    $('externalSalesCount').textContent=Number(summary.count||0).toLocaleString('id-ID');
+    const info=$('externalSalesInfo');
+    if(info)info.textContent='Sumber: '+(result.source||'SALES CONTROL')+' · '+(month||'Semua bulan')+' · '+(store==='ALL'?'Semua store aktif':store)+' · READ ONLY';
+    body.innerHTML=rows.length?rows.map(r=>'<tr><td>'+escapeHtml(r.date||'')+'</td><td>'+escapeHtml(r.store||'')+'</td><td class="number">'+formatRupiah(Number(r.gross)||0)+'</td><td class="number">'+formatRupiah(Number(r.tax)||0)+'</td><td class="number">'+formatRupiah(Number(r.nett)||0)+'</td><td class="number">'+(r.growth===''||r.growth===null?'-':escapeHtml(String(r.growth)))+'</td></tr>').join(''):'<tr><td colspan="6" class="empty">Belum ada data Sales untuk filter ini.</td></tr>';
+    populateExternalSalesStores(result.activeStores||[]);
+  }catch(err){
+    body.innerHTML='<tr><td colspan="6" class="empty">Gagal membaca Sales Control: '+escapeHtml(err.message||String(err))+'</td></tr>';
+    const info=$('externalSalesInfo');if(info)info.textContent='Periksa izin akses spreadsheet dan deployment backend.';
+    toast('Koneksi Sales Control: '+(err.message||err));
+  }
+}
+function populateExternalSalesStores(stores){
+  const select=$('externalSalesStore');if(!select)return;
+  const current=select.value||'ALL';
+  select.innerHTML='<option value="ALL">SEMUA STORE AKTIF</option>';
+  stores.forEach(store=>{const option=document.createElement('option');option.value=store;option.textContent=store;select.appendChild(option);});
+  select.value=[...select.options].some(o=>o.value===current)?current:'ALL';
+}
+function initializeExternalSalesFilter(){
+  const month=$('externalSalesMonth');
+  if(month&&!month.value){const now=new Date();month.value=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');}
+  if($('externalSalesStore')&&$('externalSalesStore').options.length<=1){
+    apiGet('stores').then(r=>populateExternalSalesStores((r.data||[]).map(x=>String(x.store||'').trim()).filter(Boolean))).catch(()=>{});
+  }
+}
+
 function showLoading(show){
   $('loading').classList.toggle('hidden', !show);
 }
@@ -1499,39 +1562,6 @@ function initAfterLogin(){
   initPublicPortal();
 }
 
-/* =====================================================
-   SALES CONTROL - DYNAMIC STORE MASTER V1
-   Mengambil daftar store aktif dari MASTER STORE melalui API stores.
-===================================================== */
-let __salesMasterStoreRows = [];
-
-async function refreshSalesStoreOptions(){
-  const ids=['salesStore','salesHistoryStore','salesComparisonStore'];
-  const previous={};
-  ids.forEach(id=>{const el=$(id);previous[id]=el?el.value:'';});
-  try{
-    const response=await apiGet('stores');
-    const rows=Array.isArray(response?.data)?response.data:[];
-    __salesMasterStoreRows=rows.filter(x=>String(x.status||'ACTIVE').toUpperCase()==='ACTIVE' && String(x.store||'').trim());
-    if(!__salesMasterStoreRows.length) throw new Error('MASTER STORE belum memiliki store aktif.');
-    const escapeOption=value=>String(value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-    const options=__salesMasterStoreRows.map(x=>`<option value="${escapeOption(x.store)}">${escapeOption(x.store)}</option>`).join('');
-    const sales=$('salesStore');
-    if(sales){sales.innerHTML='<option value="">Pilih Store</option>'+options;sales.value=__salesMasterStoreRows.some(x=>x.store===previous.salesStore)?previous.salesStore:'';}
-    ['salesHistoryStore','salesComparisonStore'].forEach(id=>{
-      const el=$(id);if(!el)return;
-      el.innerHTML='<option value="ALL">SEMUA STORE</option>'+options;
-      el.value=__salesMasterStoreRows.some(x=>x.store===previous[id])?previous[id]:'ALL';
-    });
-    return __salesMasterStoreRows;
-  }catch(err){
-    console.error('Gagal memuat MASTER STORE untuk Sales:',err);
-    const sales=$('salesStore');if(sales)sales.innerHTML='<option value="">Gagal memuat store</option>';
-    toast('Daftar Store Sales gagal dimuat: '+(err.message||err));
-    throw err;
-  }
-}
-
 function initPublicPortal(){
   state.user = {
     username:'PUBLIC',
@@ -1544,7 +1574,6 @@ function initPublicPortal(){
   $('appView').classList.remove('hidden');
 
   $('userPill').textContent = 'PUBLIC STORE PORTAL';
-  refreshSalesStoreOptions().catch(()=>{});
 
   ['salesStore','mtStore','kpiStore','swStore'].forEach(function(id){
     if($(id)) $(id).value='';
@@ -3841,14 +3870,6 @@ async function openModuleView(module,view){
 }
 function showPage(page){
   __setupModulePanels();
-  if(page==='sales'){
-    document.querySelectorAll('.page-section').forEach(x=>x.classList.add('hidden'));
-    const salesPage=__el('page-sales');if(salesPage)salesPage.classList.remove('hidden');
-    document.querySelectorAll('#nav button').forEach(btn=>btn.classList.toggle('active',btn.dataset.page==='sales'));
-    __moduleViewState.module='sales';__moduleViewState.view='dashboard';
-    refreshSalesStoreOptions().catch(()=>{});
-    return;
-  }
   if(page==='area-mapping'){
     document.querySelectorAll('.page-section').forEach(x=>x.classList.add('hidden'));
     const mapping=__el('page-area-mapping');if(mapping)mapping.classList.remove('hidden');
@@ -3871,6 +3892,13 @@ function showPage(page){
     document.querySelectorAll('#nav button').forEach(btn=>btn.classList.toggle('active',btn.dataset.page==='dashboard'));
     __moduleViewState.module='dashboard';__moduleViewState.view='dashboard';
     if(typeof loadDashboard==='function')loadDashboard();return;
+  }
+  if(page==='sales'){
+    document.querySelectorAll('.page-section').forEach(x=>x.classList.add('hidden'));
+    const sales=__el('page-sales');if(sales)sales.classList.remove('hidden');
+    document.querySelectorAll('#nav button').forEach(btn=>btn.classList.toggle('active',btn.dataset.page==='sales'));
+    __moduleViewState.module='sales';__moduleViewState.view='dashboard';
+    initializeExternalSalesFilter();loadExternalSalesControl();return;
   }
   if(__moduleSpecs[page]){
     __setModuleView(page,'menu');
