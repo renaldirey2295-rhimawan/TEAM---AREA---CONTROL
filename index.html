@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-  <!-- SYSTEM AREA CONTROL V14.1: REMOVE MANUAL AEON SENTUL AND CIBUBUR DROPDOWN OPTIONS. EXISTING FUNCTIONAL FLOW PRESERVED. -->
+  <!-- SYSTEM AREA CONTROL V14.3: STORE SOFT DELETE + ADMIN CONTROL LABEL. EXISTING FUNCTIONAL FLOW PRESERVED. -->
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>SYSTEM AREA CONTROL</title>
 <style>
@@ -473,7 +473,7 @@ button.btn:not(:disabled):hover{filter:saturate(1.12);box-shadow:0 7px 15px rgba
       </div>
       <div class="nav-group">
         <div class="nav-group-title">ADMIN</div>
-        <button data-page="admin" onclick="showPage('admin')"><span class="nav-icon">🛡</span><span>Admin Approval</span></button>
+        <button data-page="admin" onclick="showPage('admin')"><span class="nav-icon">🛡</span><span>Admin Control</span></button>
       </div>
       <div class="nav-group nav-utility">
         <div class="nav-group-title">UTILITY</div>
@@ -1527,7 +1527,10 @@ async function loadStoreManagement(){
     }
     target.innerHTML = `<div class="table-wrap"><table><thead><tr><th>STORE ID</th><th>NAMA STORE</th><th>STATUS</th><th>AKSI</th></tr></thead><tbody>${rows.map(x=>{
       const active = String(x.status).toUpperCase() === 'ACTIVE';
-      return `<tr><td>${escapeHtml(x.id)}</td><td><b>${escapeHtml(x.store)}</b></td><td><span class="badge ${active?'badge-open':'badge-closed'}">${escapeHtml(x.status)}</span></td><td><button class="btn ${active?'btn-danger':'btn-primary'}" onclick="changeStoreStatus('${escapeAttr(x.id)}','${active?'INACTIVE':'ACTIVE'}','${escapeAttr(x.store)}')">${active?'Nonaktifkan':'Aktifkan Kembali'}</button></td></tr>`;
+      const inactive = String(x.status).toUpperCase() === 'INACTIVE';
+      const statusButton = `<button class="btn ${active?'btn-danger':'btn-primary'}" onclick="changeStoreStatus('${escapeAttr(x.id)}','${active?'INACTIVE':'ACTIVE'}','${escapeAttr(x.store)}')">${active?'Nonaktifkan':'Aktifkan Kembali'}</button>`;
+      const deleteButton = inactive ? ` <button class="btn btn-danger" style="margin-left:8px" onclick="deleteStore('${escapeAttr(x.id)}','${escapeAttr(x.store)}')">Hapus</button>` : '';
+      return `<tr><td>${escapeHtml(x.id)}</td><td><b>${escapeHtml(x.store)}</b></td><td><span class="badge ${active?'badge-open':'badge-closed'}">${escapeHtml(x.status)}</span></td><td>${statusButton}${deleteButton}</td></tr>`;
     }).join('')}</tbody></table></div>`;
   }catch(err){
     target.innerHTML = `<div class="empty">Gagal memuat MASTER STORE: ${escapeHtml(err.message || err)}</div>`;
@@ -1548,6 +1551,20 @@ async function submitNewStore(){
     await refreshFrontendStoreOptions();
     await loadDashboard();
   }catch(err){ toast(err.message || 'Gagal menambahkan store.'); }
+  finally{ showLoading(false); }
+}
+
+async function deleteStore(id,name){
+  const confirmed = confirm('HAPUS STORE "'+name+'"?\n\nStore harus berstatus INACTIVE. Store akan disembunyikan dari daftar pengelolaan dan pilihan input. Data transaksi/histori serta catatan MASTER STORE tetap disimpan dan tidak dihapus permanen.');
+  if(!confirmed) return;
+  try{
+    showLoading(true);
+    const res = await apiPost({action:'deleteStore',storeId:id,adminToken:state.adminToken});
+    toast(res.message || 'Store berhasil dihapus dari daftar aktif/nonaktif.');
+    await loadStoreManagement();
+    await refreshFrontendStoreOptions();
+    await loadDashboard();
+  }catch(err){ toast(err.message || 'Gagal menghapus store.'); }
   finally{ showLoading(false); }
 }
 
@@ -4008,7 +4025,7 @@ function renderAdminRequests(){
     const id = String(r.idRequest||r.id||'');
     const canApprove = status==='PENDING';
     const canOrder = status==='APPROVED';
-    const canComplete = status==='ORDERED'; // Admin/AM dapat mengonfirmasi melalui menu Admin Approval.
+    const canComplete = status==='ORDERED'; // Admin/AM dapat mengonfirmasi melalui menu Admin Control.
     const photo = r.fotoKerusakan ? `<a class="photo-link" href="${escapeAttr(r.fotoKerusakan)}" target="_blank" rel="noopener">Lihat Foto</a>` : 'Tidak ada foto';
     return `<div class="walk-card">
       <div class="walk-card-head"><div><strong>${escapeHtml(r.namaSmallware||'Smallware request')}</strong><div class="small">${escapeHtml(id)} • ${escapeHtml(r.store||'-')} • ${escapeHtml(r.jenisRequest||'-')}</div></div><span class="badge ${status==='PENDING'?'badge-open':(['COMPLETED','REJECTED'].includes(status)?'badge-done':'badge-progress')}">${escapeHtml(status)}</span></div>
