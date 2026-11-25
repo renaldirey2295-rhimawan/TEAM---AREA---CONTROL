@@ -4610,10 +4610,6 @@ tbody tr:hover td{background:#eff6ff!important}
 </style>
 
 
-/* =========================================================
-   V20.2 — COLORFUL TABLES
-   Visual-only enhancement: preserves HTML, JavaScript and API logic.
-   ========================================================= */
 <style id="v202-colorful-tables">
 /* Colorful table frame and header */
 .table-wrap{
@@ -4980,6 +4976,42 @@ main, .main, .content, .workspace, .main-content, #main, #content{
     document.addEventListener('DOMContentLoaded',initHeaderClock,{once:true});
   }else{
     initHeaderClock();
+  }
+})();
+</script>
+
+
+<script id="v206-orphan-banner-cleanup">
+(function () {
+  "use strict";
+  var marker = "V20.2" + " — COLORFUL TABLES";
+
+  function removeLeakedBannerText(root) {
+    if (!root || !root.childNodes) return;
+    Array.prototype.slice.call(root.childNodes).forEach(function (node) {
+      if (node.nodeType === 3 && node.nodeValue && node.nodeValue.indexOf(marker) !== -1) {
+        node.parentNode && node.parentNode.removeChild(node);
+        return;
+      }
+      if (node.nodeType === 1 && node.tagName !== "SCRIPT" && node.tagName !== "STYLE") {
+        removeLeakedBannerText(node);
+      }
+    });
+  }
+
+  function clean() {
+    removeLeakedBannerText(document.body);
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", clean, { once: true });
+  } else {
+    clean();
+  }
+
+  if (window.MutationObserver && document.body) {
+    var observer = new MutationObserver(function () { clean(); });
+    observer.observe(document.body, { childList: true, subtree: true });
   }
 })();
 </script>
