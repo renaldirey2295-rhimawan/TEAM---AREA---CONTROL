@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-  <!-- SYSTEM AREA CONTROL V14.4: STORE SOFT DELETE + ADMIN CONTROL LABEL. EXISTING FUNCTIONAL FLOW PRESERVED. -->
+  <!-- SYSTEM AREA CONTROL V14.5: STORE SOFT DELETE + ADMIN CONTROL LABEL. EXISTING FUNCTIONAL FLOW PRESERVED. -->
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>SYSTEM AREA CONTROL</title>
 <style>
@@ -2373,7 +2373,17 @@ function __renderWasteHistory(){
   const info=$('wasteHistoryRangeInfo'); if(info)info.textContent=rangeLabel;
   body.innerHTML=rows.length?rows.slice().sort((a,b)=>String(b.periodeAkhir||'').localeCompare(String(a.periodeAkhir||''))).map(x=>{
     const storeName=x.namaStore||x.storeName||x.namastore||x.namaToko||x.store||'-';
-    return `<tr><td>${escapeHtml(x.periodeMulai||'-')} s/d ${escapeHtml(x.periodeAkhir||'-')}</td><td>${escapeHtml(x.kode||'-')}</td><td>${escapeHtml(x.namaBarang||'-')}</td><td>${escapeHtml(x.satuan||'-')}</td><td><b>${Number(x.totalWaste||0).toLocaleString('id-ID',{maximumFractionDigits:2})}</b></td><td>${escapeHtml(storeName)}</td></tr>`;
+    // Label periode mengikuti rentang tanggal pencarian, dibatasi juga oleh periode asli baris.
+    // Contoh: periode sumber 01-31 Okt, pencarian 01-14 Okt => label 01-14 Okt.
+    const sourceStart=__wasteParseDate(x.periodeMulai);
+    const sourceEnd=__wasteParseDate(x.periodeAkhir||x.periodeMulai);
+    const searchStart=__wasteParseDate(from);
+    const searchEnd=__wasteParseDate(to);
+    const shownStart=searchStart&&sourceStart&&searchStart>sourceStart?searchStart:sourceStart;
+    const shownEnd=searchEnd&&sourceEnd&&searchEnd<sourceEnd?searchEnd:sourceEnd;
+    const fmt=d=>d?`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`:'-';
+    const periodLabel=`${fmt(shownStart)} s/d ${fmt(shownEnd)}`;
+    return `<tr><td>${escapeHtml(periodLabel)}</td><td>${escapeHtml(x.kode||'-')}</td><td>${escapeHtml(x.namaBarang||'-')}</td><td>${escapeHtml(x.satuan||'-')}</td><td><b>${Number(x.totalWaste||0).toLocaleString('id-ID',{maximumFractionDigits:2})}</b></td><td>${escapeHtml(storeName)}</td></tr>`;
   }).join(''):'<tr><td colspan="6" class="empty">Tidak ada data Waste pada rentang tanggal dan Store yang dipilih.</td></tr>';
 }
 async function loadWasteHistory(){
