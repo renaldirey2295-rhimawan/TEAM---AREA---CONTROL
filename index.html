@@ -4589,5 +4589,106 @@ tbody tr:hover td{background:#eff6ff!important}
 }
 </style>
 
+
+/* =========================================================
+   V20.2 — COLORFUL TABLES
+   Visual-only enhancement: preserves HTML, JavaScript and API logic.
+   ========================================================= */
+<style id="v202-colorful-tables">
+/* Colorful table frame and header */
+.table-wrap{
+  border:1px solid #cbd9eb!important;
+  border-radius:12px!important;
+  background:#ffffff!important;
+  box-shadow:0 5px 16px rgba(35,65,105,.07)!important;
+}
+.table-wrap table{
+  border-collapse:separate!important;
+  border-spacing:0!important;
+}
+.table-wrap thead th,
+table thead th{
+  background:linear-gradient(135deg,#dceafe 0%,#e9e3ff 52%,#dff5ee 100%)!important;
+  color:#243b60!important;
+  border-bottom:2px solid #c6d7ee!important;
+  border-right:1px solid rgba(154,174,205,.35)!important;
+  font-weight:800!important;
+  padding:12px 13px!important;
+}
+.table-wrap thead th:first-child{border-top-left-radius:8px}
+.table-wrap thead th:last-child{border-right:0!important;border-top-right-radius:8px}
+
+/* Soft alternating row colors */
+.table-wrap tbody tr:nth-child(odd) td,
+table tbody tr:nth-child(odd) td{
+  background:#ffffff!important;
+}
+.table-wrap tbody tr:nth-child(even) td,
+table tbody tr:nth-child(even) td{
+  background:#f1f6ff!important;
+}
+.table-wrap tbody tr:hover td,
+table tbody tr:hover td{
+  background:#e2efff!important;
+  color:#173b68!important;
+}
+
+/* First column acts as a visual row label */
+.table-wrap tbody td:first-child,
+table tbody td:first-child{
+  color:#294b78!important;
+  font-weight:700!important;
+  background:#edf4ff!important;
+  border-right:1px solid #dce7f5!important;
+}
+
+/* Light column separators and clearer cell spacing */
+.table-wrap tbody td,
+table tbody td{
+  border-bottom:1px solid #e1e9f3!important;
+  border-right:1px solid #edf1f7!important;
+  padding:10px 12px!important;
+}
+.table-wrap tbody td:last-child,
+table tbody td:last-child{border-right:0!important}
+
+/* Colored table section / subtotal rows where commonly marked */
+.table-wrap tr.total td,
+.table-wrap tr.subtotal td,
+.table-wrap tr.summary td,
+table tr.total td,
+table tr.subtotal td,
+table tr.summary td{
+  background:#e3f6ec!important;
+  color:#176344!important;
+  font-weight:800!important;
+  border-top:1px solid #bde6cf!important;
+}
+
+/* Status pills remain readable and distinct */
+.table-wrap td .badge,
+table td .badge{
+  font-weight:800!important;
+  border-radius:999px!important;
+}
+
+/* Inputs and action controls inside table cells */
+.table-wrap td input,
+.table-wrap td select,
+.table-wrap td textarea{
+  border:1px solid #cbd9ec!important;
+  background:#ffffff!important;
+  border-radius:7px!important;
+}
+
+/* Keep the colorful treatment responsive */
+@media(max-width:760px){
+  .table-wrap thead th,
+  table thead th{padding:10px 11px!important}
+  .table-wrap tbody td,
+  table tbody td{padding:9px 10px!important}
+}
+</style>
+
 </body>
 </html>
