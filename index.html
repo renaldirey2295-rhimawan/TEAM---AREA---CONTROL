@@ -447,7 +447,27 @@ button.btn:not(:disabled):hover{filter:saturate(1.12);box-shadow:0 7px 15px rgba
       </div>
     </div>
 
+    <div class="header-motivation" aria-label="Motivasi kerja">
+      <span class="motivation-icon">✦</span>
+      <div class="motivation-window">
+        <div class="motivation-track" id="motivationTrack">
+          <span>Kerja sama yang kuat menghasilkan pelayanan yang hebat.</span>
+          <span>Disiplin dalam proses, konsisten dalam kualitas.</span>
+          <span>Setiap detail pekerjaan adalah bagian dari kepuasan pelanggan.</span>
+          <span>Berikan yang terbaik, tumbuh bersama sebagai satu tim.</span>
+          <span>Target tercapai melalui komitmen dan tindakan nyata.</span>
+        </div>
+      </div>
+    </div>
+
     <div class="userbox">
+      <div class="header-live-clock" aria-label="Waktu saat ini">
+        <span class="live-dot"></span>
+        <div class="clock-copy">
+          <strong id="headerClock">--:--:--</strong>
+          <small id="headerDate">Memuat tanggal...</small>
+        </div>
+      </div>
       <div id="userPill" class="userpill">PORTAL STORE</div>
     </div>
   </header>
@@ -4800,6 +4820,169 @@ main, .main, .content, .workspace, .main-content, #main, #content{
   .card, .stat, .panel{transition:none!important}
 }
 </style>
+
+
+<style id="v204-header-motivation-clock">
+/* V20.4 — header motivational ticker and live Jakarta clock */
+.topbar{
+  min-height:76px;
+  gap:18px!important;
+}
+.header-motivation{
+  flex:1 1 420px;
+  min-width:160px;
+  max-width:760px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin:0 auto;
+  padding:10px 16px;
+  border:1px solid #dce7f7;
+  border-radius:14px;
+  background:linear-gradient(100deg,rgba(232,242,255,.92),rgba(244,239,255,.92),rgba(233,249,243,.92));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.9);
+  overflow:hidden;
+}
+.motivation-icon{
+  flex:0 0 auto;
+  color:#6e83c5;
+  font-size:18px;
+}
+.motivation-window{
+  min-width:0;
+  overflow:hidden;
+  white-space:nowrap;
+  mask-image:linear-gradient(90deg,transparent 0,#000 3%,#000 97%,transparent 100%);
+}
+.motivation-track{
+  display:flex;
+  width:max-content;
+  align-items:center;
+  gap:64px;
+  animation:v204-marquee 42s linear infinite;
+  color:#334d73;
+  font-size:13px;
+  font-weight:700;
+  letter-spacing:.1px;
+}
+.motivation-track span{display:inline-block}
+.header-motivation:hover .motivation-track{animation-play-state:paused}
+@keyframes v204-marquee{
+  from{transform:translateX(0)}
+  to{transform:translateX(-50%)}
+}
+.header-live-clock{
+  display:flex;
+  align-items:center;
+  gap:9px;
+  padding:7px 11px;
+  border:1px solid #dce7f2;
+  border-radius:12px;
+  background:#f7faff;
+  white-space:nowrap;
+}
+.live-dot{
+  width:8px;height:8px;
+  border-radius:50%;
+  background:#20b779;
+  box-shadow:0 0 0 4px rgba(32,183,121,.12);
+  flex:0 0 auto;
+}
+.clock-copy{display:flex;flex-direction:column;gap:1px}
+.clock-copy strong{
+  color:#243d60;
+  font-size:15px;
+  font-variant-numeric:tabular-nums;
+  letter-spacing:.5px;
+}
+.clock-copy small{
+  color:#71829a;
+  font-size:10px;
+  text-transform:capitalize;
+}
+@media(max-width:1050px){
+  .header-motivation{max-width:none;flex-basis:300px}
+  .userpill{display:none}
+}
+@media(max-width:760px){
+  .topbar{flex-wrap:wrap!important;padding:10px 12px!important;gap:9px!important}
+  .brand{flex:1 1 auto}
+  .brand h1{font-size:15px}
+  .brand small{font-size:10px}
+  .header-motivation{
+    order:3;
+    flex:1 0 100%;
+    max-width:none;
+    padding:8px 11px;
+  }
+  .motivation-track{font-size:12px;gap:42px}
+  .userbox{margin-left:auto}
+  .header-live-clock{padding:6px 9px}
+  .clock-copy strong{font-size:13px}
+  .clock-copy small{font-size:9px}
+}
+@media(prefers-reduced-motion:reduce){
+  .motivation-track{animation:none!important}
+}
+</style>
+
+
+<script id="v204-header-clock-script">
+(function(){
+  const quotes = [
+    'Kerja sama yang kuat menghasilkan pelayanan yang hebat.',
+    'Disiplin dalam proses, konsisten dalam kualitas.',
+    'Setiap detail pekerjaan adalah bagian dari kepuasan pelanggan.',
+    'Berikan yang terbaik, tumbuh bersama sebagai satu tim.',
+    'Target tercapai melalui komitmen dan tindakan nyata.',
+    'Pelayanan terbaik dimulai dari kepedulian terhadap hal kecil.',
+    'Tetap fokus, saling mendukung, dan tuntaskan pekerjaan dengan baik.',
+    'Kualitas bukan kebetulan, melainkan hasil dari kebiasaan yang baik.'
+  ];
+
+  function initHeaderClock(){
+    const clock = document.getElementById('headerClock');
+    const date = document.getElementById('headerDate');
+    const track = document.getElementById('motivationTrack');
+
+    if(track && !track.dataset.loopReady){
+      const original = quotes.map(q => '<span></span>').join('');
+      track.innerHTML = quotes.concat(quotes).map(q =>
+        '<span>' + q.replace(/[&<>"']/g, function(ch){
+          return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch];
+        }) + '</span>'
+      ).join('');
+      track.dataset.loopReady = '1';
+    }
+
+    function updateClock(){
+      const now = new Date();
+      const timeText = new Intl.DateTimeFormat('id-ID',{
+        timeZone:'Asia/Jakarta',
+        hour:'2-digit',minute:'2-digit',second:'2-digit',
+        hourCycle:'h23'
+      }).format(now);
+      const dateText = new Intl.DateTimeFormat('id-ID',{
+        timeZone:'Asia/Jakarta',
+        weekday:'short',day:'2-digit',month:'short',year:'numeric'
+      }).format(now);
+      if(clock) clock.textContent = timeText;
+      if(date) date.textContent = dateText + ' · WIB';
+    }
+
+    updateClock();
+    if(!window.__systemAreaHeaderClockTimer){
+      window.__systemAreaHeaderClockTimer = window.setInterval(updateClock,1000);
+    }
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded',initHeaderClock,{once:true});
+  }else{
+    initHeaderClock();
+  }
+})();
+</script>
 
 </body>
 </html>
