@@ -4690,5 +4690,116 @@ table td .badge{
 }
 </style>
 
+
+<style id="v203-executive-background">
+/* =========================================================
+   V20.3 — MODERN EXECUTIVE BACKGROUND
+   Visual-only CSS. Existing application logic is untouched.
+   ========================================================= */
+
+/* Main page canvas: soft blue / lavender / mint atmosphere */
+html, body{
+  background:
+    radial-gradient(ellipse at 8% 8%, rgba(119,166,255,.20) 0%, rgba(119,166,255,0) 34%),
+    radial-gradient(ellipse at 92% 16%, rgba(185,155,255,.18) 0%, rgba(185,155,255,0) 32%),
+    radial-gradient(ellipse at 78% 92%, rgba(111,219,190,.15) 0%, rgba(111,219,190,0) 35%),
+    linear-gradient(135deg,#edf4ff 0%,#f3f1ff 48%,#eefaf6 100%)!important;
+  background-attachment:fixed!important;
+}
+
+/* Keep the working area transparent so the background can be seen */
+main, .main, .content, .workspace, .main-content, #main, #content{
+  background-color:transparent!important;
+}
+
+/* Subtle decorative color fields behind page content */
+.page, .page-content, .content-area, .main-area{
+  position:relative;
+  isolation:isolate;
+}
+.page::before, .page-content::before, .content-area::before, .main-area::before{
+  content:"";
+  position:absolute;
+  z-index:-1;
+  pointer-events:none;
+  width:310px;
+  height:310px;
+  right:2.5%;
+  top:24px;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(126,164,255,.12) 0%,rgba(126,164,255,0) 72%);
+}
+.page::after, .page-content::after, .content-area::after, .main-area::after{
+  content:"";
+  position:absolute;
+  z-index:-1;
+  pointer-events:none;
+  width:260px;
+  height:260px;
+  left:1%;
+  bottom:4%;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(112,213,183,.12) 0%,rgba(112,213,183,0) 72%);
+}
+
+/* Retain crisp white surfaces for data readability */
+.card, .panel, .stat, .hero, .table-wrap, .modal-content,
+.form-card, .section-card{
+  background-color:rgba(255,255,255,.94)!important;
+  border:1px solid rgba(203,216,238,.88)!important;
+  box-shadow:0 8px 24px rgba(44,67,112,.075)!important;
+  backdrop-filter:blur(5px);
+  -webkit-backdrop-filter:blur(5px);
+}
+
+/* KPI cards receive restrained individual color accents */
+.stats .stat:nth-child(4n+1){
+  border-top:3px solid #72a7f7!important;
+}
+.stats .stat:nth-child(4n+2){
+  border-top:3px solid #a995ed!important;
+}
+.stats .stat:nth-child(4n+3){
+  border-top:3px solid #62c7a5!important;
+}
+.stats .stat:nth-child(4n+4){
+  border-top:3px solid #f0b66d!important;
+}
+
+/* Soft hover lift for cards, without changing layout */
+.card, .stat, .panel{
+  transition:box-shadow .18s ease, border-color .18s ease;
+}
+.card:hover, .stat:hover, .panel:hover{
+  box-shadow:0 11px 28px rgba(44,67,112,.11)!important;
+  border-color:#c5d7f3!important;
+}
+
+/* Preserve the dark navy navigation identity */
+#nav, nav, .sidebar{
+  background:linear-gradient(180deg,#1b3154 0%,#172b49 100%)!important;
+}
+
+/* Mobile: reduce decorative fields and keep the interface light */
+@media(max-width:760px){
+  html, body{background-attachment:scroll!important}
+  .page::before, .page::after,
+  .page-content::before, .page-content::after,
+  .content-area::before, .content-area::after,
+  .main-area::before, .main-area::after{
+    width:170px;height:170px;opacity:.65;
+  }
+  .card, .panel, .stat, .hero, .table-wrap{
+    backdrop-filter:none;
+    -webkit-backdrop-filter:none;
+  }
+}
+
+/* Respect reduced-motion preferences */
+@media(prefers-reduced-motion:reduce){
+  .card, .stat, .panel{transition:none!important}
+}
+</style>
+
 </body>
 </html>
