@@ -1224,9 +1224,10 @@ button.btn:not(:disabled):hover{filter:saturate(1.12);box-shadow:0 7px 15px rgba
           </div>
           <div class="form-grid">
             <div class="field"><label>MODUL REQUEST</label>
-              <select id="adminModule" onchange="loadAdminRequests()">
+              <select id="adminModule" onchange="switchAdminModule()">
                 <option value="smallware">Smallware</option>
                 <option value="maintenance">Maintenance (monitoring)</option>
+                <option value="stores">Manajemen Store</option>
               </select>
             </div>
             <div class="field"><label>FILTER STATUS</label>
@@ -1251,6 +1252,14 @@ button.btn:not(:disabled):hover{filter:saturate(1.12);box-shadow:0 7px 15px rgba
         <div class="card">
           <div class="card-head"><div><h3 id="adminListTitle">Daftar Request</h3><div id="adminListInfo" class="small">Data dimuat dari database modul asal.</div></div></div>
           <div id="adminRequestList"><div class="empty">Tekan Refresh untuk memuat request.</div></div>
+        </div>
+        <div id="storeManagementPanel" class="card hidden" style="margin-top:16px">
+          <div class="card-head"><div><h3>🏪 Manajemen Store</h3><div class="small">Tambah store, nonaktifkan, atau aktifkan kembali. Data histori tidak dihapus.</div></div><button class="btn btn-light" onclick="loadStoreManagement()">↻ Refresh</button></div>
+          <div class="form-grid">
+            <div class="field"><label>NAMA STORE BARU</label><input id="newStoreName" maxlength="60" placeholder="Contoh: SSS DEPOK"></div>
+          </div>
+          <div class="actions"><button class="btn btn-primary" onclick="submitNewStore()">＋ Tambah Store</button></div>
+          <div id="storeManagementList" style="margin-top:16px"><div class="empty">Memuat daftar store...</div></div>
         </div>
       </div>
     </section>
@@ -1439,6 +1448,126 @@ async function apiPost(payload){
 }
 
 
+// MASTER STORE dinamis: hanya store ACTIVE dipakai pada form input.
+let activeStoreMaster = [];
+
+async function refreshActiveStoreMaster(){
+  const result = await apiGet('stores');
+  activeStoreMaster = (result.data || []).map(x => ({
+    id:String(x.id || ''), store:String(x.store || '').trim(),
+    status:String(x.status || 'ACTIVE').toUpperCase()
+  })).filter(x => x.store && x.status === 'ACTIVE');
+  return activeStoreMaster;
+}
+
+function applyActiveStoresToSelect(select, includeAll){
+  if(!select) return;
+  const current = select.value;
+  const first = select.options[0];
+  const firstText = first ? first.textContent : 'Pilih Store';
+  const firstValue = first ? first.value : '';
+  select.innerHTML = '';
+  const opt = document.createElement('option');
+  opt.value = firstValue;
+  opt.textContent = firstText;
+  select.appendChild(opt);
+  activeStoreMaster.forEach(item => {
+    const o = document.createElement('option');
+    o.value = item.store;
+    o.textContent = item.store;
+    select.appendChild(o);
+  });
+  if(includeAll){
+    const all = document.createElement('option');
+    all.value = 'ALL'; all.textContent = 'SEMUA STORE';
+    select.appendChild(all);
+  }
+  if(Array.from(select.options).some(o => o.value === current)) select.value = current;
+}
+
+async function refreshFrontendStoreOptions(){
+  try{
+    await refreshActiveStoreMaster();
+    // Dropdown form input yang sudah menggunakan class store-input.
+    document.querySelectorAll('select.store-input').forEach(el => {
+      const includeAll = Array.from(el.options).some(o => o.value === 'ALL');
+      applyActiveStoresToSelect(el, includeAll);
+    });
+    // Filter history/dashboard yang memiliki pilihan ALL.
+    ['salesHistoryStore','salesComparisonStore','dashboardStore','swHistoryStore'].forEach(id => {
+      const el = document.getElementById(id);
+      if(el) applyActiveStoresToSelect(el, true);
+    });
+  }catch(err){
+    console.warn('Gagal memperbarui MASTER STORE aktif:', err);
+  }
+}
+
+function switchAdminModule(){
+  const module = $('adminModule')?.value || 'smallware';
+  const isStores = module === 'stores';
+  $('adminStats')?.classList.toggle('hidden', isStores);
+  $('adminRequestList')?.parentElement?.classList.toggle('hidden', isStores);
+  $('storeManagementPanel')?.classList.toggle('hidden', !isStores);
+  if(isStores) loadStoreManagement();
+  else loadAdminRequests();
+}
+
+async function loadStoreManagement(){
+  if(!isAM() || !state.adminToken) return;
+  const target = $('storeManagementList');
+  if(!target) return;
+  try{
+    showLoading(true);
+    const res = await apiGet('storeManagement',{adminToken:state.adminToken});
+    const rows = res.data || [];
+    if(!rows.length){
+      target.innerHTML = '<div class="empty">Belum ada data store pada MASTER STORE.</div>';
+      return;
+    }
+    target.innerHTML = `<div class="table-wrap"><table><thead><tr><th>STORE ID</th><th>NAMA STORE</th><th>STATUS</th><th>AKSI</th></tr></thead><tbody>${rows.map(x=>{
+      const active = String(x.status).toUpperCase() === 'ACTIVE';
+      return `<tr><td>${escapeHtml(x.id)}</td><td><b>${escapeHtml(x.store)}</b></td><td><span class="badge ${active?'badge-open':'badge-closed'}">${escapeHtml(x.status)}</span></td><td><button class="btn ${active?'btn-danger':'btn-primary'}" onclick="changeStoreStatus('${escapeAttr(x.id)}','${active?'INACTIVE':'ACTIVE'}','${escapeAttr(x.store)}')">${active?'Nonaktifkan':'Aktifkan Kembali'}</button></td></tr>`;
+    }).join('')}</tbody></table></div>`;
+  }catch(err){
+    target.innerHTML = `<div class="empty">Gagal memuat MASTER STORE: ${escapeHtml(err.message || err)}</div>`;
+    toast(err.message || 'Gagal memuat store.');
+  }finally{ showLoading(false); }
+}
+
+async function submitNewStore(){
+  const name = ($('newStoreName')?.value || '').trim();
+  if(!name){ toast('Nama store wajib diisi.'); return; }
+  if(!confirm('Tambahkan store baru "'+name.toUpperCase()+'"?')) return;
+  try{
+    showLoading(true);
+    const res = await apiPost({action:'addStore',store:name,adminToken:state.adminToken});
+    $('newStoreName').value = '';
+    toast(res.message || 'Store berhasil ditambahkan.');
+    await loadStoreManagement();
+    await refreshFrontendStoreOptions();
+    await loadDashboard();
+  }catch(err){ toast(err.message || 'Gagal menambahkan store.'); }
+  finally{ showLoading(false); }
+}
+
+async function changeStoreStatus(id,status,name){
+  const promptText = status === 'INACTIVE'
+    ? 'Nonaktifkan store "'+name+'"? Store tidak akan muncul pada pilihan input, tetapi seluruh data historis tetap tersimpan.'
+    : 'Aktifkan kembali store "'+name+'"?';
+  if(!confirm(promptText)) return;
+  try{
+    showLoading(true);
+    const res = await apiPost({action:'setStoreStatus',storeId:id,status:status,adminToken:state.adminToken});
+    toast(res.message || 'Status store diperbarui.');
+    await loadStoreManagement();
+    await refreshFrontendStoreOptions();
+    await loadDashboard();
+  }catch(err){ toast(err.message || 'Gagal mengubah status store.'); }
+  finally{ showLoading(false); }
+}
+
+
 async function login(){
   initPublicPortal();
 }
@@ -1450,10 +1579,12 @@ function logout(){
 
 
 function initAfterLogin(){
+  refreshFrontendStoreOptions();
   initPublicPortal();
 }
 
 function initPublicPortal(){
+  refreshFrontendStoreOptions();
   state.user = {
     username:'PUBLIC',
     nama:'PUBLIC USER',
@@ -3810,10 +3941,12 @@ async function verifyAdminPortal(){
     state.adminToken = result.adminToken || '';
     $('adminLocked').classList.add('hidden');
     $('adminUnlocked').classList.remove('hidden');
+    $('storeManagementPanel')?.classList.add('hidden');
     $('adminWelcome').textContent = 'Admin aktif: ' + (state.user.nama || state.user.username);
     $('userPill').textContent = 'ADMIN • ' + (state.user.nama || state.user.username);
     $('adminPassword').value = '';
     toast('Verifikasi Admin berhasil.');
+    await refreshFrontendStoreOptions();
     await loadAdminRequests();
   }catch(err){
     toast(err.message || 'Verifikasi Admin gagal.');
