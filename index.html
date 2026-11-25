@@ -1500,7 +1500,7 @@ async function refreshActiveStoreMaster(){
   return activeStoreMaster;
 }
 
-function applyActiveStoresToSelect(select, includeAll){
+function applyActiveStoresToSelect(select, includeAll, useCanonicalValue){
   if(!select) return;
   const current = select.value;
   const first = select.options[0];
@@ -1513,7 +1513,9 @@ function applyActiveStoresToSelect(select, includeAll){
   select.appendChild(opt);
   activeStoreMaster.forEach(item => {
     const o = document.createElement('option');
-    o.value = item.store;
+    // Sales Pembanding mengirim kode store standar ke SALES CONTROL API,
+    // sementara label tetap memakai nama tampilan dari MASTER STORE.
+    o.value = useCanonicalValue ? canonicalStore(item.store) : item.store;
     o.textContent = item.store;
     select.appendChild(o);
   });
@@ -1534,10 +1536,14 @@ async function refreshFrontendStoreOptions(){
       applyActiveStoresToSelect(el, includeAll);
     });
     // Filter history/dashboard yang memiliki pilihan ALL.
-    ['salesHistoryStore','salesComparisonStore','dashboardStore','swHistoryStore'].forEach(id => {
+    ['salesHistoryStore','dashboardStore','swHistoryStore'].forEach(id => {
       const el = document.getElementById(id);
       if(el) applyActiveStoresToSelect(el, true);
     });
+    // Khusus Sales Pembanding: label mengikuti MASTER STORE,
+    // tetapi value harus kode standar yang dikenali SALES CONTROL API.
+    const comparisonStore = document.getElementById('salesComparisonStore');
+    if(comparisonStore) applyActiveStoresToSelect(comparisonStore, true, true);
   }catch(err){
     console.warn('Gagal memperbarui MASTER STORE aktif:', err);
   }
