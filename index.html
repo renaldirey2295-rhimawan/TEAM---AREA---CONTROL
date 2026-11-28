@@ -5016,5 +5016,117 @@ main, .main, .content, .workspace, .main-content, #main, #content{
 })();
 </script>
 
+
+<style id="v207-soft-theme-bold-negative">
+/* V20.7 — softer workspace, stronger typography, negative values in red */
+:root{
+  --v207-page:#edf1f5;
+  --v207-surface:#fbfcfe;
+  --v207-surface-alt:#f2f5f9;
+  --v207-border:#dce4ed;
+  --v207-text:#26364b;
+  --v207-muted:#66788f;
+  --v207-navy:#183153;
+  --v207-negative:#d52f3e;
+}
+html,body{
+  background:var(--v207-page)!important;
+  color:var(--v207-text)!important;
+}
+body{
+  font-weight:600!important;
+}
+.page,.main,.content,.workspace,.app-content{
+  background:var(--v207-page)!important;
+}
+.card,.panel,.stat,.modal,.table-card,.content-card{
+  background:var(--v207-surface)!important;
+  border-color:var(--v207-border)!important;
+  box-shadow:0 5px 18px rgba(35,54,78,.045)!important;
+}
+h1,h2,h3,h4,h5,strong,b,th,label,.btn,button{
+  font-weight:750!important;
+}
+p,small,.muted,.description,.hint{
+  color:var(--v207-muted);
+  font-weight:600;
+}
+table{
+  color:var(--v207-text)!important;
+  font-weight:650!important;
+}
+thead th,table th{
+  font-weight:800!important;
+}
+tbody tr:nth-child(even){
+  background:#f1f5fb!important;
+}
+tbody tr:nth-child(odd){
+  background:#fbfcfe!important;
+}
+td,th{
+  border-color:#e1e8f0!important;
+}
+input,select,textarea{
+  color:var(--v207-text)!important;
+  font-weight:650!important;
+  background:#fff!important;
+  border-color:#d7e0ea!important;
+}
+.header-motivation{
+  background:var(--v207-navy)!important;
+  border:1px solid #29486f!important;
+  box-shadow:0 4px 12px rgba(24,49,83,.16)!important;
+}
+.header-motivation .motivation-track,
+.header-motivation .motivation-track span{
+  color:#fff!important;
+  font-weight:800!important;
+}
+.header-motivation .motivation-window{
+  mask-image:linear-gradient(90deg,transparent 0,#000 3%,#000 97%,transparent 100%);
+}
+.v207-negative{
+  color:var(--v207-negative)!important;
+  font-weight:850!important;
+}
+@media(prefers-color-scheme:dark){
+  /* Keep the requested soft light palette consistent across devices. */
+  html,body{background:var(--v207-page)!important;color:var(--v207-text)!important}
+}
+</style>
+<script id="v207-negative-values">
+(function(){
+  "use strict";
+  function isNegativeValue(text){
+    var s=String(text||"").replace(/\s/g,"");
+    if(!s) return false;
+    // Match negative currency/number values, not ordinary hyphenated words.
+    return /-\s*(?:Rp\.?|IDR)?\s*\d/i.test(String(text||"")) ||
+           /^\(\s*(?:Rp\.?|IDR)?\s*\d[\d.,]*\s*\)$/.test(String(text||"").trim());
+  }
+  function markNegativeValues(root){
+    if(!root||!root.querySelectorAll) return;
+    var cells=root.querySelectorAll("td,th,.kpi-value,.stat-value,.metric-value,.amount,.number");
+    cells.forEach(function(el){
+      if(isNegativeValue(el.textContent)) el.classList.add("v207-negative");
+      else el.classList.remove("v207-negative");
+    });
+  }
+  function run(){markNegativeValues(document);}
+  if(document.readyState==="loading"){
+    document.addEventListener("DOMContentLoaded",run,{once:true});
+  }else{run();}
+  if(window.MutationObserver&&document.body){
+    var timer=0;
+    var observer=new MutationObserver(function(){
+      if(timer) cancelAnimationFrame(timer);
+      timer=requestAnimationFrame(function(){timer=0;run();});
+    });
+    observer.observe(document.body,{childList:true,subtree:true,characterData:true});
+  }
+})();
+</script>
+
 </body>
 </html>
